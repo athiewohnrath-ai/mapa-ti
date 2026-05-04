@@ -414,8 +414,23 @@
       </div>
 
       <div class="setting-group">
+        <span class="setting-label">Chave de acesso</span>
+        <div class="setting-card">
+          <div class="setting-card-label">Chave da Anthropic</div>
+          <div class="setting-card-sub">Necessária para buscar dados do Notion. Fica salva no navegador.</div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <input type="password" id="api-key-input" placeholder="sk-ant-..." 
+              style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:11px;font-family:'DM Mono',monospace;outline:none;">
+            <button onclick="saveApiKey()" style="padding:6px 12px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;">Salvar</button>
+          </div>
+          <div id="api-key-status" style="font-size:10px;margin-top:6px;color:var(--text3)"></div>
+        </div>
+        <button class="setting-reset" onclick="clearApiKey()" style="color:var(--text3)">Esquecer chave salva</button>
+      </div>
+
+      <div class="setting-group">
         <span class="setting-label">Restaurar</span>
-        <button class="setting-reset" onclick="resetSettings()">↺ Restaurar padrões</button>
+        <button class="setting-reset" onclick="resetSettings()">↺ Restaurar padrões visuais</button>
       </div>
 
     </div>
@@ -464,7 +479,38 @@ function saveLocal() {
   try { localStorage.setItem('aw_map_v3', JSON.stringify({canvas:canvasData,settings})); } catch(e) {}
 }
 
-// ── Theme ──────────────────────────────────────────────────────────────────
+// ── Chave API ──────────────────────────────────────────────────────────────
+function getApiKey() {
+  return localStorage.getItem('aw_api_key') || '';
+}
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val.startsWith('sk-ant-')) {
+    document.getElementById('api-key-status').textContent = '⚠ A chave deve começar com sk-ant-';
+    document.getElementById('api-key-status').style.color = 'var(--red)';
+    return;
+  }
+  localStorage.setItem('aw_api_key', val);
+  document.getElementById('api-key-status').textContent = '✓ Chave salva com sucesso!';
+  document.getElementById('api-key-status').style.color = 'var(--green)';
+  document.getElementById('api-key-input').value = '••••••••••••••••';
+  setTimeout(()=>{ doRefresh(); }, 600);
+}
+function clearApiKey() {
+  localStorage.removeItem('aw_api_key');
+  document.getElementById('api-key-input').value = '';
+  document.getElementById('api-key-status').textContent = 'Chave removida.';
+}
+function syncApiKeyUI() {
+  const key = getApiKey();
+  const status = document.getElementById('api-key-status');
+  if (key) {
+    document.getElementById('api-key-input').value = '••••••••••••••••';
+    if (status) { status.textContent = '✓ Chave configurada'; status.style.color = 'var(--green)'; }
+  }
+}
+
+
 function applyTheme() {
   document.body.classList.toggle('dark', settings.dark);
   const tog = document.getElementById('dark-toggle');
@@ -494,7 +540,7 @@ function syncSettingsUI() { applyTheme(); applyNodeWidth(settings.nodeWidth); ap
 // ── Notion API ─────────────────────────────────────────────────────────────
 async function notionQuery(prompt) {
   const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST', headers:{'Content-Type':'application/json'},
+    method:'POST', headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01'},
     body:JSON.stringify({
       model:'claude-sonnet-4-20250514', max_tokens:1000,
       system:'Return ONLY a valid JSON array. No explanation, no markdown fences.',
@@ -515,7 +561,18 @@ async function loadConnTypes() {
 
 // ── Init ───────────────────────────────────────────────────────────────────
 async function init() {
-  loadLocal(); syncSettingsUI();
+  loadLocal(); syncSettingsUI(); syncApiKeyUI();
+
+  // Se não há chave salva, abre Config. automaticamente e avisa
+  if (!getApiKey()) {
+    tab('settings');
+    setStatus('err', 'Configure sua chave em Config. →');
+    modules=defaultModules(); connTypes=defaultConnTypes();
+    selectedConn=connTypes[0].id;
+    if (!canvasData.nodes.length) seedCanvas();
+    renderSidebar(); renderCanvas(); updateChips();
+    return;
+  }
   setStatus('loading','Carregando do Notion...');
   try {
     [modules,connTypes] = await Promise.all([loadModules(),loadConnTypes()]);
