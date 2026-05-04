@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.04</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.05</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -343,7 +343,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.04</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.05</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -540,8 +540,9 @@ function syncSettingsUI() { applyTheme(); applyNodeWidth(settings.nodeWidth); ap
 
 // ── Notion API ─────────────────────────────────────────────────────────────
 async function notionQuery(prompt) {
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST', headers:{'Content-Type':'application/json','x-api-key':getApiKey(),'anthropic-version':'2023-06-01'},
+  const r = await fetch('https://n8n.athiewohnrath.com.br/webhook/mapa-ti-notion', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       model:'claude-sonnet-4-20250514', max_tokens:1000,
       system:'Return ONLY a valid JSON array. No explanation, no markdown fences.',
