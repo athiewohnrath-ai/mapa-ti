@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa de Sistemas de TI — Athié Wohnrath</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f0f11;
+    --bg2: #16161a;
+    --bg3: #1e1e24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8e8ec;
+    --text2: #8a8a9a;
+    --text3: #555568;
+    --accent: #4f8ef7;
+    --accent-dim: rgba(79,142,247,0.12);
+    --green: #2dd4a0;
+    --amber: #f0a832;
+    --red: #f05454;
+    --purple: #a78bfa;
+    --radius: 10px;
+    --radius-lg: 16px;
+    --sidebar-w: 280px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+  }
+
+  #sidebar-header {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  #logo-mark {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #4f8ef7, #a78bfa);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+
+  #logo-text { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+  #logo-sub { font-size: 10px; color: var(--text3); font-weight: 400; margin-top: 1px; }
+
+  #notion-status {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text3);
+    padding: 6px 10px;
+    background: var(--bg3);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.ok { background: var(--green); }
+  .status-dot.loading { background: var(--amber); animation: blink 1s infinite; }
+  .status-dot.err { background: var(--red); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+  #sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 6px;
+  }
+
+  .tab-btn {
+    flex: 1; padding: 10px 6px;
+    font-size: 12px; font-weight: 500;
+    color: var(--text3);
+    background: none; border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .15s;
+    font-family: inherit;
+  }
+  .tab-btn:hover { color: var(--text2); }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  #sidebar-content { flex: 1; overflow-y: auto; padding: 12px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+
+  .sidebar-action {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 8px 12px;
+    background: none;
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    color: var(--text3);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+    margin-bottom: 10px;
+    font-family: inherit;
+    text-align: left;
+  }
+  .sidebar-action:hover { background: var(--bg3); color: var(--text2); border-color: var(--border2); }
+
+  /* Module items */
+  .module-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 5px;
+    cursor: grab;
+    transition: all .15s;
+  }
+  .module-item:hover { border-color: var(--border2); transform: translateX(2px); }
+  .module-item:active { cursor: grabbing; }
+
+  .module-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .module-name { font-size: 12px; font-weight: 500; color: var(--text); }
+  .module-meta { font-size: 10px; color: var(--text3); margin-top: 1px; }
+
+  /* Conn types */
+  .conn-type-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .conn-type-item:hover { border-color: var(--border2); }
+  .conn-type-item.selected { border-color: var(--accent); background: var(--accent-dim); }
+
+  .conn-preview { width: 28px; height: 2px; flex-shrink: 0; border-radius: 1px; }
+  .conn-type-name { font-size: 12px; font-weight: 500; color: var(--text); }
+  .conn-type-desc { font-size: 10px; color: var(--text3); }
+
+  /* ── Canvas ── */
+  #canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  #edges-svg {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  #canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+  /* Nodes */
+  .canvas-node {
+    position: absolute;
+    min-width: 160px; max-width: 220px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    cursor: move;
+    user-select: none;
+    transition: box-shadow .2s, border-color .2s, transform .1s;
+  }
+  .canvas-node:hover {
+    border-color: rgba(255,255,255,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .canvas-node.connecting { border-color: var(--amber); cursor: crosshair; box-shadow: 0 0 0 2px rgba(240,168,50,0.2); }
+
+  .node-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .node-color { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .node-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
+
+  .node-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .node-tag {
+    font-size: 10px; padding: 2px 8px;
+    border-radius: 99px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+  .node-tag.status-ativo { color: var(--green); border-color: rgba(45,212,160,0.25); }
+  .node-tag.status-legado { color: var(--amber); border-color: rgba(240,168,50,0.25); }
+  .node-tag.status-desc { color: var(--red); border-color: rgba(240,84,84,0.25); }
+
+  .node-actions {
+    display: flex; gap: 5px;
+    margin-top: 10px;
+    opacity: 0; transition: opacity .15s;
+  }
+  .canvas-node:hover .node-actions { opacity: 1; }
+
+  .node-btn {
+    font-size: 10px; padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .1s;
+    font-family: inherit;
+  }
+  .node-btn:hover { background: var(--bg); color: var(--text); }
+  .node-btn.primary { color: var(--accent); border-color: rgba(79,142,247,0.3); background: var(--accent-dim); }
+
+  /* Toolbar */
+  #toolbar {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 4px; align-items: center;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 99px;
+    padding: 6px 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 50;
+  }
+
+  .tool-btn {
+    font-size: 12px; font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 99px;
+    border: none;
+    background: none;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all .15s;
+    font-family: inherit;
+  }
+  .tool-btn:hover { background: var(--bg3); color: var(--text); }
+  .tool-btn.active { background: var(--accent); color: #fff; }
+
+  .toolbar-sep { width: 1px; height: 18px; background: var(--border); margin: 0 4px; }
+
+  /* Status */
+  #statusbar {
+    position: absolute; top: 16px; right: 16px;
+    display: flex; gap: 6px; z-index: 50;
+  }
+  .chip {
+    font-size: 11px; padding: 4px 12px;
+    border-radius: 99px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* Connect banner */
+  #conn-banner {
+    display: none;
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--amber);
+    color: #000;
+    font-size: 12px; font-weight: 600;
+    padding: 7px 18px;
+    border-radius: 99px;
+    z-index: 60;
+  }
+
+  .empty { text-align: center; padding: 32px 16px; color: var(--text3); font-size: 12px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <div id="logo">
+      <div id="logo-mark">🗺</div>
+      <div>
+        <div id="logo-text">Athié Wohnrath</div>
+        <div id="logo-sub">Mapa de Sistemas de TI</div>
+      </div>
+    </div>
+    <div id="notion-status">
+      <div class="status-dot loading" id="sdot"></div>
+      <span id="slabel">Conectando ao Notion...</span>
+    </div>
+  </div>
+
+  <div id="sidebar-tabs">
+    <button class="tab-btn active" onclick="tab('modules')">Módulos</button>
+    <button class="tab-btn" onclick="tab('connections')">Conexões</button>
+  </div>
+
+  <div id="sidebar-content">
+    <div id="tab-modules">
+      <button class="sidebar-action" onclick="window.open('https://www.notion.so/4d202a202002492180014a2d890a45bb','_blank')">
+        ↗ &nbsp;Cadastrar módulo no Notion
+      </button>
+      <div id="modules-list"><div class="empty">Carregando...</div></div>
+    </div>
+    <div id="tab-connections" style="display:none">
+      <button class="sidebar-action" onclick="window.open('https://www.notion.so/7ede8840ee8a4f0dae94c03d5cbb075a','_blank')">
+        ↗ &nbsp;Cadastrar tipo de conexão
+      </button>
+      <div id="conn-types-list"><div class="empty">Carregando...</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="canvas-wrap">
+  <svg id="edges-svg"></svg>
+  <div id="canvas"></div>
+  <div id="conn-banner">Clique em outro módulo para conectar — ESC para cancelar</div>
+  <div id="statusbar">
+    <div class="chip" id="chip-nodes">— módulos</div>
+    <div class="chip" id="chip-edges">— conexões</div>
+  </div>
+  <div id="toolbar">
+    <button class="tool-btn active" id="tbtn-select" onclick="setTool('select')">Selecionar</button>
+    <button class="tool-btn" id="tbtn-connect" onclick="setTool('connect')">Conectar</button>
+    <div class="toolbar-sep"></div>
+    <button class="tool-btn" onclick="doRefresh()">↺ Atualizar</button>
+    <button class="tool-btn" onclick="clearCanvas()">Limpar</button>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG — altere aqui se trocar de workspace ──────────────────────────────
+const MODULES_DS   = 'b53cceb5-f963-4b35-9148-31583956a150';
+const CONNTYPES_DS = 'f1c7ad50-13bb-4b6f-9417-59b7342c41a9';
+const NOTION_URL_MODULES  = 'https://www.notion.so/4d202a202002492180014a2d890a45bb';
+const NOTION_URL_CONNTYPES = 'https://www.notion.so/7ede8840ee8a4f0dae94c03d5cbb075a';
+const MCP_SERVER = { type:'url', url:'https://mcp.notion.com/mcp', name:'notion' };
+// ─────────────────────────────────────────────────────────────────────────────
+
+let modules = [], connTypes = [];
+let selectedConn = null;
+let tool = 'select';
+let connectingFrom = null;
+let drag = null, dragOff = {x:0,y:0};
+let canvas = { nodes: [], edges: [] };
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+function loadLocal() {
+  try { const s = localStorage.getItem('aw_map'); if(s) canvas = JSON.parse(s); } catch(e){}
+}
+function saveLocal() {
+  try { localStorage.setItem('aw_map', JSON.stringify(canvas)); } catch(e) {}
+}
+
+// ── Notion via Anthropic API ──────────────────────────────────────────────────
+async function notionQuery(prompt) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: 'Return ONLY a valid JSON array. No explanation, no markdown.',
+      messages: [{ role: 'user', content: prompt }],
+      mcp_servers: [MCP_SERVER]
+    })
+  });
+  const d = await r.json();
+  const txt = d.content?.filter(b=>b.type==='text').map(b=>b.text).join('') || '[]';
+  return JSON.parse(txt.replace(/```json|```/g,'').trim());
+}
+
+async function loadModules() {
+  return notionQuery(
+    `Query Notion data source "${MODULES_DS}". Return JSON array with: id (page url string), name (Nome field), color (Cor field), ambiente (Ambiente field), status (Status field), area (Área field — if JSON array, join as comma string), atualizacao (field "Atualização necessária"). Return ALL records.`
+  );
+}
+
+async function loadConnTypes() {
+  return notionQuery(
+    `Query Notion data source "${CONNTYPES_DS}". Return JSON array with: id (page url), name (Nome), color (Cor), style (field "Estilo da linha"), desc (Descrição). Return ALL records.`
+  );
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init() {
+  loadLocal();
+  setStatus('loading', 'Carregando do Notion...');
+  try {
+    [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
+    if (!connTypes.length) connTypes = defaultConnTypes();
+    selectedConn = connTypes[0]?.id;
+    setStatus('ok', `${modules.length} módulos · Notion conectado`);
+    if (!canvas.nodes.length) seedCanvas();
+  } catch(e) {
+    console.warn('Notion offline, usando dados locais', e);
+    modules = defaultModules();
+    connTypes = defaultConnTypes();
+    selectedConn = connTypes[0].id;
+    setStatus('err', 'Modo offline — dados locais');
+    if (!canvas.nodes.length) seedCanvas();
+  }
+  renderSidebar();
+  renderCanvas();
+  updateChips();
+}
+
+function defaultModules() {
+  return [
+    {id:'m1',name:'ERP Totvs',color:'#4f8ef7',ambiente:'Local',status:'Ativo',area:'Financeiro, Operações, RH'},
+    {id:'m2',name:'CRM Salesforce',color:'#2dd4a0',ambiente:'Nuvem',status:'Ativo',area:'Comercial'},
+    {id:'m3',name:'Power BI',color:'#a78bfa',ambiente:'Nuvem',status:'Ativo',area:'Gestão, TI'},
+    {id:'m4',name:'Folha de Ponto',color:'#f0a832',ambiente:'Local',status:'Legado',area:'RH'},
+  ];
+}
+
+function defaultConnTypes() {
+  return [
+    {id:'ct1',name:'Fluxo de dados',color:'#4f8ef7',style:'Contínua',desc:'Dados trafegando entre sistemas'},
+    {id:'ct2',name:'Necessidade',color:'#f0a832',style:'Tracejada',desc:'Integração a desenvolver'},
+    {id:'ct3',name:'Desejo futuro',color:'#a78bfa',style:'Pontilhada',desc:'Conexão não priorizada'},
+    {id:'ct4',name:'Dependência crítica',color:'#f05454',style:'Contínua',desc:'Dependência obrigatória'},
+  ];
+}
+
+function seedCanvas() {
+  const pos = [{x:80,y:120},{x:360,y:80},{x:360,y:300},{x:80,y:300}];
+  canvas.nodes = modules.slice(0,4).map((m,i)=>({id:'n'+i, moduleId:m.id, x:pos[i]?.x||80+i*200, y:pos[i]?.y||100}));
+  canvas.edges = [
+    {id:'e0',from:'n0',to:'n1',connId:connTypes[0]?.id},
+    {id:'e1',from:'n0',to:'n3',connId:connTypes[3]?.id||connTypes[0]?.id},
+    {id:'e2',from:'n1',to:'n2',connId:connTypes[1]?.id||connTypes[0]?.id},
+  ];
+  saveLocal();
+}
+
+// ── Status ────────────────────────────────────────────────────────────────────
+function setStatus(type, msg) {
+  document.getElementById('sdot').className = 'status-dot '+type;
+  document.getElementById('slabel').textContent = msg;
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+function tab(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='modules')||(i===1&&t==='connections')));
+  document.getElementById('tab-modules').style.display   = t==='modules'?'':'none';
+  document.getElementById('tab-connections').style.display = t==='connections'?'':'none';
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const ml = document.getElementById('modules-list');
+  ml.innerHTML = modules.length
+    ? modules.map(m=>`
+        <div class="module-item" draggable="true" ondragstart="onDragStart(event,'${m.id}')">
+          <div class="module-dot" style="background:${m.color||'#666'}"></div>
+          <div>
+            <div class="module-name">${esc(m.name)}</div>
+            <div class="module-meta">${[m.ambiente,m.status].filter(Boolean).join(' · ')}</div>
+          </div>
+        </div>`).join('')
+    : '<div class="empty">Nenhum módulo. Cadastre no Notion.</div>';
+
+  const cl = document.getElementById('conn-types-list');
+  cl.innerHTML = connTypes.length
+    ? connTypes.map(ct=>`
+        <div class="conn-type-item ${selectedConn===ct.id?'selected':''}" onclick="pickConn('${ct.id}')">
+          <div class="conn-preview" style="${connPreviewStyle(ct)}"></div>
+          <div>
+            <div class="conn-type-name">${esc(ct.name)}</div>
+            <div class="conn-type-desc">${esc(ct.desc||'')}</div>
+          </div>
+        </div>`).join('')
+    : '<div class="empty">Nenhum tipo. Cadastre no Notion.</div>';
+}
+
+function connPreviewStyle(ct) {
+  const s = ct.style||'Contínua';
+  if (s==='Tracejada')  return `border-top:2px dashed ${ct.color};background:none;height:0;`;
+  if (s==='Pontilhada') return `border-top:2px dotted ${ct.color};background:none;height:0;`;
+  return `background:${ct.color};height:2px;`;
+}
+
+function pickConn(id) { selectedConn=id; renderSidebar(); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── Drag from sidebar ─────────────────────────────────────────────────────────
+function onDragStart(e, mid) { e.dataTransfer.setData('moduleId', mid); }
+
+document.getElementById('canvas-wrap').addEventListener('dragover', e=>e.preventDefault());
+document.getElementById('canvas-wrap').addEventListener('drop', e=>{
+  e.preventDefault();
+  const mid = e.dataTransfer.getData('moduleId');
+  if (!mid) return;
+  const rect = document.getElementById('canvas-wrap').getBoundingClientRect();
+  canvas.nodes.push({id:'n'+Date.now(), moduleId:mid, x:e.clientX-rect.left-90, y:e.clientY-rect.top-35});
+  saveLocal(); renderCanvas(); updateChips();
+});
+
+// ── Canvas render ─────────────────────────────────────────────────────────────
+function renderCanvas() {
+  const c = document.getElementById('canvas');
+  c.innerHTML = '';
+  canvas.nodes.forEach(node => {
+    const mod = modules.find(m=>m.id===node.moduleId);
+    if (!mod) return;
+    const statusClass = {Ativo:'status-ativo', Legado:'status-legado', Descontinuado:'status-desc'}[mod.status]||'';
+    const tags = [
+      mod.ambiente ? `<span class="node-tag">${esc(mod.ambiente)}</span>` : '',
+      mod.status   ? `<span class="node-tag ${statusClass}">${esc(mod.status)}</span>` : '',
+      ...(mod.area||'').split(',').slice(0,2).map(a=>a.trim()).filter(Boolean).map(a=>`<span class="node-tag">${esc(a)}</span>`),
+    ].join('');
+
+    const el = document.createElement('div');
+    el.className = 'canvas-node';
+    el.id = 'node-'+node.id;
+    el.style.left = node.x+'px';
+    el.style.top  = node.y+'px';
+    el.innerHTML = `
+      <div class="node-top">
+        <div class="node-color" style="background:${mod.color||'#666'}"></div>
+        <div class="node-title">${esc(mod.name)}</div>
+      </div>
+      <div class="node-tags">${tags}</div>
+      <div class="node-actions">
+        <button class="node-btn primary" onclick="startConnect('${node.id}')">Conectar</button>
+        <button class="node-btn" onclick="removeNode('${node.id}')">Remover</button>
+      </div>`;
+    el.addEventListener('mousedown', ev=>{
+      if (ev.target.classList.contains('node-btn')) return;
+      if (tool==='connect') { startConnect(node.id); return; }
+      drag = node.id;
+      const r = el.getBoundingClientRect();
+      dragOff = {x:ev.clientX-r.left, y:ev.clientY-r.top};
+      ev.preventDefault();
+    });
+    c.appendChild(el);
+  });
+  renderEdges();
+}
+
+document.addEventListener('mousemove', e=>{
+  if (!drag) return;
+  const wrap = document.getElementById('canvas-wrap').getBoundingClientRect();
+  const node = canvas.nodes.find(n=>n.id===drag);
+  if (!node) return;
+  node.x = Math.max(0, e.clientX-wrap.left-dragOff.x);
+  node.y = Math.max(0, e.clientY-wrap.top-dragOff.y);
+  const el = document.getElementById('node-'+drag);
+  if (el) { el.style.left=node.x+'px'; el.style.top=node.y+'px'; }
+  renderEdges();
+});
+
+document.addEventListener('mouseup', ()=>{ if(drag) saveLocal(); drag=null; });
+
+function removeNode(id) {
+  canvas.nodes = canvas.nodes.filter(n=>n.id!==id);
+  canvas.edges = canvas.edges.filter(e=>e.from!==id&&e.to!==id);
+  saveLocal(); renderCanvas(); updateChips();
+}
+
+// ── Edges ─────────────────────────────────────────────────────────────────────
+function nodeCenter(id) {
+  const el = document.getElementById('node-'+id);
+  const w  = document.getElementById('canvas-wrap').getBoundingClientRect();
+  if (!el) return {x:0,y:0};
+  const r = el.getBoundingClientRect();
+  return {x:r.left-w.left+r.width/2, y:r.top-w.top+r.height/2};
+}
+
+function renderEdges() {
+  const svg  = document.getElementById('edges-svg');
+  const wrap = document.getElementById('canvas-wrap');
+  svg.setAttribute('width',  wrap.offsetWidth);
+  svg.setAttribute('height', wrap.offsetHeight);
+
+  const safeid = s => (s||'').replace(/[^a-z0-9]/gi,'');
+
+  const defs = connTypes.map(ct=>`
+    <marker id="ah-${safeid(ct.id)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="${ct.color}" stroke-width="1.5" stroke-linecap="round"/>
+    </marker>`).join('');
+
+  const paths = canvas.edges.map(edge=>{
+    const ct = connTypes.find(c=>c.id===edge.connId) || connTypes[0];
+    if (!ct) return '';
+    const f = nodeCenter(edge.from), t = nodeCenter(edge.to);
+    const mx = (f.x+t.x)/2, my = (f.y+t.y)/2 - 30;
+    const dash = ct.style==='Tracejada' ? 'stroke-dasharray="8 5"' : ct.style==='Pontilhada' ? 'stroke-dasharray="2 6"' : '';
+    const aid  = safeid(ct.id);
+    return `
+      <path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}"
+        fill="none" stroke="${ct.color}" stroke-width="1.8" opacity="0.8" ${dash}
+        marker-end="url(#ah-${aid})"
+        style="pointer-events:stroke;cursor:pointer"
+        onclick="removeEdge('${edge.id}')"/>
+      <text x="${(f.x+t.x)/2}" y="${(f.y+t.y)/2-38}"
+        text-anchor="middle" font-size="10" fill="${ct.color}" opacity="0.6"
+        font-family="DM Mono, monospace">${esc(ct.name)}</text>`;
+  }).join('');
+
+  svg.innerHTML = `<defs>${defs}</defs>${paths}`;
+}
+
+// ── Connect mode ──────────────────────────────────────────────────────────────
+function setTool(t) {
+  tool = t;
+  document.getElementById('tbtn-select').classList.toggle('active',  t==='select');
+  document.getElementById('tbtn-connect').classList.toggle('active', t==='connect');
+  if (t!=='connect') cancelConnect();
+}
+
+function startConnect(nodeId) {
+  connectingFrom = nodeId;
+  document.getElementById('conn-banner').style.display = 'block';
+  document.querySelectorAll('.canvas-node').forEach(el=>{
+    el.classList.add('connecting');
+    el.onclick = ()=>{
+      const tid = el.id.replace('node-','');
+      if (tid!==connectingFrom) {
+        const exists = canvas.edges.find(e=>e.from===connectingFrom&&e.to===tid);
+        if (!exists) {
+          canvas.edges.push({id:'e'+Date.now(), from:connectingFrom, to:tid, connId:selectedConn||connTypes[0]?.id});
+          saveLocal(); renderEdges(); updateChips();
+        }
+      }
+      cancelConnect();
+    };
+  });
+}
+
+function cancelConnect() {
+  connectingFrom = null;
+  document.getElementById('conn-banner').style.display = 'none';
+  document.querySelectorAll('.canvas-node').forEach(el=>{
+    el.classList.remove('connecting');
+    el.onclick = null;
+  });
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') cancelConnect(); });
+
+function removeEdge(id) {
+  if (!confirm('Remover esta conexão?')) return;
+  canvas.edges = canvas.edges.filter(e=>e.id!==id);
+  saveLocal(); renderEdges(); updateChips();
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+async function doRefresh() {
+  setStatus('loading','Atualizando...');
+  try {
+    [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
+    selectedConn = connTypes[0]?.id;
+    setStatus('ok', `${modules.length} módulos carregados`);
+    renderSidebar(); renderCanvas();
+  } catch(e) {
+    setStatus('err','Erro ao atualizar');
+  }
+}
+
+function clearCanvas() {
+  if (!confirm('Limpar todo o canvas?')) return;
+  canvas = {nodes:[],edges:[]};
+  saveLocal(); renderCanvas(); updateChips();
+}
+
+function updateChips() {
+  document.getElementById('chip-nodes').textContent = canvas.nodes.length+' módulo'+(canvas.nodes.length!==1?'s':'');
+  document.getElementById('chip-edges').textContent = canvas.edges.length+' conexão'+(canvas.edges.length!==1?'ões':'');
+}
+
+init();
+</script>
+</body>
+</html>
