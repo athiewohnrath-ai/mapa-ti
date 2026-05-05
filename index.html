@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.32</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.33</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -97,19 +97,43 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .node:hover{box-shadow:var(--shadow2);}
 .node.connecting{border-color:var(--amber);cursor:crosshair;}
 .node.editing{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
-.ntop{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
-.ncol{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ntop{display:flex;align-items:center;margin-bottom:7px;}
+/* ncol removed */
 .ntitle{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;}
 .ntags{display:flex;flex-wrap:wrap;gap:3px;}
 .ntag{font-size:9px;padding:2px 7px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'DM Mono',monospace;}
 .ntag.s-ativo{color:var(--green);border-color:rgba(26,122,74,.25);}
 .ntag.s-legado{color:var(--amber);border-color:rgba(201,125,16,.25);}
 .ntag.s-desc{color:var(--red);}
-.nacts{display:flex;gap:4px;margin-top:9px;opacity:0;transition:opacity .15s;}
-.node:hover .nacts{opacity:1;}
-.nbtn{font-size:9px;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .1s;}
-.nbtn:hover{color:var(--text);}
-.nbtn.p{color:var(--accent);border-color:rgba(36,85,199,.25);background:var(--accent-dim);}
+/* ── Floating node toolbar ── */
+.node-toolbar {
+  position:absolute;
+  display:flex; gap:3px;
+  opacity:0; pointer-events:none;
+  transition:opacity .15s;
+  z-index:10;
+  transform:translateY(0);
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.15));
+}
+.node:hover ~ .node-toolbar,
+.node-toolbar:hover { opacity:1; pointer-events:auto; }
+#cv:has(.node:hover) .node-toolbar { opacity:0; pointer-events:none; }
+#cv .node:hover + .node-toolbar,
+#cv:hover .node-toolbar.show { opacity:1; }
+
+.ntb-btn {
+  font-size:10px; font-weight:500;
+  padding:4px 10px; border-radius:6px;
+  border:1px solid var(--border2);
+  background:var(--bg2);
+  color:var(--text2);
+  cursor:pointer; font-family:inherit;
+  transition:all .12s; white-space:nowrap;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+}
+.ntb-btn:hover{background:var(--bg3);color:var(--text);}
+.ntb-btn.p{color:var(--accent);border-color:rgba(36,85,199,.25);background:var(--bg2);}
+.ntb-btn.x{color:var(--red);padding:4px 8px;}
 
 /* Toolbar */
 #tb { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); display:flex; gap:3px; align-items:center; background:var(--bg2); border:1px solid var(--border2); border-radius:99px; padding:5px 10px; box-shadow:var(--shadow2); z-index:50; transition:background .3s; }
@@ -244,7 +268,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.32</div>
+      <div id="logo-ver">v1.33</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -361,22 +385,7 @@ select.tfi { cursor:pointer; }
     <div class="fl"><label>Desenvolvedor</label><select class="fi" id="ep-dev" onchange="window.dirty=true"></select></div>
     <div class="fl"><label>Ambiente</label><select class="fi" id="ep-amb" onchange="window.dirty=true"></select></div>
     <div class="fl"><label>Status</label><select class="fi" id="ep-sta" onchange="window.dirty=true"></select></div>
-    <div class="fl">
-      <label>Cor</label>
-      <div class="cr" id="ep-cr">
-        <div class="cd" data-c="#2455c7" style="background:#2455c7" onclick="pickC('#2455c7',this)"></div>
-        <div class="cd" data-c="#059669" style="background:#059669" onclick="pickC('#059669',this)"></div>
-        <div class="cd" data-c="#c97d10" style="background:#c97d10" onclick="pickC('#c97d10',this)"></div>
-        <div class="cd" data-c="#c42b2b" style="background:#c42b2b" onclick="pickC('#c42b2b',this)"></div>
-        <div class="cd" data-c="#6830c4" style="background:#6830c4" onclick="pickC('#6830c4',this)"></div>
-        <div class="cd" data-c="#c42b7a" style="background:#c42b7a" onclick="pickC('#c42b7a',this)"></div>
-        <div class="cd" data-c="#0891b2" style="background:#0891b2" onclick="pickC('#0891b2',this)"></div>
-        <div class="cd" data-c="#65a30d" style="background:#65a30d" onclick="pickC('#65a30d',this)"></div>
-        <div class="cd" data-c="#78716c" style="background:#78716c" onclick="pickC('#78716c',this)"></div>
-        <div class="cd" data-c="#1d4ed8" style="background:#1d4ed8" onclick="pickC('#1d4ed8',this)"></div>
-      </div>
-      <input type="hidden" id="ep-col" value="#2455c7">
-    </div>
+<!-- cor removida — usa tipo visual -->
     <div class="fl"><label>Tipo visual</label><select class="fi" id="ep-tipo" onchange="window.dirty=true;applyTipoPreview()"></select></div>
   </div>
   <div id="ep-ft">
@@ -897,13 +906,24 @@ function renderCanvas() {
     el.style.cssText = `left:${node.x}px;top:${node.y}px;width:${t.w||180}px;background:${bg};border:${t.borderW||1.5}px solid ${border};`;
     if(t.h) el.style.minHeight = t.h+'px';
 
-    el.innerHTML=`<div class="ntop"><div class="ncol" style="background:${m.color}"></div><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC}">${esc(m.name)}</div></div>
+    el.innerHTML=`<div class="ntop"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC}">${esc(m.name)}</div></div>
       <div class="ntags">${tags}</div>
-      <div class="nacts">
-        <button class="nbtn p" onclick="startConn('${node.id}')">Conectar</button>
-        <button class="nbtn" onclick="openEP('${m.id}','${node.id}')">Editar</button>
-        <button class="nbtn" onclick="removeNode('${node.id}')">×</button>
-      </div>`;
+`; // no actions inside node
+    el.addEventListener('mouseenter',()=>{
+      const tb=document.getElementById('tb-'+node.id);
+      if(tb) tb.style.opacity='1', tb.style.pointerEvents='auto';
+    });
+    el.addEventListener('mouseleave',(ev)=>{
+      // Keep visible if mouse moves to toolbar
+      setTimeout(()=>{
+        const tb=document.getElementById('tb-'+node.id);
+        if(!tb) return;
+        const tbRect=tb.getBoundingClientRect();
+        const mx=ev.clientX, my=ev.clientY;
+        if(mx>=tbRect.left&&mx<=tbRect.right&&my>=tbRect.top&&my<=tbRect.bottom) return;
+        tb.style.opacity='0'; tb.style.pointerEvents='none';
+      },50);
+    });
     el.addEventListener('mousedown',ev=>{
       if(ev.target.classList.contains('nbtn')) return;
       if(connFrom) return; // in connect mode, let mouseup handle it
@@ -913,6 +933,25 @@ function renderCanvas() {
       dragOff={x:ev.clientX-r.left,y:ev.clientY-r.top};
       ev.preventDefault();
     });
+    // Floating toolbar above node
+    const toolbar = document.createElement('div');
+    toolbar.className = 'node-toolbar';
+    toolbar.id = 'tb-'+node.id;
+    toolbar.style.left = node.x + 'px';
+    toolbar.style.top  = (node.y - 32) + 'px';
+    toolbar.innerHTML = `
+      <button class="ntb-btn p" onclick="startConn('${node.id}')">⟶ Conectar</button>
+      <button class="ntb-btn" onclick="openEP('${m.id}','${node.id}')">✎ Editar</button>
+      <button class="ntb-btn x" onclick="removeNode('${node.id}')">×</button>`;
+    cv.appendChild(toolbar);
+
+    toolbar.addEventListener('mouseleave',()=>{
+      toolbar.style.opacity='0'; toolbar.style.pointerEvents='none';
+    });
+    toolbar.addEventListener('mouseenter',()=>{
+      toolbar.style.opacity='1'; toolbar.style.pointerEvents='auto';
+    });
+
     cv.appendChild(el);
   });
   renderEdges();
@@ -926,6 +965,8 @@ document.addEventListener('mousemove',e=>{
   n.y=Math.max(0,e.clientY-w.top-dragOff.y);
   const el=document.getElementById('node-'+drag);
   if(el){el.style.left=n.x+'px';el.style.top=n.y+'px';}
+  const tb=document.getElementById('tb-'+drag);
+  if(tb){tb.style.left=n.x+'px';tb.style.top=(n.y-32)+'px';}
   renderEdges();
 });
 document.addEventListener('mouseup', e=>{
