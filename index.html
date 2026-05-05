@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.37</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.38</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -280,7 +280,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.37</div>
+      <div id="logo-ver">v1.38</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -644,6 +644,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4mvK7fnaKnAGEeE96X
 const MODS_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
 const CONN_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es`;
 const CANVAS_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Canvas`;
+const TIPOS_CSV  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tipos`;
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let modules = [], connTypes = [], canvas = {nodes:[], edges:[]};
@@ -765,6 +766,9 @@ async function init() {
   try {
     // Load modules and conn types from Sheets
     [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
+
+    // Load tipos from Sheets
+    await loadTiposFromSheets();
 
     // Load canvas from Sheets (positions + edges)
     const remoteCanvas = await loadCanvasFromSheets();
@@ -1218,6 +1222,7 @@ async function doRefresh(){
   setStatus('loading','Atualizando...');
   try{
     [modules,connTypes]=await Promise.all([loadModules(),loadConnTypes()]);
+    await loadTiposFromSheets();
     const rc=await loadCanvasFromSheets();
     if(rc&&rc.nodes&&rc.nodes.length){canvas=rc;saveLocal();}
     if(!connTypes.length) connTypes=defaultConns();
@@ -1263,6 +1268,29 @@ function loadTipos() {
     if (s) tipos = JSON.parse(s);
     if (!tipos.length) tipos = [{ ...DEFAULT_TIPO }];
   } catch(e) { tipos = [{ ...DEFAULT_TIPO }]; }
+}
+
+async function loadTiposFromSheets() {
+  try {
+    const r = await fetch(TIPOS_CSV + '&t=' + Date.now());
+    const txt = await r.text();
+    const lines = txt.trim().split('\n');
+    if (lines.length >= 2) {
+      const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"');
+      if (raw && raw.startsWith('[')) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.length) {
+          // Merge: keep default tipo, add/update rest
+          const hasDefault = parsed.find(t=>t.id==='default');
+          if (!hasDefault) parsed.unshift({...DEFAULT_TIPO});
+          tipos = parsed;
+          saveTiposLocal();
+          return true;
+        }
+      }
+    }
+  } catch(e) { console.log('loadTiposFromSheets error:', e); }
+  return false;
 }
 
 function saveTiposLocal() {
@@ -1454,21 +1482,24 @@ async function saveTipo() {
   closeTipoPanel();
   renderTiposList();
   fillTipoSelect();
-  renderCanvas(); // re-render all nodes with new tipo styles
+  renderCanvas();
+  setStatus('loading','Salvando tipo...');
   await saveTiposToSheets();
+  setStatus('ok', modules.length+' módulos · tipo salvo');
+  setTimeout(()=>setStatus('ok', modules.length+' módulos'), 2000);
 }
 
 function deleteTipo() {
   if (editingTipoId==='default') return;
   if (!confirm('Excluir este tipo? Os módulos que o usam voltarão ao padrão.')) return;
   tipos = tipos.filter(t=>t.id!==editingTipoId);
-  // Reset modules using this tipo
   modules.forEach(m=>{ if(m.tipo===editingTipoId) m.tipo='default'; });
   saveTiposLocal();
   closeTipoPanel();
   renderTiposList();
   fillTipoSelect();
   renderCanvas();
+  await saveTiposToSheets();
 }
 
 function fillTipoSelect() {
