@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.29</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.30</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -175,6 +175,60 @@ select.fi{cursor:pointer;}
 .grid-sz-btn { padding:3px 8px; border-radius:6px; border:1px solid var(--border2); background:var(--bg3); color:var(--text2); font-size:10px; cursor:pointer; font-family:inherit; transition:all .15s; }
 .grid-sz-btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
 
+
+/* ── Tipos visuais ── */
+.tipo-item { display:flex; align-items:center; gap:9px; padding:9px 11px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:5px; cursor:pointer; transition:all .15s; }
+.tipo-item:hover { border-color:var(--border2); }
+.tipo-preview { width:32px; height:24px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+.tipo-name { font-size:12px; font-weight:500; color:var(--text); flex:1; }
+.tipo-edit { font-size:11px; color:var(--text3); background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:5px; }
+.tipo-edit:hover { background:var(--bg); color:var(--accent); }
+
+/* Tipo editor panel */
+#tipo-panel { display:none; position:fixed; inset:0; z-index:250; align-items:center; justify-content:center; }
+#tipo-panel.open { display:flex; }
+#tipo-panel-bg { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(2px); }
+#tipo-box { position:relative; z-index:251; background:var(--bg2); border:1px solid var(--border2); border-radius:16px; width:560px; max-width:96vw; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 12px 48px rgba(0,0,0,.25); overflow:hidden; }
+#tipo-box-hd { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+#tipo-box-title { font-size:14px; font-weight:600; color:var(--text); }
+#tipo-box-close { background:none; border:none; font-size:20px; color:var(--text3); cursor:pointer; }
+#tipo-box-body { overflow-y:auto; padding:18px; flex:1; display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; }
+#tipo-box-body .full { grid-column:1/-1; }
+#tipo-box-ft { padding:13px 18px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
+
+.tfl { display:flex; flex-direction:column; gap:4px; }
+.tfl label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; }
+.tfi { padding:7px 10px; border-radius:8px; border:1px solid var(--border2); background:var(--bg3); color:var(--text); font-size:12px; font-family:inherit; outline:none; width:100%; }
+.tfi:focus { border-color:var(--accent); }
+select.tfi { cursor:pointer; }
+
+.shape-row { display:flex; gap:6px; flex-wrap:wrap; }
+.shape-opt { width:42px; height:36px; border-radius:6px; border:1.5px solid var(--border2); background:var(--bg3); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:all .15s; }
+.shape-opt:hover { border-color:var(--accent); }
+.shape-opt.on { border-color:var(--accent); background:var(--accent-dim); }
+
+.color-pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.color-pair label { font-size:9px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; display:block; }
+.color-inp { display:flex; gap:5px; align-items:center; }
+.color-inp input[type=color] { width:28px; height:28px; border-radius:6px; border:1px solid var(--border2); cursor:pointer; padding:0; }
+.color-inp input[type=text] { flex:1; }
+
+.field-check { display:flex; flex-wrap:wrap; gap:6px; }
+.fchk { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text); cursor:pointer; }
+.fchk input { cursor:pointer; }
+
+.section-lbl { font-size:11px; font-weight:600; color:var(--text2); padding-bottom:6px; border-bottom:1px solid var(--border); margin-bottom:2px; }
+
+/* Canvas node shapes */
+.node.shape-oval { border-radius:50px; }
+.node.shape-circle { border-radius:50%; aspect-ratio:1; }
+.node.shape-diamond { border-radius:0; transform:rotate(45deg); }
+.node.shape-diamond .node-inner { transform:rotate(-45deg); }
+.node.shape-hexagon { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; }
+.node.shape-star { clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); border-radius:0; }
+.node.shape-parallelogram { clip-path:polygon(10% 0%,100% 0%,90% 100%,0% 100%); border-radius:0; }
+.node.shape-cloud { border-radius:50% 50% 50% 50%/40% 40% 60% 60%; }
+
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
@@ -190,7 +244,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.29</div>
+      <div id="logo-ver">v1.30</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -198,6 +252,7 @@ select.fi{cursor:pointer;}
   <div id="tabs">
     <button class="tab on" onclick="tab('mods')">Módulos</button>
     <button class="tab" onclick="tab('conns')">Conexões</button>
+    <button class="tab" onclick="tab('tipos')">Tipos</button>
     <button class="tab" onclick="tab('cfg')">Config.</button>
   </div>
 
@@ -211,6 +266,13 @@ select.fi{cursor:pointer;}
     <!-- Conexões -->
     <div id="t-conns" style="display:none">
       <div id="conns-list"></div>
+    </div>
+
+
+    <!-- Tipos Visuais -->
+    <div id="t-tipos" style="display:none">
+      <button class="add-btn" onclick="openNewTipo()">+ Novo tipo visual</button>
+      <div id="tipos-list"></div>
     </div>
 
     <!-- Config -->
@@ -331,6 +393,198 @@ select.fi{cursor:pointer;}
 </div>
 
 <!-- Delete confirm dialog (reuse existing dlg-del) -->
+
+<!-- Tipo Visual Editor -->
+<div id="tipo-panel">
+  <div id="tipo-panel-bg" onclick="closeTipoPanel()"></div>
+  <div id="tipo-box">
+    <div id="tipo-box-hd">
+      <span id="tipo-box-title">Novo tipo visual</span>
+      <button id="tipo-box-close" onclick="closeTipoPanel()">×</button>
+    </div>
+    <div id="tipo-box-body">
+      <input type="hidden" id="tp-id">
+
+      <!-- Nome -->
+      <div class="tfl full">
+        <label>Nome do tipo</label>
+        <input class="tfi" id="tp-name" placeholder="Ex: Sistema crítico, Legado, Em desenvolvimento...">
+      </div>
+
+      <!-- Forma -->
+      <div class="tfl full">
+        <label>Forma do card</label>
+        <div class="shape-row" id="tp-shapes">
+          <div class="shape-opt on" data-shape="rect" onclick="pickShape('rect',this)" title="Retângulo">▭</div>
+          <div class="shape-opt" data-shape="oval" onclick="pickShape('oval',this)" title="Oval">⬭</div>
+          <div class="shape-opt" data-shape="circle" onclick="pickShape('circle',this)" title="Círculo">●</div>
+          <div class="shape-opt" data-shape="diamond" onclick="pickShape('diamond',this)" title="Diamante">◆</div>
+          <div class="shape-opt" data-shape="hexagon" onclick="pickShape('hexagon',this)" title="Hexágono">⬡</div>
+          <div class="shape-opt" data-shape="star" onclick="pickShape('star',this)" title="Estrela">★</div>
+          <div class="shape-opt" data-shape="parallelogram" onclick="pickShape('parallelogram',this)" title="Paralelogramo">▱</div>
+          <div class="shape-opt" data-shape="cloud" onclick="pickShape('cloud',this)" title="Nuvem">☁</div>
+        </div>
+        <input type="hidden" id="tp-shape" value="rect">
+      </div>
+
+      <!-- Tamanho -->
+      <div class="tfl">
+        <label>Largura (px)</label>
+        <input class="tfi" id="tp-w" type="number" min="80" max="400" value="180">
+      </div>
+      <div class="tfl">
+        <label>Altura mínima (px)</label>
+        <input class="tfi" id="tp-h" type="number" min="40" max="400" value="0" placeholder="Auto">
+      </div>
+
+      <!-- Fundo -->
+      <div class="tfl full">
+        <div class="section-lbl">Fundo do card</div>
+        <div class="color-pair">
+          <div>
+            <label>☀️ Modo dia</label>
+            <div class="color-inp">
+              <input type="color" id="tp-bg-light" value="#ffffff">
+              <input class="tfi" id="tp-bg-light-txt" value="#ffffff" oninput="syncColor('tp-bg-light',this.value)">
+            </div>
+          </div>
+          <div>
+            <label>🌙 Modo noite</label>
+            <div class="color-inp">
+              <input type="color" id="tp-bg-dark" value="#17171b">
+              <input class="tfi" id="tp-bg-dark-txt" value="#17171b" oninput="syncColor('tp-bg-dark',this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Borda -->
+      <div class="tfl full">
+        <div class="section-lbl">Borda</div>
+        <div class="color-pair">
+          <div>
+            <label>☀️ Cor dia</label>
+            <div class="color-inp">
+              <input type="color" id="tp-border-light" value="#e0e0e0">
+              <input class="tfi" id="tp-border-light-txt" value="#e0e0e0" oninput="syncColor('tp-border-light',this.value)">
+            </div>
+          </div>
+          <div>
+            <label>🌙 Cor noite</label>
+            <div class="color-inp">
+              <input type="color" id="tp-border-dark" value="#2a2a35">
+              <input class="tfi" id="tp-border-dark-txt" value="#2a2a35" oninput="syncColor('tp-border-dark',this.value)">
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:8px">
+          <label style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Espessura da borda (px)</label>
+          <input class="tfi" id="tp-border-w" type="number" min="0" max="10" value="1.5" step="0.5" style="width:80px;margin-top:4px">
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div class="tfl full">
+        <div class="section-lbl">Título</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px">
+          <div class="tfl">
+            <label>Fonte</label>
+            <select class="tfi" id="tp-title-font">
+              <option value="'DM Sans',sans-serif">DM Sans</option>
+              <option value="'Georgia',serif">Georgia</option>
+              <option value="'DM Mono',monospace">DM Mono</option>
+              <option value="'Arial',sans-serif">Arial</option>
+              <option value="'Courier New',monospace">Courier New</option>
+            </select>
+          </div>
+          <div class="tfl">
+            <label>Tamanho</label>
+            <input class="tfi" id="tp-title-size" type="number" min="8" max="32" value="12">
+          </div>
+          <div class="tfl">
+            <label>Peso</label>
+            <select class="tfi" id="tp-title-weight">
+              <option value="400">Normal</option>
+              <option value="500">Médio</option>
+              <option value="600" selected>Semi</option>
+              <option value="700">Bold</option>
+            </select>
+          </div>
+        </div>
+        <div class="color-pair" style="margin-top:8px">
+          <div>
+            <label>☀️ Cor dia</label>
+            <div class="color-inp">
+              <input type="color" id="tp-title-light" value="#1a1916">
+              <input class="tfi" id="tp-title-light-txt" value="#1a1916" oninput="syncColor('tp-title-light',this.value)">
+            </div>
+          </div>
+          <div>
+            <label>🌙 Cor noite</label>
+            <div class="color-inp">
+              <input type="color" id="tp-title-dark" value="#e8e8ec">
+              <input class="tfi" id="tp-title-dark-txt" value="#e8e8ec" oninput="syncColor('tp-title-dark',this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campos visíveis -->
+      <div class="tfl full">
+        <div class="section-lbl">Campos visíveis no card</div>
+        <div class="field-check">
+          <label class="fchk"><input type="checkbox" id="tp-show-area" checked> Área</label>
+          <label class="fchk"><input type="checkbox" id="tp-show-sta" checked> Status</label>
+          <label class="fchk"><input type="checkbox" id="tp-show-amb" checked> Ambiente</label>
+          <label class="fchk"><input type="checkbox" id="tp-show-dev"> Desenvolvedor</label>
+          <label class="fchk"><input type="checkbox" id="tp-show-desc"> Descrição</label>
+        </div>
+      </div>
+
+      <!-- Fonte dos campos -->
+      <div class="tfl full">
+        <div class="section-lbl">Fonte dos campos</div>
+        <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
+          <div class="tfl">
+            <label>Fonte</label>
+            <select class="tfi" id="tp-field-font">
+              <option value="'DM Mono',monospace">DM Mono</option>
+              <option value="'DM Sans',sans-serif">DM Sans</option>
+              <option value="'Arial',sans-serif">Arial</option>
+            </select>
+          </div>
+          <div class="tfl">
+            <label>Tamanho</label>
+            <input class="tfi" id="tp-field-size" type="number" min="7" max="16" value="9">
+          </div>
+        </div>
+        <div class="color-pair" style="margin-top:8px">
+          <div>
+            <label>☀️ Cor dia</label>
+            <div class="color-inp">
+              <input type="color" id="tp-field-light" value="#9a9890">
+              <input class="tfi" id="tp-field-light-txt" value="#9a9890" oninput="syncColor('tp-field-light',this.value)">
+            </div>
+          </div>
+          <div>
+            <label>🌙 Cor noite</label>
+            <div class="color-inp">
+              <input type="color" id="tp-field-dark" value="#55556a">
+              <input class="tfi" id="tp-field-dark-txt" value="#55556a" oninput="syncColor('tp-field-dark',this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div id="tipo-box-ft">
+      <button class="db d" id="tp-del-btn" onclick="deleteTipo()" style="margin-right:auto">Excluir tipo</button>
+      <button class="db g" onclick="closeTipoPanel()">Cancelar</button>
+      <button class="bs" onclick="saveTipo()">Salvar tipo</button>
+    </div>
+  </div>
+</div>
+
 <!-- Dialog: unsaved -->
 <div class="dlg" id="dlg-unsaved">
   <div class="dlg-bg" onclick="dlgUnsaved('cancel')"></div>
@@ -475,6 +729,7 @@ function showChip(txt, persist) {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   loadLocal();
+  loadTipos();
   applySett();
   setStatus('loading','Carregando...');
 
@@ -535,7 +790,7 @@ function applySett() {
   applyNW(settings.nw, false);
   applySnap();
 }
-function toggleTheme() { settings.dark=!settings.dark; applySett(); saveLocal(); }
+function toggleTheme() { settings.dark=!settings.dark; applySett(); saveLocal(); renderCanvas(); }
 function applyNW(v, save=true) {
   settings.nw=Number(v);
   document.documentElement.style.setProperty('--nw', v+'px');
@@ -546,8 +801,9 @@ function applyNW(v, save=true) {
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 function tab(t) {
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['mods','conns','cfg'][i]===t));
-  ['mods','conns','cfg'].forEach(id=>{document.getElementById('t-'+id).style.display=id===t?'':'none';});
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['mods','conns','tipos','cfg'][i]===t));
+  ['mods','conns','tipos','cfg'].forEach(id=>{document.getElementById('t-'+id).style.display=id===t?'':'none';});
+  if(t==='tipos') renderTiposList();
   if(t==='cfg') renderCfgLists();
 }
 
@@ -618,15 +874,28 @@ function renderCanvas() {
   canvas.nodes.forEach(node=>{
     const m=modules.find(x=>x.id===node.mid); if(!m) return;
     const sc={Ativo:'s-ativo',Legado:'s-legado',Descontinuado:'s-desc'}[m.sta]||'';
-    const tags=[
-      m.amb?`<span class="ntag">${esc(m.amb)}</span>`:'',
-      m.sta?`<span class="ntag ${sc}">${esc(m.sta)}</span>`:'',
-      m.dev?`<span class="ntag">${esc(m.dev)}</span>`:'',
+    const t = getTipo(m.tipo);
+    const isDark = settings.dark;
+    const bg     = isDark ? t.bgDark    : t.bgLight;
+    const border = isDark ? t.borderDark: t.borderLight;
+    const titleC = isDark ? t.titleDark : t.titleLight;
+    const fieldC = isDark ? t.fieldDark : t.fieldLight;
+
+    const tags = [
+      t.showAmb && m.amb  ? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.amb)}</span>` : '',
+      t.showSta && m.sta  ? `<span class="ntag ${sc}" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px">${esc(m.sta)}</span>` : '',
+      t.showDev && m.dev  ? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.dev)}</span>` : '',
+      t.showArea && m.area? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.area.split(',')[0].trim())}</span>` : '',
+      t.showDesc && m.desc? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC};max-width:100%;overflow:hidden;text-overflow:ellipsis">${esc(m.desc.substring(0,40))}</span>` : '',
     ].join('');
+
     const el=document.createElement('div');
-    el.className='node'; el.id='node-'+node.id;
-    el.style.left=node.x+'px'; el.style.top=node.y+'px';
-    el.innerHTML=`<div class="ntop"><div class="ncol" style="background:${m.color}"></div><div class="ntitle">${esc(m.name)}</div></div>
+    const shapeClass = t.shape && t.shape!=='rect' ? 'node shape-'+t.shape : 'node';
+    el.className=shapeClass; el.id='node-'+node.id;
+    el.style.cssText = `left:${node.x}px;top:${node.y}px;width:${t.w||180}px;background:${bg};border:${t.borderW||1.5}px solid ${border};`;
+    if(t.h) el.style.minHeight = t.h+'px';
+
+    el.innerHTML=`<div class="ntop"><div class="ncol" style="background:${m.color}"></div><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC}">${esc(m.name)}</div></div>
       <div class="ntags">${tags}</div>
       <div class="nacts">
         <button class="nbtn p" onclick="startConn('${node.id}')">Conectar</button>
@@ -760,6 +1029,8 @@ function openEP(mid, nid) {
   document.getElementById('ep-desc').value=m.desc||'';
   document.getElementById('ep-col').value=m.color||'#2455c7';
   fillSelects();
+  fillTipoSelect();
+  const curTipo=document.getElementById('ep-tipo'); if(curTipo) curTipo.value=m.tipo||'default';
   document.querySelectorAll('.cd').forEach(d=>d.classList.toggle('on',d.dataset.c===m.color));
   document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
   const nodeEl=document.getElementById('node-'+nid); if(nodeEl) nodeEl.classList.add('editing');
@@ -838,6 +1109,7 @@ async function saveMod(){
     amb: document.getElementById('ep-amb').value,
     sta: document.getElementById('ep-sta').value,
     color:document.getElementById('ep-col').value,
+    tipo: document.getElementById('ep-tipo').value || 'default',
   };
   const idx=modules.findIndex(m=>m.id===editId);
   if(idx>=0) modules[idx]={...modules[idx],...mod};
@@ -932,6 +1204,206 @@ function updateChips(){
   document.getElementById('chip-edges').textContent=canvas.edges.length+' conexão'+(canvas.edges.length!==1?'ões':'');
 }
 
+
+
+
+// ── Tipos Visuais ──────────────────────────────────────────────────────────
+let tipos = [];
+let editingTipoId = null;
+
+const DEFAULT_TIPO = {
+  id:'default', name:'Padrão',
+  shape:'rect', w:180, h:0,
+  bgLight:'#ffffff', bgDark:'#17171b',
+  borderLight:'#e0e0e0', borderDark:'#2a2a35', borderW:1.5,
+  titleFont:"'DM Sans',sans-serif", titleSize:12, titleWeight:'600',
+  titleLight:'#1a1916', titleDark:'#e8e8ec',
+  showArea:true, showSta:true, showAmb:true, showDev:false, showDesc:false,
+  fieldFont:"'DM Mono',monospace", fieldSize:9,
+  fieldLight:'#9a9890', fieldDark:'#55556a'
+};
+
+function loadTipos() {
+  try {
+    const s = localStorage.getItem('aw_tipos');
+    if (s) tipos = JSON.parse(s);
+    if (!tipos.length) tipos = [{ ...DEFAULT_TIPO }];
+  } catch(e) { tipos = [{ ...DEFAULT_TIPO }]; }
+}
+
+function saveTiposLocal() {
+  try { localStorage.setItem('aw_tipos', JSON.stringify(tipos)); } catch(e) {}
+}
+
+async function saveTiposToSheets() {
+  await postSheet({ action: 'saveTipos', tipos });
+}
+
+function getTipo(tipoId) {
+  return tipos.find(t=>t.id===tipoId) || tipos[0] || DEFAULT_TIPO;
+}
+
+function renderTiposList() {
+  const list = document.getElementById('tipos-list');
+  if (!list) return;
+  list.innerHTML = tipos.map(t => `
+    <div class="tipo-item">
+      <div class="tipo-preview">${shapePreviewSVG(t)}</div>
+      <div class="tipo-name">${esc(t.name)}</div>
+      <button class="tipo-edit" onclick="openEditTipo('${t.id}')">Editar</button>
+    </div>`).join('');
+}
+
+function shapePreviewSVG(t) {
+  const shapes = {
+    rect:'<rect x="2" y="4" width="28" height="16" rx="2" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    oval:'<rect x="2" y="4" width="28" height="16" rx="8" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    circle:'<circle cx="16" cy="12" r="10" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    diamond:'<polygon points="16,2 30,12 16,22 2,12" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    hexagon:'<polygon points="8,4 24,4 32,12 24,20 8,20 0,12" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    star:'<polygon points="16,2 19,10 28,10 21,15 24,23 16,18 8,23 11,15 4,10 13,10" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    parallelogram:'<polygon points="6,4 32,4 26,20 0,20" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+    cloud:'<ellipse cx="16" cy="14" rx="14" ry="9" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
+  };
+  return '<svg width="32" height="24" viewBox="0 0 32 24">'+(shapes[t.shape]||shapes.rect)+'</svg>';
+}
+
+function openNewTipo() {
+  editingTipoId = null;
+  fillTipoForm({ ...DEFAULT_TIPO, id:'', name:'' });
+  document.getElementById('tipo-box-title').textContent = 'Novo tipo visual';
+  document.getElementById('tp-del-btn').style.display = 'none';
+  document.getElementById('tipo-panel').classList.add('open');
+}
+
+function openEditTipo(id) {
+  const t = tipos.find(x=>x.id===id);
+  if (!t) return;
+  editingTipoId = id;
+  fillTipoForm(t);
+  document.getElementById('tipo-box-title').textContent = 'Editar tipo: ' + t.name;
+  document.getElementById('tp-del-btn').style.display = id==='default' ? 'none' : '';
+  document.getElementById('tipo-panel').classList.add('open');
+}
+
+function closeTipoPanel() {
+  document.getElementById('tipo-panel').classList.remove('open');
+  editingTipoId = null;
+}
+
+function fillTipoForm(t) {
+  document.getElementById('tp-id').value = t.id||'';
+  document.getElementById('tp-name').value = t.name||'';
+  document.getElementById('tp-shape').value = t.shape||'rect';
+  document.getElementById('tp-w').value = t.w||180;
+  document.getElementById('tp-h').value = t.h||0;
+  // Shape buttons
+  document.querySelectorAll('.shape-opt').forEach(el=>el.classList.toggle('on',el.dataset.shape===(t.shape||'rect')));
+  // Colors
+  setColorPair('tp-bg-light', t.bgLight||'#ffffff');
+  setColorPair('tp-bg-dark',  t.bgDark||'#17171b');
+  setColorPair('tp-border-light', t.borderLight||'#e0e0e0');
+  setColorPair('tp-border-dark',  t.borderDark||'#2a2a35');
+  document.getElementById('tp-border-w').value = t.borderW||1.5;
+  // Title
+  document.getElementById('tp-title-font').value   = t.titleFont||"'DM Sans',sans-serif";
+  document.getElementById('tp-title-size').value   = t.titleSize||12;
+  document.getElementById('tp-title-weight').value = t.titleWeight||'600';
+  setColorPair('tp-title-light', t.titleLight||'#1a1916');
+  setColorPair('tp-title-dark',  t.titleDark||'#e8e8ec');
+  // Fields visibility
+  document.getElementById('tp-show-area').checked = t.showArea!==false;
+  document.getElementById('tp-show-sta').checked  = t.showSta!==false;
+  document.getElementById('tp-show-amb').checked  = t.showAmb!==false;
+  document.getElementById('tp-show-dev').checked  = !!t.showDev;
+  document.getElementById('tp-show-desc').checked = !!t.showDesc;
+  // Field font
+  document.getElementById('tp-field-font').value = t.fieldFont||"'DM Mono',monospace";
+  document.getElementById('tp-field-size').value = t.fieldSize||9;
+  setColorPair('tp-field-light', t.fieldLight||'#9a9890');
+  setColorPair('tp-field-dark',  t.fieldDark||'#55556a');
+}
+
+function setColorPair(id, val) {
+  const el = document.getElementById(id);
+  const txt = document.getElementById(id+'-txt');
+  if (el) el.value = val;
+  if (txt) txt.value = val;
+}
+
+function syncColor(id, val) {
+  const el = document.getElementById(id);
+  if (el && /^#[0-9a-fA-F]{6}$/.test(val)) el.value = val;
+}
+
+function pickShape(shape, el) {
+  document.getElementById('tp-shape').value = shape;
+  document.querySelectorAll('.shape-opt').forEach(e=>e.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function readTipoForm() {
+  return {
+    id: document.getElementById('tp-id').value || 't'+Date.now(),
+    name: document.getElementById('tp-name').value.trim() || 'Sem nome',
+    shape: document.getElementById('tp-shape').value,
+    w: Number(document.getElementById('tp-w').value)||180,
+    h: Number(document.getElementById('tp-h').value)||0,
+    bgLight: document.getElementById('tp-bg-light').value,
+    bgDark:  document.getElementById('tp-bg-dark').value,
+    borderLight: document.getElementById('tp-border-light').value,
+    borderDark:  document.getElementById('tp-border-dark').value,
+    borderW: Number(document.getElementById('tp-border-w').value)||1.5,
+    titleFont:   document.getElementById('tp-title-font').value,
+    titleSize:   Number(document.getElementById('tp-title-size').value)||12,
+    titleWeight: document.getElementById('tp-title-weight').value,
+    titleLight: document.getElementById('tp-title-light').value,
+    titleDark:  document.getElementById('tp-title-dark').value,
+    showArea: document.getElementById('tp-show-area').checked,
+    showSta:  document.getElementById('tp-show-sta').checked,
+    showAmb:  document.getElementById('tp-show-amb').checked,
+    showDev:  document.getElementById('tp-show-dev').checked,
+    showDesc: document.getElementById('tp-show-desc').checked,
+    fieldFont: document.getElementById('tp-field-font').value,
+    fieldSize: Number(document.getElementById('tp-field-size').value)||9,
+    fieldLight: document.getElementById('tp-field-light').value,
+    fieldDark:  document.getElementById('tp-field-dark').value,
+  };
+}
+
+async function saveTipo() {
+  const t = readTipoForm();
+  if (!t.name) { alert('Dê um nome ao tipo.'); return; }
+  const idx = tipos.findIndex(x=>x.id===t.id);
+  if (idx>=0) tipos[idx] = t; else tipos.push(t);
+  saveTiposLocal();
+  closeTipoPanel();
+  renderTiposList();
+  fillTipoSelect();
+  renderCanvas(); // re-render all nodes with new tipo styles
+  await saveTiposToSheets();
+}
+
+function deleteTipo() {
+  if (editingTipoId==='default') return;
+  if (!confirm('Excluir este tipo? Os módulos que o usam voltarão ao padrão.')) return;
+  tipos = tipos.filter(t=>t.id!==editingTipoId);
+  // Reset modules using this tipo
+  modules.forEach(m=>{ if(m.tipo===editingTipoId) m.tipo='default'; });
+  saveTiposLocal();
+  closeTipoPanel();
+  renderTiposList();
+  fillTipoSelect();
+  renderCanvas();
+}
+
+function fillTipoSelect() {
+  const sel = document.getElementById('ep-tipo');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = tipos.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
+  sel.value = cur || 'default';
+}
 
 
 // ── Grid snap ──────────────────────────────────────────────────────────────
