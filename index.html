@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.15</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.16</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,8 +359,8 @@
   #edit-panel.open { display: flex; }
 
   @keyframes popIn {
-    from { opacity:0; transform:translateY(calc(-50% - 8px)) scale(.97); }
-    to   { opacity:1; transform:translateY(-50%) scale(1); }
+    from { opacity:0; transform:scale(.96) translateY(-6px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
   }
 
   /* Arrow pointing left toward the node */
@@ -472,7 +472,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.15</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.16</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -1228,37 +1228,42 @@ function openEditPanel(moduleId, nodeElRef) {
   document.getElementById('edit-overlay').classList.add('open');
 
   if (nodeEl) {
-    const rect = nodeEl.getBoundingClientRect();
+    // Force a reflow so offsetHeight is accurate
+    panel.style.visibility = 'hidden';
+    panel.style.display = 'flex';
     const panelW = 288;
-    const margin = 14;
+    const panelH = panel.offsetHeight;
+    panel.style.visibility = '';
+
+    const rect = nodeEl.getBoundingClientRect();
+    const margin = 12;
     const viewW = window.innerWidth;
     const viewH = window.innerHeight;
 
+    // Horizontal: prefer right of node, fallback left
     let left = rect.right + margin;
-    let arrowDir = 'left'; // arrow points left (panel is to the right of node)
-
-    // If no room on right, put on left
     if (left + panelW > viewW - 12) {
       left = rect.left - panelW - margin;
-      arrowDir = 'right';
-    }
-    // Clamp left
-    left = Math.max(12, left);
-
-    // Vertical: center on node
-    const panelH = Math.min(panel.offsetHeight||500, viewH*0.88);
-    let top = rect.top + rect.height/2;
-
-    panel.style.left = left + 'px';
-    panel.style.top = top + 'px';
-    panel.style.transform = 'translateY(-50%)';
-
-    // Arrow direction
-    if (arrowDir === 'right') {
-      panel.style.setProperty('--arrow-display','none');
+      panel.style.setProperty('--arrow-display', 'none');
     } else {
       panel.style.removeProperty('--arrow-display');
     }
+    left = Math.max(12, left);
+
+    // Vertical: align top of panel with top of node
+    let top = rect.top;
+
+    // If panel goes below screen, align bottom of panel with bottom of node
+    if (top + panelH > viewH - 12) {
+      top = rect.bottom - panelH;
+    }
+
+    // Final clamp to keep inside screen
+    top = Math.max(12, Math.min(top, viewH - panelH - 12));
+
+    panel.style.left = left + 'px';
+    panel.style.top = top + 'px';
+    panel.style.transform = 'none';
   } else {
     // Fallback: center of screen
     panel.style.left = '50%';
