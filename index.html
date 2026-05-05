@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.27</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.28</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -186,7 +186,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.27</div>
+      <div id="logo-ver">v1.28</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -615,6 +615,7 @@ function renderCanvas() {
       </div>`;
     el.addEventListener('mousedown',ev=>{
       if(ev.target.classList.contains('nbtn')) return;
+      if(connFrom) return; // in connect mode, let mouseup handle it
       if(tool==='con'){startConn(node.id);return;}
       drag=node.id;
       const r=el.getBoundingClientRect();
@@ -636,7 +637,20 @@ document.addEventListener('mousemove',e=>{
   if(el){el.style.left=n.x+'px';el.style.top=n.y+'px';}
   renderEdges();
 });
-document.addEventListener('mouseup',()=>{ if(drag){schedSave();} drag=null; });
+document.addEventListener('mouseup', e=>{
+  if(drag){ schedSave(); drag=null; return; }
+  drag=null;
+  // Handle connection click
+  if(!connFrom) return;
+  const target = e.target.closest('.node');
+  if(!target) return;
+  const tid = target.id.replace('node-','');
+  if(tid===connFrom) return;
+  if(canvas.edges.find(e=>e.from===connFrom&&e.to===tid)) { cancelConn(); return; }
+  canvas.edges.push({id:'e'+Date.now(), from:connFrom, to:tid, cid:selConn||connTypes[0]?.id});
+  saveLocal(); schedSave(); renderEdges(); updateChips();
+  cancelConn();
+});
 
 function removeNode(id) {
   canvas.nodes=canvas.nodes.filter(n=>n.id!==id);
@@ -687,22 +701,12 @@ function setTool(t){
 function startConn(nid){
   connFrom=nid;
   document.getElementById('cbanner').style.display='block';
-  document.querySelectorAll('.node').forEach(el=>{
-    el.classList.add('connecting');
-    el.onclick=()=>{
-      const tid=el.id.replace('node-','');
-      if(tid!==connFrom && !canvas.edges.find(e=>e.from===connFrom&&e.to===tid)){
-        canvas.edges.push({id:'e'+Date.now(),from:connFrom,to:tid,cid:selConn||connTypes[0]?.id});
-        saveLocal(); schedSave(); renderEdges(); updateChips();
-      }
-      cancelConn();
-    };
-  });
+  document.querySelectorAll('.node').forEach(el=>el.classList.add('connecting'));
 }
 function cancelConn(){
   connFrom=null;
   document.getElementById('cbanner').style.display='none';
-  document.querySelectorAll('.node').forEach(el=>{el.classList.remove('connecting');el.onclick=null;});
+  document.querySelectorAll('.node').forEach(el=>el.classList.remove('connecting'));
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){cancelConn();closeEP(true);}});
 
