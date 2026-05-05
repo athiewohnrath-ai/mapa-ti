@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.11</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.12</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -343,7 +343,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.11</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.12</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -360,8 +360,11 @@
   <div id="sidebar-content">
 
     <div id="tab-modules">
-      <button class="sidebar-action" onclick="window.open('https://docs.google.com/spreadsheets/d/1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA','_blank')">
-        ↗ &nbsp;Abrir planilha de módulos
+      <button class="sidebar-action" onclick="openNewModuleModal()">
+        + &nbsp;Novo módulo
+      </button>
+      <button class="sidebar-action" onclick="window.open('https://docs.google.com/spreadsheets/d/1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA','_blank')" style="font-size:10px">
+        ↗ &nbsp;Ver planilha completa
       </button>
       <div id="modules-list"><div class="empty">Carregando...</div></div>
     </div>
@@ -459,6 +462,7 @@
 
 <script>
 const SHEET_ID        = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
+const APPS_SCRIPT     = 'https://script.google.com/macros/s/AKfycbzGRiSWx5mj-sxVsnq9fh1bg8cNXAX9G5TNfOofubf66MGUL2zRqAZTOuZZOVpkWlr3/exec';
 const MODULES_URL     = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos';
 const CONNTYPES_URL   = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es';
 
@@ -478,6 +482,24 @@ function loadLocal() {
 }
 function saveLocal() {
   try { localStorage.setItem('aw_map_v3', JSON.stringify({canvas:canvasData,settings})); } catch(e) {}
+}
+async function saveToSheets() {
+  try {
+    await fetch(APPS_SCRIPT, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({action:'saveCanvas', canvas: canvasData})
+    });
+  } catch(e) {}
+}
+async function saveModuleToSheets(mod) {
+  try {
+    await fetch(APPS_SCRIPT, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify({action:'saveModule', ...mod})
+    });
+  } catch(e) {}
 }
 
 // ── Chave API ──────────────────────────────────────────────────────────────
@@ -735,7 +757,8 @@ function renderCanvas() {
       <div class="node-tags">${tags}</div>
       <div class="node-actions">
         <button class="node-btn primary" onclick="startConnect('${node.id}')">Conectar</button>
-        <button class="node-btn" onclick="removeNode('${node.id}')">Remover</button>
+        <button class="node-btn" onclick="openEditModuleModal('${node.moduleId}')">Editar</button>
+        <button class="node-btn" onclick="removeNode('${node.id}')">×</button>
       </div>`;
     el.addEventListener('mousedown',ev=>{
       if(ev.target.classList.contains('node-btn')) return;
@@ -830,7 +853,7 @@ function startConnect(nodeId) {
       if(tid!==connectingFrom){
         if(!canvasData.edges.find(e=>e.from===connectingFrom&&e.to===tid)){
           canvasData.edges.push({id:'e'+Date.now(),from:connectingFrom,to:tid,connId:selectedConn||connTypes[0]?.id});
-          saveLocal(); renderEdges(); updateChips();
+          saveLocal(); saveToSheets(); renderEdges(); updateChips();
         }
       }
       cancelConnect();
@@ -875,5 +898,75 @@ function updateChips() {
 
 init();
 </script>
+
+<!-- Modal de novo módulo -->
+<div id="module-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border-radius:16px;border:1px solid var(--border2);width:420px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.2);overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span id="modal-title-text" style="font-size:15px;font-weight:600;color:var(--text)">Novo módulo</span>
+      <button onclick="closeModuleModal()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer">×</button>
+    </div>
+    <div style="padding:20px">
+      <input type="hidden" id="mod-editing-id">
+      
+      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Nome do módulo *</label>
+      <input id="mod-name" type="text" placeholder="Ex: ERP Totvs, HubSpot..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;margin-bottom:14px;font-family:inherit;outline:none">
+      
+      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Cor</label>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="mod-colors">
+        <div class="color-opt" data-color="#2563eb" style="width:22px;height:22px;border-radius:50%;background:#2563eb;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#2563eb',this)"></div>
+        <div class="color-opt" data-color="#059669" style="width:22px;height:22px;border-radius:50%;background:#059669;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#059669',this)"></div>
+        <div class="color-opt" data-color="#d97706" style="width:22px;height:22px;border-radius:50%;background:#d97706;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#d97706',this)"></div>
+        <div class="color-opt" data-color="#dc2626" style="width:22px;height:22px;border-radius:50%;background:#dc2626;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#dc2626',this)"></div>
+        <div class="color-opt" data-color="#7c3aed" style="width:22px;height:22px;border-radius:50%;background:#7c3aed;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#7c3aed',this)"></div>
+        <div class="color-opt" data-color="#db2777" style="width:22px;height:22px;border-radius:50%;background:#db2777;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#db2777',this)"></div>
+        <div class="color-opt" data-color="#0891b2" style="width:22px;height:22px;border-radius:50%;background:#0891b2;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#0891b2',this)"></div>
+        <div class="color-opt" data-color="#65a30d" style="width:22px;height:22px;border-radius:50%;background:#65a30d;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#65a30d',this)"></div>
+      </div>
+      <input type="hidden" id="mod-color" value="#2563eb">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Ambiente</label>
+          <select id="mod-ambiente" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;outline:none">
+            <option value="">—</option>
+            <option>Local</option>
+            <option>Nuvem</option>
+            <option>Servidor AW</option>
+            <option>Híbrido</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Status</label>
+          <select id="mod-status" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;outline:none">
+            <option value="">—</option>
+            <option>Ativo</option>
+            <option>Em implantação</option>
+            <option>Legado</option>
+            <option>Descontinuado</option>
+            <option>Protótipo</option>
+          </select>
+        </div>
+      </div>
+
+      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Área</label>
+      <input id="mod-area" type="text" placeholder="Ex: Comercial, Financeiro, RH..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;margin-bottom:14px;font-family:inherit;outline:none">
+
+      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Atualização necessária</label>
+      <select id="mod-atualizacao" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:20px">
+        <option value="">—</option>
+        <option>Sim</option>
+        <option>Não</option>
+        <option>Em análise</option>
+      </select>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="closeModuleModal()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit">Cancelar</button>
+        <button onclick="saveModule()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Salvar módulo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
