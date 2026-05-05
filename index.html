@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.23</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.24</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -176,7 +176,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.23</div>
+      <div id="logo-ver">v1.24</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -264,12 +264,12 @@ select.fi{cursor:pointer;}
   </div>
   <div id="ep-body">
     <input type="hidden" id="ep-id">
-    <div class="fl"><label>Nome *</label><input class="fi" id="ep-name" oninput="dirty=true" placeholder="Nome do módulo"></div>
-    <div class="fl"><label>Área</label><input class="fi" id="ep-area" oninput="dirty=true" placeholder="Ex: Comercial, RH..."></div>
-    <div class="fl"><label>Descrição</label><textarea class="fi" id="ep-desc" oninput="dirty=true" placeholder="O que este módulo faz?"></textarea></div>
-    <div class="fl"><label>Desenvolvedor</label><select class="fi" id="ep-dev" onchange="dirty=true"></select></div>
-    <div class="fl"><label>Ambiente</label><select class="fi" id="ep-amb" onchange="dirty=true"></select></div>
-    <div class="fl"><label>Status</label><select class="fi" id="ep-sta" onchange="dirty=true"></select></div>
+    <div class="fl"><label>Nome *</label><input class="fi" id="ep-name" oninput="window.dirty=true" placeholder="Nome do módulo"></div>
+    <div class="fl"><label>Área</label><input class="fi" id="ep-area" oninput="window.dirty=true" placeholder="Ex: Comercial, RH..."></div>
+    <div class="fl"><label>Descrição</label><textarea class="fi" id="ep-desc" oninput="window.dirty=true" placeholder="O que este módulo faz?"></textarea></div>
+    <div class="fl"><label>Desenvolvedor</label><select class="fi" id="ep-dev" onchange="window.dirty=true"></select></div>
+    <div class="fl"><label>Ambiente</label><select class="fi" id="ep-amb" onchange="window.dirty=true"></select></div>
+    <div class="fl"><label>Status</label><select class="fi" id="ep-sta" onchange="window.dirty=true"></select></div>
     <div class="fl">
       <label>Cor</label>
       <div class="cr" id="ep-cr">
@@ -336,7 +336,7 @@ let settings = {dark:false, nw:180};
 let cfg = {devs:['Totvs','Salesforce','Microsoft','AW Interno','Externo'], ambs:['Local','Nuvem','Servidor AW','Híbrido','SaaS'], sts:['Ativo','Em implantação','Protótipo','Legado','Descontinuado','Planejado']};
 let tool='sel', connFrom=null, selConn=null;
 let drag=null, dragOff={x:0,y:0};
-let editId=null, dirty=false;
+let editId=null; window.dirty=false;
 let _saveTimer=null;
 
 // ─── Persist local ────────────────────────────────────────────────────────────
@@ -698,7 +698,7 @@ function fillSelects() {
 
 function openEP(mid, nid) {
   const m=modules.find(x=>x.id===mid); if(!m) return;
-  editId=mid; dirty=false;
+  editId=mid; window.dirty=false;
   document.getElementById('ep-id').value=mid;
   document.getElementById('ep-name').value=m.name||'';
   document.getElementById('ep-area').value=m.area||'';
@@ -738,7 +738,7 @@ function tryCloseEP(e) {
   // Don't fire if a dialog is already open
   if(document.getElementById('dlg-unsaved').classList.contains('open')) return;
   if(document.getElementById('dlg-del').classList.contains('open')) return;
-  if(dirty){
+  if(window.dirty){
     document.getElementById('dlg-unsaved').classList.add('open');
   } else {
     closeEP(true);
@@ -746,12 +746,16 @@ function tryCloseEP(e) {
 }
 
 function closeEP(force){
-  if(!force && dirty) return;
-  dirty=false; editId=null;
-  document.getElementById('ep').classList.remove('open');
+  if(!force && window.dirty) return;
+  window.dirty=false; editId=null;
+  const ep=document.getElementById('ep');
+  ep.classList.remove('open');
+  ep.style.display='';
+  ep.style.visibility='';
+  ep.style.transform='';
   document.getElementById('eov').classList.remove('open');
+  document.getElementById('eov').style.pointerEvents='';
   document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
-  document.getElementById('ep').style.transform='';
 }
 
 function dlgUnsaved(choice){
@@ -765,7 +769,7 @@ function dlgUnsaved(choice){
 function pickC(c,el){
   document.getElementById('ep-col').value=c;
   document.querySelectorAll('.cd').forEach(d=>d.classList.remove('on'));
-  el.classList.add('on'); dirty=true;
+  el.classList.add('on'); window.dirty=true;
 }
 
 async function saveMod(){
@@ -782,7 +786,7 @@ async function saveMod(){
   };
   const idx=modules.findIndex(m=>m.id===editId);
   if(idx>=0) modules[idx]={...modules[idx],...mod};
-  dirty=false; closeEP(true);
+  window.dirty=false; closeEP(true);
   renderSidebar(); renderCanvas();
   setStatus('loading','Salvando...');
   await postSheet({action:'saveModule',...mod});
@@ -790,18 +794,22 @@ async function saveMod(){
 }
 
 function confirmDelete(){
-  const m=modules.find(x=>x.id===editId);
-  if(!m){ alert('Módulo não encontrado.'); return; }
-  document.getElementById('del-name').textContent=m.name;
-  // Pause the eov so it doesn't fire and close things
-  document.getElementById('eov').style.pointerEvents='none';
+  // Capture editId NOW before anything can reset it
+  const capturedId = editId;
+  const m = modules.find(x=>x.id===capturedId);
+  if(!m){ console.log('editId=',editId,'modules=',modules.map(x=>x.id)); return; }
+  document.getElementById('del-name').textContent = m.name;
+  document.getElementById('eov').style.pointerEvents = 'none';
+  // Store captured id in data attribute for safety
+  document.getElementById('dlg-del').dataset.delId = capturedId;
   document.getElementById('dlg-del').classList.add('open');
 }
 async function dlgDel(yes){
-  document.getElementById('dlg-del').classList.remove('open');
+  const dlg = document.getElementById('dlg-del');
+  const id = dlg.dataset.delId || editId;
+  dlg.classList.remove('open');
   document.getElementById('eov').style.pointerEvents='';
   if(!yes) return;
-  const id=editId;
   modules=modules.filter(m=>m.id!==id);
   canvas.nodes=canvas.nodes.filter(n=>n.mid!==id);
   canvas.edges=canvas.edges.filter(e=>{
