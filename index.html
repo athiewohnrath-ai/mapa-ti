@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.30</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.31</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -244,7 +244,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.30</div>
+      <div id="logo-ver">v1.31</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -579,6 +579,7 @@ select.tfi { cursor:pointer; }
     </div>
     <div id="tipo-box-ft">
       <button class="db d" id="tp-del-btn" onclick="deleteTipo()" style="margin-right:auto">Excluir tipo</button>
+      <button class="db g" id="tp-dup-btn" onclick="duplicateTipo()">Duplicar</button>
       <button class="db g" onclick="closeTipoPanel()">Cancelar</button>
       <button class="bs" onclick="saveTipo()">Salvar tipo</button>
     </div>
@@ -1369,6 +1370,23 @@ function readTipoForm() {
     fieldLight: document.getElementById('tp-field-light').value,
     fieldDark:  document.getElementById('tp-field-dark').value,
   };
+}
+
+
+function duplicateTipo() {
+  const t = readTipoForm();
+  const newTipo = {
+    ...t,
+    id: 't' + Date.now(),
+    name: t.name + ' (cópia)',
+  };
+  tipos.push(newTipo);
+  saveTiposLocal();
+  renderTiposList();
+  fillTipoSelect();
+  // Open the new duplicate for editing
+  closeTipoPanel();
+  setTimeout(() => openEditTipo(newTipo.id), 150);
 }
 
 async function saveTipo() {
