@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.10</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.11</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -343,7 +343,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.10</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.11</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -360,15 +360,15 @@
   <div id="sidebar-content">
 
     <div id="tab-modules">
-      <button class="sidebar-action" onclick="window.open('https://www.notion.so/4d202a202002492180014a2d890a45bb','_blank')">
-        ↗ &nbsp;Cadastrar módulo no Notion
+      <button class="sidebar-action" onclick="window.open('https://docs.google.com/spreadsheets/d/1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA','_blank')">
+        ↗ &nbsp;Abrir planilha de módulos
       </button>
       <div id="modules-list"><div class="empty">Carregando...</div></div>
     </div>
 
     <div id="tab-connections" style="display:none">
-      <button class="sidebar-action" onclick="window.open('https://www.notion.so/7ede8840ee8a4f0dae94c03d5cbb075a','_blank')">
-        ↗ &nbsp;Cadastrar tipo de conexão
+      <button class="sidebar-action" onclick="window.open('https://docs.google.com/spreadsheets/d/1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA','_blank')">
+        ↗ &nbsp;Abrir planilha de conexões
       </button>
       <div id="conn-types-list"><div class="empty">Carregando...</div></div>
     </div>
@@ -458,10 +458,9 @@
 </div>
 
 <script>
-const MODULES_DB_ID   = '4d202a202002492180014a2d890a45bb';
-const CONNTYPES_DB_ID = '7ede8840ee8a4f0dae94c03d5cbb075a';
-const NOTION_TOKEN    = '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';
-const N8N_PROXY       = 'https://n8n.athiewohnrath.com.br/webhook/mapa-ti-notion';
+const SHEET_ID        = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
+const MODULES_URL     = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos';
+const CONNTYPES_URL   = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es';
 
 let modules = [], connTypes = [];
 let selectedConn = null;
@@ -540,57 +539,58 @@ function resetSettings() { applyNodeWidth(180); applyLineWidth(1.8); }
 function syncSettingsUI() { applyTheme(); applyNodeWidth(settings.nodeWidth); applyLineWidth(settings.lineWidth); }
 
 // ── Notion API ─────────────────────────────────────────────────────────────
-// ── Notion API via proxy CORS ─────────────────────────────────────────────
-const CORS_PROXY = 'https://corsproxy.io/?';
-
-async function notionQueryDB(dbId) {
-  const url = CORS_PROXY + encodeURIComponent('https://api.notion.com/v1/databases/'+dbId+'/query');
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + NOTION_TOKEN,
-      'Notion-Version': '2022-06-28',
-      'Content-Type': 'application/json'
-    },
-    body: '{}'
+// ── Google Sheets CSV parser ───────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  return lines.slice(1).map(line => {
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let c of line) {
+      if (c==='"') inQ=!inQ;
+      else if (c===',' && !inQ) { vals.push(cur.trim()); cur=''; }
+      else cur+=c;
+    }
+    vals.push(cur.trim());
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = (vals[i]||'').replace(/^"|"$/g,''));
+    return obj;
   });
-  return r.json();
-}
-
-function getProp(page, name, type) {
-  const p = page.properties?.[name];
-  if (!p) return '';
-  if (type==='title') return p.title?.map(t=>t.plain_text).join('')||'';
-  if (type==='rich_text') return p.rich_text?.map(t=>t.plain_text).join('')||'';
-  if (type==='select') return p.select?.name||'';
-  if (type==='multi_select') return p.multi_select?.map(o=>o.name).join(', ')||'';
-  return '';
 }
 
 async function loadModules() {
-  const data = await notionQueryDB(MODULES_DB_ID);
-  if (!data.results) return defaultModules();
-  return data.results.map(p => ({
-    id: p.id,
-    name: getProp(p,'Nome','title'),
-    color: getProp(p,'Cor','select') || '#2563eb',
-    ambiente: getProp(p,'Ambiente','select'),
-    status: getProp(p,'Status','select'),
-    area: getProp(p,'Área','multi_select'),
-    atualizacao: getProp(p,'Atualização necessária','select'),
-  })).filter(m => m.name);
+  try {
+    const r = await fetch(MODULES_URL);
+    const text = await r.text();
+    const rows = parseCSV(text);
+    if (!rows.length) return defaultModules();
+    return rows.map((row,i) => ({
+      id: 'm_'+i,
+      name: row['Nome'] || row['nome'] || '',
+      color: row['Cor'] || row['cor'] || '#2563eb',
+      ambiente: row['Ambiente'] || row['ambiente'] || '',
+      status: row['Status'] || row['status'] || '',
+      area: row['Área'] || row['area'] || row['Area'] || '',
+      atualizacao: row['Atualização'] || row['atualizacao'] || '',
+    })).filter(m => m.name);
+  } catch(e) { return defaultModules(); }
 }
 
 async function loadConnTypes() {
-  const data = await notionQueryDB(CONNTYPES_DB_ID);
-  if (!data.results) return defaultConnTypes();
-  return data.results.map(p => ({
-    id: p.id,
-    name: getProp(p,'Nome','title'),
-    color: getProp(p,'Cor','select') || '#2563eb',
-    style: getProp(p,'Estilo da linha','select') || 'Contínua',
-    desc: getProp(p,'Descrição','rich_text'),
-  })).filter(c => c.name);
+  try {
+    const r = await fetch(CONNTYPES_URL);
+    const text = await r.text();
+    const rows = parseCSV(text);
+    if (!rows.length) return defaultConnTypes();
+    return rows.map((row,i) => ({
+      id: 'ct_'+i,
+      name: row['Nome'] || row['nome'] || '',
+      color: row['Cor'] || row['cor'] || '#2563eb',
+      style: row['Estilo'] || row['estilo'] || 'Contínua',
+      desc: row['Descrição'] || row['descricao'] || '',
+    })).filter(c => c.name);
+  } catch(e) { return defaultConnTypes(); }
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────
