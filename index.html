@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.40</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.41</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -280,7 +280,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.40</div>
+      <div id="logo-ver">v1.41</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1064,11 +1064,11 @@ function openEP(mid, nid) {
   document.getElementById('ep-name').value=m.name||'';
   document.getElementById('ep-area').value=m.area||'';
   document.getElementById('ep-desc').value=m.desc||'';
-  document.getElementById('ep-col').value=m.color||'#2455c7';
+  // ep-col removed (color now via tipo)
   fillSelects();
   fillTipoSelect();
   const curTipo=document.getElementById('ep-tipo'); if(curTipo) curTipo.value=m.tipo||'default';
-  document.querySelectorAll('.cd').forEach(d=>d.classList.toggle('on',d.dataset.c===m.color));
+  // color dots removed
   document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
 
   const nodeEl=document.getElementById('node-'+nid); if(nodeEl) nodeEl.classList.add('editing');
@@ -1132,11 +1132,7 @@ function dlgUnsaved(choice){
   // 'cancel' → do nothing, stay open
 }
 
-function pickC(c,el){
-  document.getElementById('ep-col').value=c;
-  document.querySelectorAll('.cd').forEach(d=>d.classList.remove('on'));
-  el.classList.add('on'); window.dirty=true;
-}
+function pickC(c,el){ window.dirty=true; } // color picker removed
 
 async function saveMod(){
   const name=document.getElementById('ep-name').value.trim();
@@ -1148,7 +1144,7 @@ async function saveMod(){
     dev: document.getElementById('ep-dev').value,
     amb: document.getElementById('ep-amb').value,
     sta: document.getElementById('ep-sta').value,
-    color:document.getElementById('ep-col').value,
+    color: m?.color || '#2455c7', // color managed via tipo
     tipo: document.getElementById('ep-tipo').value || 'default',
   };
   const idx=modules.findIndex(m=>m.id===editId);
