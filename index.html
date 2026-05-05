@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.24</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.25</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -161,6 +161,16 @@ select.fi{cursor:pointer;}
 .db.d{background:var(--red);color:#fff;}
 .db.g{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
 
+.mod-del-btn { font-size:16px; color:var(--text3); padding:0 2px; line-height:1; flex-shrink:0; opacity:0; transition:opacity .15s; }
+.mod-item:hover .mod-del-btn { opacity:1; }
+
+#mod-menu { display:none; position:fixed; z-index:400; background:var(--bg2); border:1px solid var(--border2); border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,.2); overflow:hidden; min-width:160px; }
+#mod-menu.open { display:block; }
+.mm-item { padding:9px 14px; font-size:12px; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .1s; }
+.mm-item:hover { background:var(--bg3); }
+.mm-item.danger { color:var(--red); }
+.mm-sep { height:1px; background:var(--border); margin:3px 0; }
+
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
@@ -176,7 +186,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.24</div>
+      <div id="logo-ver">v1.25</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -288,11 +298,20 @@ select.fi{cursor:pointer;}
     </div>
   </div>
   <div id="ep-ft">
-    <button class="bd" onclick="confirmDelete()">Excluir</button>
+    <button class="bd" onclick="hideModule()">Ocultar</button>
     <button class="bs" onclick="saveMod()">Salvar</button>
   </div>
 </div>
 
+
+<!-- Module context menu -->
+<div id="mod-menu">
+  <div class="mm-item" onclick="modMenuAction('canvas')">↗ Adicionar ao canvas</div>
+  <div class="mm-sep"></div>
+  <div class="mm-item danger" onclick="modMenuAction('delete')">🗑 Excluir definitivamente</div>
+</div>
+
+<!-- Delete confirm dialog (reuse existing dlg-del) -->
 <!-- Dialog: unsaved -->
 <div class="dlg" id="dlg-unsaved">
   <div class="dlg-bg" onclick="dlgUnsaved('cancel')"></div>
@@ -793,6 +812,21 @@ async function saveMod(){
   setStatus('ok',modules.length+' módulos');
 }
 
+function hideModule(){
+  // Remove from canvas but keep in modules list (returns to sidebar)
+  const id = editId;
+  canvas.nodes = canvas.nodes.filter(n=>n.mid!==id);
+  canvas.edges = canvas.edges.filter(e=>{
+    const f=canvas.nodes.find(n=>n.id===e.from);
+    const t=canvas.nodes.find(n=>n.id===e.to);
+    return f&&t;
+  });
+  window.dirty = false;
+  closeEP(true);
+  saveLocal(); schedSave();
+  renderCanvas(); renderSidebar(); updateChips();
+}
+
 function confirmDelete(){
   // Capture editId NOW before anything can reset it
   const capturedId = editId;
@@ -810,6 +844,8 @@ async function dlgDel(yes){
   dlg.classList.remove('open');
   document.getElementById('eov').style.pointerEvents='';
   if(!yes) return;
+  // Close edit panel if open for this module
+  if (editId === id) { window.dirty=false; closeEP(true); }
   modules=modules.filter(m=>m.id!==id);
   canvas.nodes=canvas.nodes.filter(n=>n.mid!==id);
   canvas.edges=canvas.edges.filter(e=>{
@@ -859,6 +895,53 @@ function updateChips(){
   document.getElementById('chip-mods').textContent=canvas.nodes.length+' módulo'+(canvas.nodes.length!==1?'s':'');
   document.getElementById('chip-edges').textContent=canvas.edges.length+' conexão'+(canvas.edges.length!==1?'ões':'');
 }
+
+
+// ── Module sidebar menu ───────────────────────────────────────────────────────
+let menuModId = null;
+
+function showModMenu(e, mid) {
+  e.stopPropagation();
+  menuModId = mid;
+  const menu = document.getElementById('mod-menu');
+  menu.classList.add('open');
+
+  // Position near click
+  const x = e.clientX, y = e.clientY;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const mw = 170, mh = 90;
+  menu.style.left = Math.min(x, vw-mw-8) + 'px';
+  menu.style.top  = Math.min(y, vh-mh-8) + 'px';
+}
+
+function closeModMenu() {
+  document.getElementById('mod-menu').classList.remove('open');
+  menuModId = null;
+}
+
+function modMenuAction(action) {
+  closeModMenu();
+  if (action === 'canvas') {
+    // Add to canvas center
+    const already = canvas.nodes.find(n=>n.mid===menuModId);
+    if (already) return;
+    const w = document.getElementById('cw');
+    canvas.nodes.push({id:'n'+Date.now(), mid:menuModId, x:w.offsetWidth/2-90, y:w.offsetHeight/2-35});
+    saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
+  } else if (action === 'delete') {
+    const m = modules.find(x=>x.id===menuModId);
+    if (!m) return;
+    document.getElementById('del-name').textContent = m.name;
+    document.getElementById('dlg-del').dataset.delId = menuModId;
+    document.getElementById('dlg-del').classList.add('open');
+  }
+}
+
+// Close menu on outside click
+document.addEventListener('click', (e)=>{
+  const menu = document.getElementById('mod-menu');
+  if (menu && !menu.contains(e.target)) closeModMenu();
+});
 
 init();
 </script>
