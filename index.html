@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.12</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.13</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -343,7 +343,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.12</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.13</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -480,6 +480,28 @@ function loadLocal() {
     if (s) { const p=JSON.parse(s); canvasData=p.canvas||{nodes:[],edges:[]}; settings={...settings,...(p.settings||{})}; }
   } catch(e) {}
 }
+
+async function loadCanvasFromSheets() {
+  try {
+    const url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Canvas';
+    const r = await fetch(url);
+    const text = await r.text();
+    // Canvas is stored as JSON in cell A2
+    const lines = text.trim().split('\n');
+    if (lines.length >= 2) {
+      const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"');
+      if (raw && raw.startsWith('{')) {
+        const parsed = JSON.parse(raw);
+        if (parsed.nodes && parsed.nodes.length) {
+          canvasData = parsed;
+          saveLocal();
+          return true;
+        }
+      }
+    }
+  } catch(e) {}
+  return false;
+}
 function saveLocal() {
   try { localStorage.setItem('aw_map_v3', JSON.stringify({canvas:canvasData,settings})); } catch(e) {}
 }
@@ -490,7 +512,7 @@ async function saveToSheets() {
       headers:{'Content-Type':'text/plain'},
       body: JSON.stringify({action:'saveCanvas', canvas: canvasData})
     });
-  } catch(e) {}
+  } catch(e) { console.log('Sheets save failed', e); }
 }
 async function saveModuleToSheets(mod) {
   try {
@@ -635,7 +657,11 @@ async function init() {
     if (!connTypes.length) connTypes=defaultConnTypes();
     selectedConn=connTypes[0]?.id;
     setStatus('ok',`${modules.length} módulos · conectado`);
-    if (!canvasData.nodes.length) seedCanvas();
+    // Try loading canvas from Sheets
+    if (!canvasData.nodes.length) {
+      const loaded = await loadCanvasFromSheets();
+      if (!loaded) seedCanvas();
+    }
   } catch(e) {
     modules=defaultModules(); connTypes=defaultConnTypes();
     selectedConn=connTypes[0].id;
@@ -687,8 +713,11 @@ function tab(t) {
 // ── Sidebar ────────────────────────────────────────────────────────────────
 function renderSidebar() {
   const ml=document.getElementById('modules-list');
-  ml.innerHTML = modules.length
-    ? modules.map(m=>`
+  // Only show modules NOT already on canvas
+  const onCanvas = new Set(canvasData.nodes.map(n=>n.moduleId));
+  const available = modules.filter(m=>!onCanvas.has(m.id));
+  ml.innerHTML = available.length
+    ? available.map(m=>`
         <div class="module-item" draggable="true" ondragstart="onDragStart(event,'${m.id}')">
           <div class="module-dot" style="background:${m.color||'#888'}"></div>
           <div>
@@ -696,7 +725,7 @@ function renderSidebar() {
             <div class="module-meta">${[m.ambiente,m.status].filter(Boolean).join(' · ')}</div>
           </div>
         </div>`).join('')
-    : '<div class="empty">Nenhum módulo encontrado.</div>';
+    : '<div class="empty" style="font-size:11px;color:var(--text3)">Todos os módulos estão no canvas.</div>';
 
   const cl=document.getElementById('conn-types-list');
   cl.innerHTML = connTypes.length
@@ -730,7 +759,7 @@ document.getElementById('canvas-wrap').addEventListener('drop',e=>{
   if(!mid) return;
   const rect=document.getElementById('canvas-wrap').getBoundingClientRect();
   canvasData.nodes.push({id:'n'+Date.now(),moduleId:mid,x:e.clientX-rect.left-90,y:e.clientY-rect.top-35});
-  saveLocal(); renderCanvas(); updateChips();
+  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
 });
 
 // ── Canvas ─────────────────────────────────────────────────────────────────
@@ -789,7 +818,7 @@ document.addEventListener('mouseup',()=>{if(drag)saveLocal();drag=null;});
 function removeNode(id) {
   canvasData.nodes=canvasData.nodes.filter(n=>n.id!==id);
   canvasData.edges=canvasData.edges.filter(e=>e.from!==id&&e.to!==id);
-  saveLocal(); renderCanvas(); updateChips();
+  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
 }
 
 // ── Edges ──────────────────────────────────────────────────────────────────
@@ -888,7 +917,7 @@ async function doRefresh() {
 function clearCanvas() {
   if(!confirm('Limpar todo o canvas?')) return;
   canvasData={nodes:[],edges:[]};
-  saveLocal(); renderCanvas(); updateChips();
+  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
 }
 
 function updateChips() {
