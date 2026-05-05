@@ -3,1511 +3,848 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.21</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.22</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
-  :root {
-    --bg:      #f4f3f0;
-    --bg2:     #ffffff;
-    --bg3:     #eeede9;
-    --border:  rgba(0,0,0,0.07);
-    --border2: rgba(0,0,0,0.13);
-    --text:    #1a1a1a;
-    --text2:   #5a5a6a;
-    --text3:   #9a9aaa;
-    --accent:  #2563eb;
-    --accent-dim: rgba(37,99,235,0.1);
-    --green:   #059669;
-    --amber:   #d97706;
-    --red:     #dc2626;
-    --purple:  #7c3aed;
-    --node-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --node-shadow-hover: 0 6px 24px rgba(0,0,0,0.13);
-    --toolbar-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    --dot-color: rgba(0,0,0,0.12);
-    --radius: 10px;
-    --radius-lg: 14px;
-    --sidebar-w: 280px;
-    --node-width: 180px;
-    --line-width: 1.8;
-  }
+:root {
+  --bg:      #f5f4f0;
+  --bg2:     #ffffff;
+  --bg3:     #eeecea;
+  --border:  rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.13);
+  --text:    #1a1916;
+  --text2:   #5a5950;
+  --text3:   #9a9890;
+  --accent:  #2455c7;
+  --accent-dim: rgba(36,85,199,0.1);
+  --green:   #1a7a4a;
+  --amber:   #c97d10;
+  --red:     #c42b2b;
+  --purple:  #6830c4;
+  --dot:     rgba(0,0,0,0.1);
+  --shadow:  0 2px 12px rgba(0,0,0,0.07);
+  --shadow2: 0 6px 28px rgba(0,0,0,0.12);
+  --r: 10px; --rl: 14px;
+  --sw: 260px;
+}
+body.dark {
+  --bg:#0f0f11; --bg2:#17171b; --bg3:#1f1f25;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#e8e8ec; --text2:#8a8a9a; --text3:#55556a;
+  --accent:#4f8ef7; --accent-dim:rgba(79,142,247,0.12);
+  --green:#2dd4a0; --amber:#f0a832; --red:#f05454; --purple:#a78bfa;
+  --dot:rgba(255,255,255,0.045);
+  --shadow:0 2px 16px rgba(0,0,0,0.4); --shadow2:0 8px 32px rgba(0,0,0,0.5);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; height:100vh; display:flex; transition:background .3s,color .3s; }
 
-  body.dark {
-    --bg:      #0f0f11;
-    --bg2:     #16161a;
-    --bg3:     #1e1e24;
-    --border:  rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.13);
-    --text:    #e8e8ec;
-    --text2:   #8a8a9a;
-    --text3:   #555568;
-    --accent:  #4f8ef7;
-    --accent-dim: rgba(79,142,247,0.12);
-    --green:   #2dd4a0;
-    --amber:   #f0a832;
-    --red:     #f05454;
-    --purple:  #a78bfa;
-    --node-shadow: 0 2px 16px rgba(0,0,0,0.4);
-    --node-shadow-hover: 0 8px 32px rgba(0,0,0,0.5);
-    --toolbar-shadow: 0 8px 32px rgba(0,0,0,0.4);
-    --dot-color: rgba(255,255,255,0.05);
-  }
+/* ── Sidebar ── */
+#sidebar { width:var(--sw); min-width:var(--sw); background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:100; transition:background .3s; }
+#sh { padding:16px 14px 12px; border-bottom:1px solid var(--border); }
+#logo { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
+#logo-mark { width:28px; height:28px; background:linear-gradient(135deg,var(--accent),var(--purple)); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+#logo-text { font-size:12px; font-weight:600; color:var(--text); }
+#logo-sub  { font-size:10px; color:var(--text3); margin-top:1px; }
+#logo-ver  { margin-left:auto; font-size:9px; font-family:'DM Mono',monospace; color:var(--text3); background:var(--bg3); border:1px solid var(--border); padding:2px 7px; border-radius:99px; }
+#status-bar { font-size:11px; color:var(--text3); padding:4px 8px; background:var(--bg3); border-radius:6px; border:1px solid var(--border); display:flex; align-items:center; gap:5px; }
+.sdot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+.sdot.ok{background:var(--green);} .sdot.err{background:var(--red);} .sdot.loading{background:var(--amber);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+#tabs { display:flex; border-bottom:1px solid var(--border); padding:0 4px; }
+.tab { flex:1; padding:8px 4px; font-size:11px; font-weight:500; color:var(--text3); background:none; border:none; cursor:pointer; border-bottom:2px solid transparent; transition:all .15s; font-family:inherit; }
+.tab:hover{color:var(--text2);} .tab.on{color:var(--text);border-bottom-color:var(--accent);}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow: hidden;
-    height: 100vh;
-    display: flex;
-    transition: background .3s, color .3s;
-  }
+#sc { flex:1; overflow-y:auto; padding:10px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
 
-  #sidebar {
-    width: var(--sidebar-w);
-    min-width: var(--sidebar-w);
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    z-index: 100;
-    transition: background .3s, border-color .3s;
-  }
+.add-btn { width:100%; margin-bottom:8px; padding:7px 12px; background:none; border:1px dashed var(--border2); border-radius:var(--r); color:var(--text3); font-size:11px; font-weight:500; cursor:pointer; font-family:inherit; text-align:left; transition:all .15s; display:flex; align-items:center; gap:6px; }
+.add-btn:hover{background:var(--bg3);color:var(--text2);}
 
-  #sidebar-header { padding: 18px 16px 14px; border-bottom: 1px solid var(--border); }
+.mod-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:5px; cursor:grab; transition:all .15s; }
+.mod-item:hover{border-color:var(--border2);transform:translateX(2px);}
+.mod-item:active{cursor:grabbing;}
+.mdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.mname { font-size:12px; font-weight:500; color:var(--text); }
+.mmeta { font-size:10px; color:var(--text3); margin-top:1px; }
+.empty-list { text-align:center; padding:24px 10px; color:var(--text3); font-size:11px; }
 
-  #logo { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; width: 100%; }
-  #logo-mark {
-    width: 30px; height: 30px;
-    background: linear-gradient(135deg, var(--accent), var(--purple));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px;
-  }
-  #logo-text { font-size: 13px; font-weight: 600; color: var(--text); }
-  #logo-sub  { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.conn-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:5px; cursor:pointer; transition:all .15s; }
+.conn-item:hover{border-color:var(--border2);}
+.conn-item.on{border-color:var(--accent);background:var(--accent-dim);}
+.cname{font-size:12px;font-weight:500;color:var(--text);}
+.cdesc{font-size:10px;color:var(--text3);}
 
-  #notion-status {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--text3);
-    padding: 5px 10px;
-    background: var(--bg3);
-    border-radius: 6px;
-    border: 1px solid var(--border);
-  }
+/* Config lists */
+.cfg-lbl { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; display:block; margin-bottom:6px; }
+.cfg-item { display:flex; align-items:center; padding:6px 10px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:4px; font-size:12px; color:var(--text); }
+.cfg-item span{flex:1;}
+.cfg-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:15px; line-height:1; }
+.cfg-del:hover{color:var(--red);}
+.cfg-add { display:flex; gap:6px; margin-bottom:14px; }
+.cfg-add input{flex:1;}
+.cfg-add button{padding:7px 11px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;font-family:inherit;}
 
-  .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .status-dot.ok      { background: var(--green); }
-  .status-dot.loading { background: var(--amber); animation: blink 1s infinite; }
-  .status-dot.err     { background: var(--red); }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+/* ── Canvas ── */
+#cw { flex:1; position:relative; overflow:hidden; background:var(--bg); background-image:radial-gradient(circle,var(--dot) 1px,transparent 1px); background-size:26px 26px; transition:background .3s; }
+#esvg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
+#cv   { position:absolute; top:0; left:0; width:100%; height:100%; }
 
-  #sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 4px; }
-  .tab-btn {
-    flex: 1; padding: 9px 4px;
-    font-size: 11px; font-weight: 500;
-    color: var(--text3);
-    background: none; border: none;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all .15s; font-family: inherit;
-  }
-  .tab-btn:hover { color: var(--text2); }
-  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+/* Nodes */
+.node { position:absolute; width:var(--nw,180px); background:var(--bg2); border:1.5px solid var(--border2); border-radius:var(--rl); padding:12px 14px; cursor:move; user-select:none; box-shadow:var(--shadow); transition:box-shadow .2s,border-color .2s,background .3s; }
+.node:hover{box-shadow:var(--shadow2);}
+.node.connecting{border-color:var(--amber);cursor:crosshair;}
+.node.editing{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.ntop{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.ncol{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ntitle{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;}
+.ntags{display:flex;flex-wrap:wrap;gap:3px;}
+.ntag{font-size:9px;padding:2px 7px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'DM Mono',monospace;}
+.ntag.s-ativo{color:var(--green);border-color:rgba(26,122,74,.25);}
+.ntag.s-legado{color:var(--amber);border-color:rgba(201,125,16,.25);}
+.ntag.s-desc{color:var(--red);}
+.nacts{display:flex;gap:4px;margin-top:9px;opacity:0;transition:opacity .15s;}
+.node:hover .nacts{opacity:1;}
+.nbtn{font-size:9px;padding:3px 9px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:inherit;transition:all .1s;}
+.nbtn:hover{color:var(--text);}
+.nbtn.p{color:var(--accent);border-color:rgba(36,85,199,.25);background:var(--accent-dim);}
 
-  #sidebar-content { flex: 1; overflow-y: auto; padding: 10px; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; }
+/* Toolbar */
+#tb { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); display:flex; gap:3px; align-items:center; background:var(--bg2); border:1px solid var(--border2); border-radius:99px; padding:5px 10px; box-shadow:var(--shadow2); z-index:50; transition:background .3s; }
+.tbtn { font-size:11px; font-weight:500; padding:5px 13px; border-radius:99px; border:none; background:none; color:var(--text2); cursor:pointer; font-family:inherit; transition:all .15s; }
+.tbtn:hover{background:var(--bg3);color:var(--text);}
+.tbtn.on{background:var(--accent);color:#fff;}
+.tsep{width:1px;height:15px;background:var(--border);margin:0 3px;}
 
-  .sidebar-action {
-    display: flex; align-items: center; gap: 8px;
-    width: 100%; padding: 7px 12px;
-    background: none;
-    border: 1px dashed var(--border2);
-    border-radius: var(--radius);
-    color: var(--text3);
-    font-size: 11px; font-weight: 500;
-    cursor: pointer; transition: all .15s;
-    margin-bottom: 8px; font-family: inherit; text-align: left;
-  }
-  .sidebar-action:hover { background: var(--bg3); color: var(--text2); }
+/* Chips */
+#chips { position:absolute; top:12px; right:12px; display:flex; gap:5px; z-index:50; }
+.chip { font-size:10px; padding:3px 10px; border-radius:99px; background:var(--bg2); border:1px solid var(--border); color:var(--text3); font-family:'DM Mono',monospace; transition:background .3s; }
+#chip-save { opacity:0; transition:opacity .4s; }
 
-  .module-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 5px; cursor: grab; transition: all .15s;
-  }
-  .module-item:hover { border-color: var(--border2); transform: translateX(2px); }
-  .module-item:active { cursor: grabbing; }
-  .module-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .module-name { font-size: 12px; font-weight: 500; color: var(--text); }
-  .module-meta { font-size: 10px; color: var(--text3); margin-top: 1px; }
+/* Connect banner */
+#cbanner { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); background:var(--amber); color:#fff; font-size:11px; font-weight:600; padding:6px 16px; border-radius:99px; z-index:60; }
 
-  .conn-type-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    margin-bottom: 5px; cursor: pointer; transition: all .15s;
-  }
-  .conn-type-item:hover   { border-color: var(--border2); }
-  .conn-type-item.selected { border-color: var(--accent); background: var(--accent-dim); }
-  .conn-type-name { font-size: 12px; font-weight: 500; color: var(--text); }
-  .conn-type-desc { font-size: 10px; color: var(--text3); }
+/* ── Edit popover ── */
+#eov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; backdrop-filter:blur(2px); }
+#ep  { display:none; position:fixed; width:292px; background:var(--bg2); border:1px solid var(--border2); border-radius:var(--rl); box-shadow:0 8px 40px rgba(0,0,0,.25); z-index:201; flex-direction:column; max-height:88vh; overflow:hidden; }
+#ep.open,#eov.open{display:flex;}
+#ep-hd { padding:13px 15px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+#ep-title { font-size:13px; font-weight:600; color:var(--text); }
+#ep-close { background:none; border:none; font-size:20px; color:var(--text3); cursor:pointer; line-height:1; }
+#ep-body { overflow-y:auto; padding:14px 15px; flex:1; scrollbar-width:thin; }
+.fl { margin-bottom:13px; }
+.fl label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; display:block; margin-bottom:4px; }
+.fi { width:100%; padding:7px 10px; border-radius:8px; border:1px solid var(--border2); background:var(--bg3); color:var(--text); font-size:12px; font-family:inherit; outline:none; transition:border-color .15s; }
+.fi:focus{border-color:var(--accent);}
+textarea.fi{resize:vertical;min-height:58px;}
+select.fi{cursor:pointer;}
+.cr{display:flex;gap:6px;flex-wrap:wrap;}
+.cd{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;}
+.cd:hover{transform:scale(1.15);}
+.cd.on{border-color:var(--text);}
+#ep-ft { padding:11px 15px; border-top:1px solid var(--border); display:flex; gap:8px; flex-shrink:0; }
+.bs { flex:1; padding:8px; border-radius:8px; border:none; background:var(--accent); color:#fff; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
+.bd { padding:8px 12px; border-radius:8px; border:1px solid var(--border2); background:none; color:var(--red); font-size:12px; cursor:pointer; font-family:inherit; }
 
-  /* ── Configurações ── */
-  .setting-group { margin-bottom: 20px; }
-  .setting-label {
-    font-size: 10px; font-weight: 600;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    display: block;
-  }
+/* ── Dialogs ── */
+.dlg { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; }
+.dlg.open{display:flex;}
+.dlg-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);}
+.dlg-box { position:relative; z-index:301; background:var(--bg2); border:1px solid var(--border2); border-radius:14px; padding:22px; width:300px; box-shadow:0 12px 48px rgba(0,0,0,.25); text-align:center; }
+.dlg-ico{font-size:26px;margin-bottom:9px;}
+.dlg-t{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;}
+.dlg-s{font-size:12px;color:var(--text3);margin-bottom:18px;line-height:1.5;}
+.dlg-btns{display:flex;gap:7px;justify-content:center;}
+.db{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;border:none;}
+.db.p{background:var(--accent);color:#fff;}
+.db.d{background:var(--red);color:#fff;}
+.db.g{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
 
-  .setting-card {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-    margin-bottom: 6px;
-  }
-  .setting-card-label { font-size: 12px; font-weight: 500; color: var(--text); }
-  .setting-card-sub   { font-size: 10px; color: var(--text3); margin-top: 2px; margin-bottom: 10px; }
-
-  .slider-row { display: flex; align-items: center; gap: 8px; }
-  .setting-slider {
-    flex: 1; -webkit-appearance: none;
-    height: 3px; border-radius: 2px;
-    background: var(--border2); outline: none; cursor: pointer;
-  }
-  .setting-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--accent); cursor: pointer;
-    border: 2px solid var(--bg2);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-  }
-  .setting-value {
-    font-size: 11px; font-family: 'DM Mono', monospace;
-    color: var(--accent); min-width: 36px; text-align: right;
-  }
-
-  .theme-row {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 11px 12px;
-    cursor: pointer; transition: all .15s;
-    margin-bottom: 6px;
-  }
-  .theme-row:hover { border-color: var(--border2); }
-
-  .toggle-switch {
-    width: 34px; height: 18px;
-    background: var(--border2);
-    border-radius: 9px; position: relative;
-    transition: background .2s; flex-shrink: 0;
-  }
-  .toggle-switch.on { background: var(--accent); }
-  .toggle-knob {
-    position: absolute; top: 2px; left: 2px;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: white; transition: transform .2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-  .toggle-switch.on .toggle-knob { transform: translateX(16px); }
-
-  .setting-reset {
-    width: 100%; padding: 7px;
-    border-radius: var(--radius);
-    border: 1px solid var(--border2);
-    background: none; color: var(--red);
-    font-size: 11px; font-weight: 500;
-    cursor: pointer; transition: all .15s; font-family: inherit;
-  }
-  .setting-reset:hover { background: var(--bg3); }
-
-  /* ── Canvas ── */
-  #canvas-wrap {
-    flex: 1; position: relative; overflow: hidden;
-    background: var(--bg);
-    background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
-    background-size: 28px 28px;
-    transition: background .3s;
-  }
-
-  #edges-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-  #canvas    { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
-  .canvas-node {
-    position: absolute;
-    width: var(--node-width);
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    border-radius: var(--radius-lg);
-    padding: 13px 15px;
-    cursor: move; user-select: none;
-    box-shadow: var(--node-shadow);
-    transition: box-shadow .2s, border-color .2s, background .3s, width .2s;
-  }
-  .canvas-node:hover { box-shadow: var(--node-shadow-hover); }
-  .canvas-node.connecting { border-color: var(--amber); cursor: crosshair; }
-
-  .node-top   { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-  .node-color { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .node-title { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
-
-  .node-tags { display: flex; flex-wrap: wrap; gap: 3px; }
-  .node-tag  {
-    font-size: 9px; padding: 2px 7px; border-radius: 99px;
-    background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text3); font-family: 'DM Mono', monospace;
-  }
-  .node-tag.s-ativo  { color: var(--green); border-color: rgba(5,150,105,0.3); }
-  .node-tag.s-legado { color: var(--amber); border-color: rgba(217,119,6,0.3); }
-  .node-tag.s-desc   { color: var(--red); }
-
-  .node-actions { display: flex; gap: 4px; margin-top: 9px; opacity: 0; transition: opacity .15s; }
-  .canvas-node:hover .node-actions { opacity: 1; }
-
-  .node-btn {
-    font-size: 9px; padding: 3px 9px; border-radius: 6px;
-    border: 1px solid var(--border2); background: var(--bg3);
-    color: var(--text2); cursor: pointer; font-family: inherit; transition: all .1s;
-  }
-  .node-btn:hover { color: var(--text); }
-  .node-btn.primary { color: var(--accent); border-color: rgba(37,99,235,0.25); background: var(--accent-dim); }
-  body.dark .node-btn.primary { border-color: rgba(79,142,247,0.3); }
-
-  #toolbar {
-    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 3px; align-items: center;
-    background: var(--bg2); border: 1px solid var(--border2);
-    border-radius: 99px; padding: 5px 10px;
-    box-shadow: var(--toolbar-shadow); z-index: 50; transition: background .3s;
-  }
-  .tool-btn {
-    font-size: 11px; font-weight: 500; padding: 5px 14px; border-radius: 99px;
-    border: none; background: none; color: var(--text2); cursor: pointer;
-    transition: all .15s; font-family: inherit;
-  }
-  .tool-btn:hover { background: var(--bg3); color: var(--text); }
-  .tool-btn.active { background: var(--accent); color: #fff; }
-  .toolbar-sep { width: 1px; height: 16px; background: var(--border); margin: 0 3px; }
-
-  #theme-btn {
-    font-size: 14px; padding: 3px 7px;
-    border-radius: 99px; border: none;
-    background: none; cursor: pointer; line-height: 1;
-    transition: background .15s;
-  }
-  #theme-btn:hover { background: var(--bg3); }
-
-  #statusbar { position: absolute; top: 14px; right: 14px; display: flex; gap: 5px; z-index: 50; }
-  .chip {
-    font-size: 10px; padding: 3px 10px; border-radius: 99px;
-    background: var(--bg2); border: 1px solid var(--border);
-    color: var(--text3); font-family: 'DM Mono', monospace;
-    transition: background .3s;
-  }
-
-  #conn-banner {
-    display: none; position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
-    background: var(--amber); color: #000;
-    font-size: 11px; font-weight: 600;
-    padding: 6px 16px; border-radius: 99px; z-index: 60;
-  }
-  body.dark #conn-banner { color: #fff; }
-
-  .empty { text-align: center; padding: 28px 14px; color: var(--text3); font-size: 11px; }
-
-  /* ── Popover de edição flutuante ── */
-  #edit-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 150;
-    backdrop-filter: blur(2px);
-  }
-  #edit-overlay.open { display: block; }
-
-  #edit-panel {
-    position: fixed;
-    top: 50%; 
-    transform: translateY(-50%);
-    left: var(--panel-x, 50%);
-    width: 288px;
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    border-radius: 16px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.05);
-    display: none;
-    flex-direction: column;
-    z-index: 151;
-    max-height: 88vh;
-    overflow: hidden;
-    animation: popIn .18s ease;
-  }
-  #edit-panel.open { display: flex; }
-
-  @keyframes popIn {
-    from { opacity:0; transform:scale(.96) translateY(-6px); }
-    to   { opacity:1; transform:scale(1) translateY(0); }
-  }
-
-  /* Arrow pointing left toward the node */
-  #edit-panel::before {
-    content: '';
-    position: absolute;
-    left: -8px; top: 50%; transform: translateY(-50%);
-    border: 8px solid transparent;
-    border-right-color: var(--border2);
-    border-left: none;
-    display: var(--arrow-display, block);
-  }
-  #edit-panel::after {
-    content: '';
-    position: absolute;
-    left: -6px; top: 50%; transform: translateY(-50%);
-    border: 7px solid transparent;
-    border-right-color: var(--bg2);
-    border-left: none;
-    display: var(--arrow-display, block);
-  }
-
-  #edit-panel-header {
-    padding: 14px 16px 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    flex-shrink: 0;
-  }
-  #edit-panel-title { font-size: 13px; font-weight: 600; color: var(--text); }
-  #edit-panel-close { background: none; border: none; font-size: 20px; color: var(--text3); cursor: pointer; line-height: 1; }
-  #edit-panel-body { overflow-y: auto; padding: 14px 16px; scrollbar-width: thin; flex: 1; }
-
-  .field-group { margin-bottom: 13px; }
-  .field-lbl { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; display: block; margin-bottom: 4px; }
-  .field-inp {
-    width: 100%; padding: 7px 10px;
-    border-radius: 8px; border: 1px solid var(--border2);
-    background: var(--bg3); color: var(--text);
-    font-size: 12px; font-family: inherit; outline: none;
-    transition: border-color .15s;
-  }
-  .field-inp:focus { border-color: var(--accent); }
-  textarea.field-inp { resize: vertical; min-height: 60px; }
-  select.field-inp { cursor: pointer; }
-
-  .color-row { display: flex; gap: 6px; flex-wrap: wrap; }
-  .cp-dot {
-    width: 20px; height: 20px; border-radius: 50%;
-    cursor: pointer; border: 2px solid transparent;
-    transition: transform .1s;
-  }
-  .cp-dot:hover { transform: scale(1.15); }
-  .cp-dot.selected { border-color: var(--text); }
-
-  #edit-panel-footer {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border);
-    display: flex; gap: 8px;
-    flex-shrink: 0;
-  }
-  .btn-save {
-    flex: 1; padding: 8px;
-    border-radius: 8px; border: none;
-    background: var(--accent); color: #fff;
-    font-size: 12px; font-weight: 600;
-    cursor: pointer; font-family: inherit;
-    transition: opacity .15s;
-  }
-  .btn-save:hover { opacity: .85; }
-  .btn-delete {
-    padding: 8px 12px; border-radius: 8px;
-    border: 1px solid var(--border2);
-    background: none; color: var(--red);
-    font-size: 12px; cursor: pointer; font-family: inherit;
-  }
-
-  /* Config lists */
-  .config-list-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 10px;
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 8px; margin-bottom: 5px;
-    font-size: 12px; color: var(--text);
-  }
-  .config-list-item span { flex: 1; }
-  .config-list-del { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; line-height: 1; }
-  .config-list-del:hover { color: var(--red); }
-  .config-add-row { display: flex; gap: 6px; margin-top: 6px; }
-  .config-add-row input { flex: 1; }
-  .config-add-btn {
-    padding: 7px 12px; border-radius: 8px;
-    border: 1px solid var(--border2); background: var(--bg3);
-    color: var(--text); font-size: 11px; cursor: pointer; font-family: inherit;
-  }
-  .canvas-node.editing { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
-
-
-  /* ── Diálogos de confirmação ── */
-  .confirm-dialog {
-    display: none;
-    position: fixed; inset: 0;
-    z-index: 300;
-    align-items: center; justify-content: center;
-  }
-  .confirm-dialog-box {
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    border-radius: 14px;
-    padding: 24px;
-    width: 300px;
-    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
-    position: relative; z-index: 301;
-    text-align: center;
-  }
-  .confirm-dialog-icon { font-size: 28px; margin-bottom: 10px; }
-  .confirm-dialog-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-  .confirm-dialog-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; line-height: 1.5; }
-  .confirm-dialog-btns { display: flex; gap: 8px; justify-content: center; }
-  .cdb { padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; border: none; }
-  .cdb.primary { background: var(--accent); color: #fff; }
-  .cdb.danger  { background: var(--red); color: #fff; }
-  .cdb.ghost   { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
-
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
 </head>
 <body>
 
+<!-- Sidebar -->
 <div id="sidebar">
-  <div id="sidebar-header">
+  <div id="sh">
     <div id="logo">
       <div id="logo-mark">🗺</div>
       <div>
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.21</div>
+      <div id="logo-ver">v1.22</div>
     </div>
-    <div id="notion-status">
-      <div class="status-dot loading" id="sdot"></div>
-      <span id="slabel">Conectando ao Notion...</span>
-    </div>
+    <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
 
-  <div id="sidebar-tabs">
-    <button class="tab-btn active" onclick="tab('modules')">Módulos</button>
-    <button class="tab-btn" onclick="tab('connections')">Conexões</button>
-    <button class="tab-btn" onclick="tab('settings')">Config.</button>
+  <div id="tabs">
+    <button class="tab on" onclick="tab('mods')">Módulos</button>
+    <button class="tab" onclick="tab('conns')">Conexões</button>
+    <button class="tab" onclick="tab('cfg')">Config.</button>
   </div>
 
-  <div id="sidebar-content">
-
-    <div id="tab-modules">
-      <button class="sidebar-action" onclick="openNewModuleModal()">
-        + &nbsp;Novo módulo
-      </button>
-      <button class="sidebar-action" onclick="window.open('https://docs.google.com/spreadsheets/d/1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA','_blank')" style="font-size:10px">
-        ↗ &nbsp;Ver planilha completa
-      </button>
-      <div id="modules-list"><div class="empty">Carregando...</div></div>
+  <div id="sc">
+    <!-- Módulos -->
+    <div id="t-mods">
+      <button class="add-btn" onclick="openNewMod()">+ Novo módulo</button>
+      <div id="mods-list"></div>
     </div>
 
-    <div id="tab-connections" style="display:none">
-      <button class="sidebar-action" onclick="window.open('https://docs.google.com/spreadsheets/d/1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA','_blank')">
-        ↗ &nbsp;Abrir planilha de conexões
-      </button>
-      <div id="conn-types-list"><div class="empty">Carregando...</div></div>
+    <!-- Conexões -->
+    <div id="t-conns" style="display:none">
+      <div id="conns-list"></div>
     </div>
 
-    <div id="tab-settings" style="display:none">
-
-      <div class="setting-group">
-        <span class="setting-label">Aparência</span>
-        <div class="theme-row" onclick="toggleTheme()">
-          <div>
-            <div style="font-size:12px;font-weight:500;color:var(--text)">Modo escuro</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px">Alternar entre dia e noite</div>
+    <!-- Config -->
+    <div id="t-cfg" style="display:none">
+      <div style="margin-bottom:18px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span class="cfg-lbl" style="margin:0">Modo escuro</span>
+          <div id="theme-tog" onclick="toggleTheme()" style="width:32px;height:18px;background:var(--border2);border-radius:9px;position:relative;cursor:pointer;transition:background .2s">
+            <div id="theme-knob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
           </div>
-          <div class="toggle-switch" id="dark-toggle"><div class="toggle-knob"></div></div>
         </div>
-      </div>
-
-      <div class="setting-group">
-        <span class="setting-label">Caixas de módulo</span>
-        <div class="setting-card">
-          <div class="setting-card-label">Largura da caixa</div>
-          <div class="setting-card-sub">Tamanho dos cards no canvas</div>
-          <div class="slider-row">
-            <input type="range" class="setting-slider" id="sl-node-width"
-              min="120" max="320" step="10" value="180"
-              oninput="applyNodeWidth(this.value)">
-            <span class="setting-value" id="val-node-width">180px</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span class="cfg-lbl" style="margin:0">Largura dos cards</span>
+          <div style="display:flex;align-items:center;gap:7px">
+            <input type="range" id="sl-nw" min="140" max="300" step="10" value="180" style="-webkit-appearance:none;width:90px;height:3px;border-radius:2px;background:var(--border2);outline:none;cursor:pointer" oninput="applyNW(this.value)">
+            <span id="nw-val" style="font-size:10px;font-family:'DM Mono',monospace;color:var(--accent);min-width:32px">180px</span>
           </div>
         </div>
       </div>
 
-      <div class="setting-group">
-        <span class="setting-label">Conexões</span>
-        <div class="setting-card">
-          <div class="setting-card-label">Espessura da linha</div>
-          <div class="setting-card-sub">Largura das setas no canvas</div>
-          <div class="slider-row">
-            <input type="range" class="setting-slider" id="sl-line-width"
-              min="0.5" max="6" step="0.5" value="1.8"
-              oninput="applyLineWidth(this.value)">
-            <span class="setting-value" id="val-line-width">1.8px</span>
-          </div>
-        </div>
-      </div>
+      <span class="cfg-lbl">Desenvolvedores</span>
+      <div id="cfg-devs"></div>
+      <div class="cfg-add"><input class="fi" id="in-dev" placeholder="Nova empresa..."><button onclick="addCfg('devs')">+</button></div>
 
-      <div class="setting-group">
-        <span class="setting-label">Chave de acesso</span>
-        <div class="setting-card">
-          <div class="setting-card-label">Chave da Anthropic</div>
-          <div class="setting-card-sub">Necessária para buscar dados do Notion. Fica salva no navegador.</div>
-          <div style="display:flex;gap:6px;margin-top:8px">
-            <input type="password" id="api-key-input" placeholder="sk-ant-..." 
-              style="flex:1;padding:6px 10px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-size:11px;font-family:'DM Mono',monospace;outline:none;">
-            <button onclick="saveApiKey()" style="padding:6px 12px;border-radius:6px;border:none;background:var(--accent);color:#fff;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;">Salvar</button>
-          </div>
-          <div id="api-key-status" style="font-size:10px;margin-top:6px;color:var(--text3)"></div>
-        </div>
-        <button class="setting-reset" onclick="clearApiKey()" style="color:var(--text3)">Esquecer chave salva</button>
-      </div>
+      <span class="cfg-lbl">Ambientes</span>
+      <div id="cfg-ambs"></div>
+      <div class="cfg-add"><input class="fi" id="in-amb" placeholder="Novo ambiente..."><button onclick="addCfg('ambs')">+</button></div>
 
-      <div class="setting-group">
-        <span class="setting-label">Desenvolvedores</span>
-        <div id="cfg-devs-list"></div>
-        <div class="config-add-row">
-          <input class="field-inp" id="cfg-dev-input" placeholder="Nova empresa..." style="margin-bottom:0">
-          <button class="config-add-btn" onclick="addConfigItem('devs')">+</button>
-        </div>
-      </div>
-
-      <div class="setting-group">
-        <span class="setting-label">Ambientes</span>
-        <div id="cfg-ambientes-list"></div>
-        <div class="config-add-row">
-          <input class="field-inp" id="cfg-ambiente-input" placeholder="Novo ambiente..." style="margin-bottom:0">
-          <button class="config-add-btn" onclick="addConfigItem('ambientes')">+</button>
-        </div>
-      </div>
-
-      <div class="setting-group">
-        <span class="setting-label">Status</span>
-        <div id="cfg-status-list"></div>
-        <div class="config-add-row">
-          <input class="field-inp" id="cfg-status-input" placeholder="Novo status..." style="margin-bottom:0">
-          <button class="config-add-btn" onclick="addConfigItem('status')">+</button>
-        </div>
-      </div>
-
-      <div class="setting-group">
-        <span class="setting-label">Restaurar</span>
-        <button class="setting-reset" onclick="resetSettings()">↺ Restaurar padrões visuais</button>
-      </div>
-
+      <span class="cfg-lbl">Status</span>
+      <div id="cfg-sts"></div>
+      <div class="cfg-add"><input class="fi" id="in-sta" placeholder="Novo status..."><button onclick="addCfg('sts')">+</button></div>
     </div>
   </div>
 </div>
 
-<div id="canvas-wrap">
-  <svg id="edges-svg"></svg>
-  <div id="canvas"></div>
-  <div id="conn-banner">Clique em outro módulo para conectar — ESC para cancelar</div>
-  <div id="statusbar">
-    <div class="chip" id="chip-nodes">— módulos</div>
-    <div class="chip" id="chip-edges">— conexões</div>
+<!-- Canvas -->
+<div id="cw">
+  <svg id="esvg"></svg>
+  <div id="cv"></div>
+  <div id="cbanner">Clique em outro módulo para conectar — ESC para cancelar</div>
+  <div id="chips">
+    <div class="chip" id="chip-mods">—</div>
+    <div class="chip" id="chip-edges">—</div>
+    <div class="chip" id="chip-save">✓ salvo</div>
   </div>
-  <div id="toolbar">
-    <button class="tool-btn active" id="tbtn-select" onclick="setTool('select')">Selecionar</button>
-    <button class="tool-btn" id="tbtn-connect" onclick="setTool('connect')">Conectar</button>
-    <div class="toolbar-sep"></div>
-    <button class="tool-btn" onclick="doRefresh()">↺ Atualizar</button>
-    <button class="tool-btn" onclick="clearCanvas()">Limpar</button>
-    <div class="toolbar-sep"></div>
-    <button id="theme-btn" onclick="toggleTheme()" title="Alternar tema">🌙</button>
+  <div id="tb">
+    <button class="tbtn on" id="tbtn-sel" onclick="setTool('sel')">Selecionar</button>
+    <button class="tbtn" id="tbtn-con" onclick="setTool('con')">Conectar</button>
+    <div class="tsep"></div>
+    <button class="tbtn" onclick="doRefresh()">↺ Atualizar</button>
+    <button class="tbtn" onclick="clearCanvas()">Limpar</button>
+    <div class="tsep"></div>
+    <button id="theme-btn" onclick="toggleTheme()" style="font-size:14px;padding:3px 7px;border-radius:99px;border:none;background:none;cursor:pointer;">🌙</button>
   </div>
+</div>
 
-<!-- Overlay escurecido -->
-<div id="edit-overlay" onclick="closeEditPanel(false)"></div>
+<!-- Edit overlay -->
+<div id="eov" onclick="tryCloseEP()"></div>
 
-<!-- Popover flutuante -->
-<div id="edit-panel">
-  <div id="edit-panel-header">
-      <span id="edit-panel-title">Editar módulo</span>
-      <button id="edit-panel-close" onclick="closeEditPanel(false)">×</button>
+<!-- Edit popover -->
+<div id="ep">
+  <div id="ep-hd">
+    <span id="ep-title">Editar módulo</span>
+    <button id="ep-close" onclick="tryCloseEP()">×</button>
+  </div>
+  <div id="ep-body">
+    <input type="hidden" id="ep-id">
+    <div class="fl"><label>Nome *</label><input class="fi" id="ep-name" oninput="dirty=true" placeholder="Nome do módulo"></div>
+    <div class="fl"><label>Área</label><input class="fi" id="ep-area" oninput="dirty=true" placeholder="Ex: Comercial, RH..."></div>
+    <div class="fl"><label>Descrição</label><textarea class="fi" id="ep-desc" oninput="dirty=true" placeholder="O que este módulo faz?"></textarea></div>
+    <div class="fl"><label>Desenvolvedor</label><select class="fi" id="ep-dev" onchange="dirty=true"></select></div>
+    <div class="fl"><label>Ambiente</label><select class="fi" id="ep-amb" onchange="dirty=true"></select></div>
+    <div class="fl"><label>Status</label><select class="fi" id="ep-sta" onchange="dirty=true"></select></div>
+    <div class="fl">
+      <label>Cor</label>
+      <div class="cr" id="ep-cr">
+        <div class="cd" data-c="#2455c7" style="background:#2455c7" onclick="pickC('#2455c7',this)"></div>
+        <div class="cd" data-c="#059669" style="background:#059669" onclick="pickC('#059669',this)"></div>
+        <div class="cd" data-c="#c97d10" style="background:#c97d10" onclick="pickC('#c97d10',this)"></div>
+        <div class="cd" data-c="#c42b2b" style="background:#c42b2b" onclick="pickC('#c42b2b',this)"></div>
+        <div class="cd" data-c="#6830c4" style="background:#6830c4" onclick="pickC('#6830c4',this)"></div>
+        <div class="cd" data-c="#c42b7a" style="background:#c42b7a" onclick="pickC('#c42b7a',this)"></div>
+        <div class="cd" data-c="#0891b2" style="background:#0891b2" onclick="pickC('#0891b2',this)"></div>
+        <div class="cd" data-c="#65a30d" style="background:#65a30d" onclick="pickC('#65a30d',this)"></div>
+        <div class="cd" data-c="#78716c" style="background:#78716c" onclick="pickC('#78716c',this)"></div>
+        <div class="cd" data-c="#1d4ed8" style="background:#1d4ed8" onclick="pickC('#1d4ed8',this)"></div>
+      </div>
+      <input type="hidden" id="ep-col" value="#2455c7">
     </div>
-    <div id="edit-panel-body">
-      <input type="hidden" id="ep-id">
+  </div>
+  <div id="ep-ft">
+    <button class="bd" onclick="confirmDelete()">Excluir</button>
+    <button class="bs" onclick="saveMod()">Salvar</button>
+  </div>
+</div>
 
-      <div class="field-group">
-        <label class="field-lbl">Nome *</label>
-        <input class="field-inp" id="ep-name" type="text" placeholder="Nome do módulo" oninput="markDirty()">
-      </div>
-
-      <div class="field-group">
-        <label class="field-lbl">Área</label>
-        <input class="field-inp" id="ep-area" type="text" placeholder="Ex: Comercial, RH..." oninput="markDirty()">
-      </div>
-
-      <div class="field-group">
-        <label class="field-lbl">Descrição</label>
-        <textarea class="field-inp" id="ep-desc" placeholder="O que este módulo faz?" oninput="markDirty()"></textarea>
-      </div>
-
-      <div class="field-group">
-        <label class="field-lbl">Desenvolvedor</label>
-        <select class="field-inp" id="ep-dev" onchange="markDirty()"></select>
-      </div>
-
-      <div class="field-group">
-        <label class="field-lbl">Ambiente</label>
-        <select class="field-inp" id="ep-ambiente" onchange="markDirty()"></select>
-      </div>
-
-      <div class="field-group">
-        <label class="field-lbl">Status</label>
-        <select class="field-inp" id="ep-status" onchange="markDirty()"></select>
-      </div>
-
-      <div class="field-group">
-        <label class="field-lbl">Cor</label>
-        <div class="color-row" id="ep-colors">
-          <div class="cp-dot" data-color="#2563eb" style="background:#2563eb" onclick="epPickColor('#2563eb',this)"></div>
-          <div class="cp-dot" data-color="#059669" style="background:#059669" onclick="epPickColor('#059669',this)"></div>
-          <div class="cp-dot" data-color="#d97706" style="background:#d97706" onclick="epPickColor('#d97706',this)"></div>
-          <div class="cp-dot" data-color="#dc2626" style="background:#dc2626" onclick="epPickColor('#dc2626',this)"></div>
-          <div class="cp-dot" data-color="#7c3aed" style="background:#7c3aed" onclick="epPickColor('#7c3aed',this)"></div>
-          <div class="cp-dot" data-color="#db2777" style="background:#db2777" onclick="epPickColor('#db2777',this)"></div>
-          <div class="cp-dot" data-color="#0891b2" style="background:#0891b2" onclick="epPickColor('#0891b2',this)"></div>
-          <div class="cp-dot" data-color="#65a30d" style="background:#65a30d" onclick="epPickColor('#65a30d',this)"></div>
-          <div class="cp-dot" data-color="#888780" style="background:#888780" onclick="epPickColor('#888780',this)"></div>
-          <div class="cp-dot" data-color="#1e40af" style="background:#1e40af" onclick="epPickColor('#1e40af',this)"></div>
-        </div>
-        <input type="hidden" id="ep-color" value="#2563eb">
-      </div>
-    </div>
-    <div id="edit-panel-footer">
-      <button class="btn-delete" onclick="deleteModuleFromPanel()">Excluir</button>
-      <button class="btn-save" onclick="saveModuleFromPanel()">Salvar</button>
+<!-- Dialog: unsaved -->
+<div class="dlg" id="dlg-unsaved">
+  <div class="dlg-bg" onclick="dlgUnsaved('cancel')"></div>
+  <div class="dlg-box">
+    <div class="dlg-ico">💾</div>
+    <div class="dlg-t">Alterações não salvas</div>
+    <div class="dlg-s">Você fez alterações neste módulo.<br>O que deseja fazer?</div>
+    <div class="dlg-btns">
+      <button class="db g" onclick="dlgUnsaved('cancel')">Continuar editando</button>
+      <button class="db g" onclick="dlgUnsaved('discard')">Descartar</button>
+      <button class="db p" onclick="dlgUnsaved('save')">Salvar</button>
     </div>
   </div>
 </div>
 
+<!-- Dialog: delete -->
+<div class="dlg" id="dlg-del">
+  <div class="dlg-bg" onclick="dlgDel(false)"></div>
+  <div class="dlg-box">
+    <div class="dlg-ico">🗑️</div>
+    <div class="dlg-t">Excluir módulo?</div>
+    <div class="dlg-s">Tem certeza que deseja excluir<br><strong id="del-name"></strong>?<br>Esta ação não pode ser desfeita.</div>
+    <div class="dlg-btns">
+      <button class="db g" onclick="dlgDel(false)">Cancelar</button>
+      <button class="db d" onclick="dlgDel(true)">Excluir</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const SHEET_ID        = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
-const APPS_SCRIPT     = 'https://script.google.com/macros/s/AKfycbzGRiSWx5mj-sxVsnq9fh1bg8cNXAX9G5TNfOofubf66MGUL2zRqAZTOuZZOVpkWlr3/exec';
-const MODULES_URL     = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos';
-const CONNTYPES_URL   = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es';
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const SHEET_ID   = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4mvK7fnaKnAGEeE96XxBnBcP_MywkIYTCq4yawxhXNy1CXGPoOpCqPXec6zV8xB_Q/exec';
+const MODS_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
+const CONN_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es`;
+const CANVAS_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Canvas`;
 
-let modules = [], connTypes = [];
-let selectedConn = null;
-let tool = 'select';
-let connectingFrom = null;
-let drag = null, dragOff = {x:0,y:0};
-let canvasData = { nodes: [], edges: [] };
-let settings = { dark: false, nodeWidth: 180, lineWidth: 1.8 };
+// ─── State ────────────────────────────────────────────────────────────────────
+let modules = [], connTypes = [], canvas = {nodes:[], edges:[]};
+let settings = {dark:false, nw:180};
+let cfg = {devs:['Totvs','Salesforce','Microsoft','AW Interno','Externo'], ambs:['Local','Nuvem','Servidor AW','Híbrido','SaaS'], sts:['Ativo','Em implantação','Protótipo','Legado','Descontinuado','Planejado']};
+let tool='sel', connFrom=null, selConn=null;
+let drag=null, dragOff={x:0,y:0};
+let editId=null, dirty=false;
+let _saveTimer=null;
 
+// ─── Persist local ────────────────────────────────────────────────────────────
+function saveLocal() {
+  try { localStorage.setItem('aw_v22', JSON.stringify({canvas, settings, cfg})); } catch(e){}
+}
 function loadLocal() {
   try {
-    const s = localStorage.getItem('aw_map_v3');
-    if (s) { const p=JSON.parse(s); canvasData=p.canvas||{nodes:[],edges:[]}; settings={...settings,...(p.settings||{})}; }
-  } catch(e) {}
+    const s = localStorage.getItem('aw_v22');
+    if (s) { const p=JSON.parse(s); canvas=p.canvas||{nodes:[],edges:[]}; settings={...settings,...(p.settings||{})}; cfg={...cfg,...(p.cfg||{})}; }
+  } catch(e){}
 }
 
-async function loadCanvasFromSheets() {
-  try {
-    const url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet=Canvas';
-    const r = await fetch(url);
-    const text = await r.text();
-    // Canvas is stored as JSON in cell A2
-    const lines = text.trim().split('\n');
-    if (lines.length >= 2) {
-      const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"');
-      if (raw && raw.startsWith('{')) {
-        const parsed = JSON.parse(raw);
-        if (parsed.nodes && parsed.nodes.length) {
-          canvasData = parsed;
-          saveLocal();
-          return true;
-        }
-      }
-    }
-  } catch(e) {}
-  return false;
-}
-function saveLocal() {
-  try { localStorage.setItem('aw_map_v3', JSON.stringify({canvas:canvasData,settings})); } catch(e) {}
-}
-async function postToSheets(payload) {
-  // GET with params — always works, no CORS issues
-  try {
-    const json = JSON.stringify(payload);
-    const url = APPS_SCRIPT + '?action=' + encodeURIComponent(payload.action)
-              + '&data=' + encodeURIComponent(json);
-    await fetch(url, { mode: 'no-cors' });
-  } catch(e) { console.warn('postToSheets error:', e); }
-}
-
-async function saveToSheets() {
-  await postToSheets({action:'saveCanvas', canvas:canvasData});
-}
-
-let _saveTimer = null;
-function saveToSheetsDebounced() {
-  clearTimeout(_saveTimer);
-  const chip = document.getElementById('chip-save-status');
-  if (chip) { chip.textContent = '↑ salvando...'; chip.style.opacity='1'; }
-  _saveTimer = setTimeout(async () => {
-    saveLocal();
-    await saveToSheets();
-    if (chip) { chip.textContent = '✓ salvo'; setTimeout(()=>{ chip.style.opacity='0'; }, 2000); }
-  }, 1500);
-}
-async function saveModuleToSheets(mod) {
-  await postToSheets({action:'saveModule', ...mod});
-}
-
-// ── Chave API ──────────────────────────────────────────────────────────────
-function getApiKey() {
-  return localStorage.getItem('aw_api_key') || '';
-}
-function saveApiKey() {
-  const val = document.getElementById('api-key-input').value.trim();
-  if (!val.startsWith('sk-ant-') && !val.startsWith('sk-')) {
-    document.getElementById('api-key-status').textContent = '⚠ A chave deve começar com sk-';
-    document.getElementById('api-key-status').style.color = 'var(--red)';
-    return;
-  }
-  localStorage.setItem('aw_api_key', val);
-  document.getElementById('api-key-status').textContent = '✓ Chave salva com sucesso!';
-  document.getElementById('api-key-status').style.color = 'var(--green)';
-  document.getElementById('api-key-input').value = '••••••••••••••••';
-  setTimeout(()=>{ doRefresh(); }, 600);
-}
-function clearApiKey() {
-  localStorage.removeItem('aw_api_key');
-  document.getElementById('api-key-input').value = '';
-  document.getElementById('api-key-status').textContent = 'Chave removida.';
-}
-function syncApiKeyUI() {
-  const key = getApiKey();
-  const status = document.getElementById('api-key-status');
-  if (key) {
-    document.getElementById('api-key-input').value = '••••••••••••••••';
-    if (status) { status.textContent = '✓ Chave configurada'; status.style.color = 'var(--green)'; }
-  }
-}
-
-
-function applyTheme() {
-  document.body.classList.toggle('dark', settings.dark);
-  const tog = document.getElementById('dark-toggle');
-  if (tog) tog.classList.toggle('on', settings.dark);
-  document.getElementById('theme-btn').textContent = settings.dark ? '☀️' : '🌙';
-}
-function toggleTheme() { settings.dark=!settings.dark; applyTheme(); saveLocal(); }
-
-// ── Sliders ────────────────────────────────────────────────────────────────
-function applyNodeWidth(v) {
-  settings.nodeWidth = Number(v);
-  document.documentElement.style.setProperty('--node-width', v+'px');
-  document.getElementById('val-node-width').textContent = v+'px';
-  document.getElementById('sl-node-width').value = v;
-  saveLocal();
-}
-function applyLineWidth(v) {
-  settings.lineWidth = Number(v);
-  document.getElementById('val-line-width').textContent = Number(v).toFixed(1)+'px';
-  document.getElementById('sl-line-width').value = v;
-  renderEdges(); saveLocal();
-}
-function resetSettings() { applyNodeWidth(180); applyLineWidth(1.8); }
-
-function syncSettingsUI() { applyTheme(); applyNodeWidth(settings.nodeWidth); applyLineWidth(settings.lineWidth); }
-
-// ── Notion API ─────────────────────────────────────────────────────────────
-// ── Google Sheets CSV parser ───────────────────────────────────────────────
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
+// ─── Google Sheets: read ──────────────────────────────────────────────────────
+function parseCSV(txt) {
+  const lines = txt.trim().split('\n');
   if (lines.length < 2) return [];
-  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  const hdrs = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
   return lines.slice(1).map(line => {
-    const vals = [];
-    let cur = '', inQ = false;
-    for (let c of line) {
-      if (c==='"') inQ=!inQ;
-      else if (c===',' && !inQ) { vals.push(cur.trim()); cur=''; }
-      else cur+=c;
+    const vals=[], cur={v:'',q:false};
+    for (const c of line+',') {
+      if (c==='"') cur.q=!cur.q;
+      else if (c===',' && !cur.q) { vals.push(cur.v.replace(/^"|"$/g,'')); cur.v=''; }
+      else cur.v+=c;
     }
-    vals.push(cur.trim());
-    const obj = {};
-    headers.forEach((h,i) => obj[h] = (vals[i]||'').replace(/^"|"$/g,''));
+    const obj={};
+    hdrs.forEach((h,i)=>obj[h]=(vals[i]||'').trim());
     return obj;
   });
 }
 
 async function loadModules() {
-  try {
-    const r = await fetch(MODULES_URL);
-    const text = await r.text();
-    const rows = parseCSV(text);
-    if (!rows.length) return defaultModules();
-    return rows.map((row,i) => ({
-      id: row['ID'] || row['id'] || 'm_'+i,
-      name: row['Nome'] || row['nome'] || '',
-      color: row['Cor'] || row['cor'] || '#2563eb',
-      ambiente: row['Ambiente'] || row['ambiente'] || '',
-      status: row['Status'] || row['status'] || '',
-      area: row['Área'] || row['area'] || row['Area'] || '',
-      atualizacao: row['Atualização'] || row['atualizacao'] || '',
-      desc: row['Descrição'] || row['descricao'] || '',
-      dev: row['Desenvolvedor'] || row['desenvolvedor'] || '',
-    })).filter(m => m.name);
-  } catch(e) { return defaultModules(); }
+  const r = await fetch(MODS_CSV);
+  const rows = parseCSV(await r.text());
+  return rows.map((row,i)=>({
+    id:   row['ID']||row['id']||'m'+i,
+    name: row['Nome']||row['nome']||'',
+    color:row['Cor']||row['cor']||'#2455c7',
+    amb:  row['Ambiente']||row['ambiente']||'',
+    sta:  row['Status']||row['status']||'',
+    area: row['Área']||row['area']||row['Area']||'',
+    atua: row['Atualização']||row['atualizacao']||'',
+    desc: row['Descrição']||row['descricao']||'',
+    dev:  row['Desenvolvedor']||row['desenvolvedor']||'',
+  })).filter(m=>m.name);
 }
 
 async function loadConnTypes() {
-  try {
-    const r = await fetch(CONNTYPES_URL);
-    const text = await r.text();
-    const rows = parseCSV(text);
-    if (!rows.length) return defaultConnTypes();
-    return rows.map((row,i) => ({
-      id: 'ct_'+i,
-      name: row['Nome'] || row['nome'] || '',
-      color: row['Cor'] || row['cor'] || '#2563eb',
-      style: row['Estilo'] || row['estilo'] || 'Contínua',
-      desc: row['Descrição'] || row['descricao'] || '',
-    })).filter(c => c.name);
-  } catch(e) { return defaultConnTypes(); }
+  const r = await fetch(CONN_CSV);
+  const rows = parseCSV(await r.text());
+  return rows.map((row,i)=>({
+    id:   row['ID']||row['id']||'ct'+i,
+    name: row['Nome']||row['nome']||'',
+    color:row['Cor']||row['cor']||'#2455c7',
+    style:row['Estilo']||row['estilo']||'Contínua',
+    desc: row['Descrição']||row['descricao']||'',
+  })).filter(c=>c.name);
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────
-async function init() {
-  loadLocal(); loadConfigLists(); syncSettingsUI(); syncApiKeyUI();
-
-  // Se não há chave salva, abre Config. automaticamente e avisa
-  if (!getApiKey()) {
-    tab('settings');
-    setStatus('err', 'Configure sua chave em Config. →');
-    modules=defaultModules(); connTypes=defaultConnTypes();
-    selectedConn=connTypes[0].id;
-    if (!canvasData.nodes.length) seedCanvas();
-    renderSidebar(); renderCanvas(); updateChips();
-    return;
-  }
-  setStatus('loading','Carregando do Notion...');
+async function loadCanvasFromSheets() {
   try {
-    [modules,connTypes] = await Promise.all([loadModules(),loadConnTypes()]);
-    if (!connTypes.length) connTypes=defaultConnTypes();
-    selectedConn=connTypes[0]?.id;
-    setStatus('ok',`${modules.length} módulos · conectado`);
-    // Try loading canvas from Sheets
-    if (!canvasData.nodes.length) {
-      const loaded = await loadCanvasFromSheets();
-      if (!loaded) seedCanvas();
+    const r = await fetch(CANVAS_CSV+'&t='+Date.now());
+    const txt = await r.text();
+    const lines = txt.trim().split('\n');
+    if (lines.length >= 2) {
+      const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"');
+      if (raw && raw.startsWith('{')) {
+        const p = JSON.parse(raw);
+        if (p && (p.nodes||p.edges)) return p;
+      }
     }
+  } catch(e){}
+  return null;
+}
+
+// ─── Google Sheets: write ─────────────────────────────────────────────────────
+async function postSheet(payload) {
+  const url = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
+  try { await fetch(url, {mode:'no-cors'}); } catch(e){}
+}
+
+function schedSave() {
+  clearTimeout(_saveTimer);
+  showChip('↑ salvando...',true);
+  _saveTimer = setTimeout(async ()=>{
+    saveLocal();
+    await postSheet({action:'saveCanvas', canvas});
+    showChip('✓ salvo',false);
+    setTimeout(()=>{ document.getElementById('chip-save').style.opacity='0'; }, 2000);
+  }, 1200);
+}
+
+function showChip(txt, persist) {
+  const c = document.getElementById('chip-save');
+  c.textContent = txt; c.style.opacity = '1';
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  loadLocal();
+  applySett();
+  setStatus('loading','Carregando...');
+
+  try {
+    // Load modules and conn types from Sheets
+    [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
+
+    // Load canvas from Sheets (positions + edges)
+    const remoteCanvas = await loadCanvasFromSheets();
+    if (remoteCanvas && remoteCanvas.nodes && remoteCanvas.nodes.length) {
+      canvas = remoteCanvas;
+      saveLocal();
+    } else if (!canvas.nodes.length && modules.length) {
+      seedCanvas();
+    }
+
+    if (!connTypes.length) connTypes = defaultConns();
+    selConn = connTypes[0]?.id;
+    setStatus('ok', modules.length+' módulos · conectado');
   } catch(e) {
-    modules=defaultModules(); connTypes=defaultConnTypes();
-    selectedConn=connTypes[0].id;
-    setStatus('err','Modo offline — dados locais');
-    if (!canvasData.nodes.length) seedCanvas();
+    setStatus('err','Modo offline');
+    if (!modules.length) modules = [];
+    if (!connTypes.length) connTypes = defaultConns();
+    if (!canvas.nodes.length) seedCanvas();
   }
+
   renderSidebar(); renderCanvas(); updateChips();
 }
 
-function defaultModules() {
+function defaultConns() {
   return [
-    {id:'m1',name:'ERP Totvs',color:'#2563eb',ambiente:'Local',status:'Ativo',area:'Financeiro, Operações, RH'},
-    {id:'m2',name:'CRM Salesforce',color:'#059669',ambiente:'Nuvem',status:'Ativo',area:'Comercial'},
-    {id:'m3',name:'Power BI',color:'#7c3aed',ambiente:'Nuvem',status:'Ativo',area:'Gestão, TI'},
-    {id:'m4',name:'Folha de Ponto',color:'#d97706',ambiente:'Local',status:'Legado',area:'RH'},
+    {id:'ct0',name:'Fluxo de dados',color:'#2455c7',style:'Contínua',desc:'Dados entre sistemas'},
+    {id:'ct1',name:'Necessidade',color:'#c97d10',style:'Tracejada',desc:'Integração a desenvolver'},
+    {id:'ct2',name:'Desejo futuro',color:'#6830c4',style:'Pontilhada',desc:'Não priorizado'},
+    {id:'ct3',name:'Dependência crítica',color:'#c42b2b',style:'Contínua',desc:'Obrigatória'},
   ];
-}
-function defaultConnTypes() {
-  return [
-    {id:'ct1',name:'Fluxo de dados',color:'#2563eb',style:'Contínua',desc:'Dados entre sistemas'},
-    {id:'ct2',name:'Necessidade',color:'#d97706',style:'Tracejada',desc:'Integração a desenvolver'},
-    {id:'ct3',name:'Desejo futuro',color:'#7c3aed',style:'Pontilhada',desc:'Não priorizado'},
-    {id:'ct4',name:'Dependência crítica',color:'#dc2626',style:'Contínua',desc:'Obrigatória'},
-  ];
-}
-function seedCanvas() {
-  const pos=[{x:80,y:110},{x:340,y:70},{x:340,y:290},{x:80,y:290}];
-  canvasData.nodes=modules.slice(0,4).map((m,i)=>({id:'n'+i,moduleId:m.id,x:pos[i]?.x||80+i*200,y:pos[i]?.y||100}));
-  canvasData.edges=[
-    {id:'e0',from:'n0',to:'n1',connId:connTypes[0]?.id},
-    {id:'e1',from:'n0',to:'n3',connId:connTypes[3]?.id||connTypes[0]?.id},
-    {id:'e2',from:'n1',to:'n2',connId:connTypes[1]?.id||connTypes[0]?.id},
-  ];
-  saveLocal();
 }
 
-function setStatus(type,msg) {
-  document.getElementById('sdot').className='status-dot '+type;
+function seedCanvas() {
+  const pos=[{x:80,y:100},{x:340,y:70},{x:340,y:280},{x:80,y:280}];
+  canvas.nodes = modules.slice(0,4).map((m,i)=>({id:'n'+i,mid:m.id,x:pos[i]?.x||80,y:pos[i]?.y||100}));
+  canvas.edges = [];
+}
+
+function setStatus(t,msg) {
+  document.getElementById('sdot').className='sdot '+t;
   document.getElementById('slabel').textContent=msg;
 }
 
-// ── Tabs ───────────────────────────────────────────────────────────────────
+// ─── Settings ─────────────────────────────────────────────────────────────────
+function applySett() {
+  document.body.classList.toggle('dark', settings.dark);
+  document.getElementById('theme-btn').textContent = settings.dark?'☀️':'🌙';
+  const tog = document.getElementById('theme-tog');
+  const knob = document.getElementById('theme-knob');
+  if (tog) { tog.style.background = settings.dark?'var(--accent)':'var(--border2)'; }
+  if (knob) knob.style.transform = settings.dark?'translateX(14px)':'none';
+  applyNW(settings.nw, false);
+}
+function toggleTheme() { settings.dark=!settings.dark; applySett(); saveLocal(); }
+function applyNW(v, save=true) {
+  settings.nw=Number(v);
+  document.documentElement.style.setProperty('--nw', v+'px');
+  const el=document.getElementById('sl-nw'); if(el) el.value=v;
+  const vl=document.getElementById('nw-val'); if(vl) vl.textContent=v+'px';
+  if(save) saveLocal();
+}
+
+// ─── Tabs ─────────────────────────────────────────────────────────────────────
 function tab(t) {
-  const ts=['modules','connections','settings'];
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',ts[i]===t));
-  ts.forEach(id=>{ document.getElementById('tab-'+id).style.display=id===t?'':'none'; });
-  if(t==='settings'){ renderConfigLists(); populateEditPanelSelects(); }
+  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['mods','conns','cfg'][i]===t));
+  ['mods','conns','cfg'].forEach(id=>{document.getElementById('t-'+id).style.display=id===t?'':'none';});
+  if(t==='cfg') renderCfgLists();
 }
 
-// ── Sidebar ────────────────────────────────────────────────────────────────
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
 function renderSidebar() {
-  const ml=document.getElementById('modules-list');
-  // Only show modules NOT already on canvas
-  const onCanvas = new Set(canvasData.nodes.map(n=>n.moduleId));
-  const available = modules.filter(m=>!onCanvas.has(m.id));
-  ml.innerHTML = available.length
-    ? available.map(m=>`
-        <div class="module-item" draggable="true" ondragstart="onDragStart(event,'${m.id}')">
-          <div class="module-dot" style="background:${m.color||'#888'}"></div>
-          <div>
-            <div class="module-name">${esc(m.name)}</div>
-            <div class="module-meta">${[m.ambiente,m.status].filter(Boolean).join(' · ')}</div>
-          </div>
-        </div>`).join('')
-    : '<div class="empty" style="font-size:11px;color:var(--text3)">Todos os módulos estão no canvas.</div>';
+  // Modules — hide those on canvas
+  const onCV = new Set(canvas.nodes.map(n=>n.mid));
+  const avail = modules.filter(m=>!onCV.has(m.id));
+  const ml = document.getElementById('mods-list');
+  ml.innerHTML = avail.length
+    ? avail.map(m=>`<div class="mod-item" draggable="true" ondragstart="onDS(event,'${m.id}')">
+        <div class="mdot" style="background:${m.color}"></div>
+        <div><div class="mname">${esc(m.name)}</div><div class="mmeta">${[m.amb,m.sta].filter(Boolean).join(' · ')}</div></div>
+      </div>`).join('')
+    : '<div class="empty-list">Todos os módulos estão no canvas</div>';
 
-  const cl=document.getElementById('conn-types-list');
-  cl.innerHTML = connTypes.length
-    ? connTypes.map(ct=>`
-        <div class="conn-type-item ${selectedConn===ct.id?'selected':''}" onclick="pickConn('${ct.id}')">
-          <div style="width:28px;flex-shrink:0;${connPreviewStyle(ct)}"></div>
-          <div>
-            <div class="conn-type-name">${esc(ct.name)}</div>
-            <div class="conn-type-desc">${esc(ct.desc||'')}</div>
-          </div>
-        </div>`).join('')
-    : '<div class="empty">Nenhum tipo encontrado.</div>';
+  // Conn types
+  const cl = document.getElementById('conns-list');
+  cl.innerHTML = connTypes.map(ct=>`
+    <div class="conn-item ${selConn===ct.id?'on':''}" onclick="selC('${ct.id}')">
+      <div style="width:26px;flex-shrink:0;${connStyle(ct)}"></div>
+      <div><div class="cname">${esc(ct.name)}</div><div class="cdesc">${esc(ct.desc||'')}</div></div>
+    </div>`).join('');
 }
 
-function connPreviewStyle(ct) {
-  const s=ct.style||'Contínua';
-  if (s==='Tracejada')  return `height:0;border-top:2px dashed ${ct.color};`;
-  if (s==='Pontilhada') return `height:0;border-top:2px dotted ${ct.color};`;
+function connStyle(ct) {
+  if (ct.style==='Tracejada') return `height:0;border-top:2px dashed ${ct.color};`;
+  if (ct.style==='Pontilhada') return `height:0;border-top:2px dotted ${ct.color};`;
   return `height:2px;background:${ct.color};border-radius:1px;`;
 }
-function pickConn(id) { selectedConn=id; renderSidebar(); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function selC(id){selConn=id;renderSidebar();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// ── Drag ───────────────────────────────────────────────────────────────────
-function onDragStart(e,mid) { e.dataTransfer.setData('moduleId',mid); }
+// ─── Config lists ─────────────────────────────────────────────────────────────
+function renderCfgLists() {
+  ['devs','ambs','sts'].forEach(key=>{
+    const el=document.getElementById('cfg-'+key);
+    if(!el) return;
+    el.innerHTML=(cfg[key]||[]).map((v,i)=>`<div class="cfg-item"><span>${esc(v)}</span><button class="cfg-del" onclick="delCfg('${key}',${i})">×</button></div>`).join('');
+  });
+}
+function addCfg(key) {
+  const map={devs:'in-dev',ambs:'in-amb',sts:'in-sta'};
+  const inp=document.getElementById(map[key]); if(!inp) return;
+  const v=inp.value.trim(); if(!v) return;
+  if(!cfg[key]) cfg[key]=[];
+  if(!cfg[key].includes(v)) { cfg[key].push(v); saveLocal(); renderCfgLists(); fillSelects(); }
+  inp.value='';
+}
+function delCfg(key,idx) { cfg[key].splice(idx,1); saveLocal(); renderCfgLists(); fillSelects(); }
 
-document.getElementById('canvas-wrap').addEventListener('dragover',e=>e.preventDefault());
-document.getElementById('canvas-wrap').addEventListener('drop',e=>{
+// ─── Drag sidebar → canvas ────────────────────────────────────────────────────
+function onDS(e,mid){e.dataTransfer.setData('mid',mid);}
+document.getElementById('cw').addEventListener('dragover',e=>e.preventDefault());
+document.getElementById('cw').addEventListener('drop',e=>{
   e.preventDefault();
-  const mid=e.dataTransfer.getData('moduleId');
-  if(!mid) return;
-  const rect=document.getElementById('canvas-wrap').getBoundingClientRect();
-  canvasData.nodes.push({id:'n'+Date.now(),moduleId:mid,x:e.clientX-rect.left-90,y:e.clientY-rect.top-35});
-  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
+  const mid=e.dataTransfer.getData('mid'); if(!mid) return;
+  const r=document.getElementById('cw').getBoundingClientRect();
+  canvas.nodes.push({id:'n'+Date.now(),mid,x:e.clientX-r.left-90,y:e.clientY-r.top-35});
+  saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
 });
 
-// ── Canvas ─────────────────────────────────────────────────────────────────
+// ─── Canvas ───────────────────────────────────────────────────────────────────
 function renderCanvas() {
-  const c=document.getElementById('canvas');
-  c.innerHTML='';
-  canvasData.nodes.forEach(node=>{
-    const mod=modules.find(m=>m.id===node.moduleId);
-    if(!mod) return;
-    const sc={Ativo:'s-ativo',Legado:'s-legado',Descontinuado:'s-desc'}[mod.status]||'';
+  const cv=document.getElementById('cv');
+  cv.innerHTML='';
+  canvas.nodes.forEach(node=>{
+    const m=modules.find(x=>x.id===node.mid); if(!m) return;
+    const sc={Ativo:'s-ativo',Legado:'s-legado',Descontinuado:'s-desc'}[m.sta]||'';
     const tags=[
-      mod.ambiente?`<span class="node-tag">${esc(mod.ambiente)}</span>`:'',
-      mod.status?`<span class="node-tag ${sc}">${esc(mod.status)}</span>`:'',
-      ...(mod.area||'').split(',').slice(0,1).map(a=>a.trim()).filter(Boolean).map(a=>`<span class="node-tag">${esc(a)}</span>`),
-      mod.dev?`<span class="node-tag" style="color:var(--text3)">${esc(mod.dev)}</span>`:'',
+      m.amb?`<span class="ntag">${esc(m.amb)}</span>`:'',
+      m.sta?`<span class="ntag ${sc}">${esc(m.sta)}</span>`:'',
+      m.dev?`<span class="ntag">${esc(m.dev)}</span>`:'',
     ].join('');
     const el=document.createElement('div');
-    el.className='canvas-node'; el.id='node-'+node.id;
+    el.className='node'; el.id='node-'+node.id;
     el.style.left=node.x+'px'; el.style.top=node.y+'px';
-    el.innerHTML=`
-      <div class="node-top">
-        <div class="node-color" style="background:${mod.color||'#888'}"></div>
-        <div class="node-title">${esc(mod.name)}</div>
-      </div>
-      <div class="node-tags">${tags}</div>
-      <div class="node-actions">
-        <button class="node-btn primary" onclick="startConnect('${node.id}')">Conectar</button>
-        <button class="node-btn" onclick="openEditPanel('${node.moduleId}')">Editar</button>
-        <button class="node-btn" onclick="removeNode('${node.id}')">×</button>
+    el.innerHTML=`<div class="ntop"><div class="ncol" style="background:${m.color}"></div><div class="ntitle">${esc(m.name)}</div></div>
+      <div class="ntags">${tags}</div>
+      <div class="nacts">
+        <button class="nbtn p" onclick="startConn('${node.id}')">Conectar</button>
+        <button class="nbtn" onclick="openEP('${m.id}','${node.id}')">Editar</button>
+        <button class="nbtn" onclick="removeNode('${node.id}')">×</button>
       </div>`;
     el.addEventListener('mousedown',ev=>{
-      if(ev.target.classList.contains('node-btn')) return;
-      if(tool==='connect'){startConnect(node.id);return;}
+      if(ev.target.classList.contains('nbtn')) return;
+      if(tool==='con'){startConn(node.id);return;}
       drag=node.id;
       const r=el.getBoundingClientRect();
       dragOff={x:ev.clientX-r.left,y:ev.clientY-r.top};
       ev.preventDefault();
     });
-    c.appendChild(el);
+    cv.appendChild(el);
   });
   renderEdges();
 }
 
 document.addEventListener('mousemove',e=>{
   if(!drag) return;
-  const wrap=document.getElementById('canvas-wrap').getBoundingClientRect();
-  const node=canvasData.nodes.find(n=>n.id===drag);
-  if(!node) return;
-  node.x=Math.max(0,e.clientX-wrap.left-dragOff.x);
-  node.y=Math.max(0,e.clientY-wrap.top-dragOff.y);
+  const w=document.getElementById('cw').getBoundingClientRect();
+  const n=canvas.nodes.find(x=>x.id===drag); if(!n) return;
+  n.x=Math.max(0,e.clientX-w.left-dragOff.x);
+  n.y=Math.max(0,e.clientY-w.top-dragOff.y);
   const el=document.getElementById('node-'+drag);
-  if(el){el.style.left=node.x+'px';el.style.top=node.y+'px';}
+  if(el){el.style.left=n.x+'px';el.style.top=n.y+'px';}
   renderEdges();
 });
-document.addEventListener('mouseup',()=>{if(drag)saveLocal();drag=null;});
+document.addEventListener('mouseup',()=>{ if(drag){schedSave();} drag=null; });
 
 function removeNode(id) {
-  canvasData.nodes=canvasData.nodes.filter(n=>n.id!==id);
-  canvasData.edges=canvasData.edges.filter(e=>e.from!==id&&e.to!==id);
-  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
+  canvas.nodes=canvas.nodes.filter(n=>n.id!==id);
+  canvas.edges=canvas.edges.filter(e=>e.from!==id&&e.to!==id);
+  saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
 }
 
-// ── Edges ──────────────────────────────────────────────────────────────────
-function nodeCenter(id) {
+// ─── Edges ────────────────────────────────────────────────────────────────────
+function nCenter(id) {
   const el=document.getElementById('node-'+id);
-  const w=document.getElementById('canvas-wrap').getBoundingClientRect();
+  const w=document.getElementById('cw').getBoundingClientRect();
   if(!el) return {x:0,y:0};
   const r=el.getBoundingClientRect();
   return {x:r.left-w.left+r.width/2,y:r.top-w.top+r.height/2};
 }
 
 function renderEdges() {
-  const svg=document.getElementById('edges-svg');
-  const wrap=document.getElementById('canvas-wrap');
-  svg.setAttribute('width',wrap.offsetWidth);
-  svg.setAttribute('height',wrap.offsetHeight);
+  const svg=document.getElementById('esvg');
+  const w=document.getElementById('cw');
+  svg.setAttribute('width',w.offsetWidth); svg.setAttribute('height',w.offsetHeight);
   const sid=s=>(s||'').replace(/[^a-z0-9]/gi,'');
-  const lw=settings.lineWidth;
-
-  const defs=connTypes.map(ct=>`
-    <marker id="ah-${sid(ct.id)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-      <path d="M2 1L8 5L2 9" fill="none" stroke="${ct.color}" stroke-width="1.5" stroke-linecap="round"/>
-    </marker>`).join('');
-
-  const paths=canvasData.edges.map(edge=>{
-    const ct=connTypes.find(c=>c.id===edge.connId)||connTypes[0];
-    if(!ct) return '';
-    const f=nodeCenter(edge.from),t=nodeCenter(edge.to);
-    const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-30;
-    const dash=ct.style==='Tracejada'?`stroke-dasharray="${lw*4} ${lw*3}"`
-              :ct.style==='Pontilhada'?`stroke-dasharray="${lw} ${lw*4}"` : '';
-    return `
-      <path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}"
-        fill="none" stroke="${ct.color}" stroke-width="${lw}" opacity="0.85" ${dash}
-        marker-end="url(#ah-${sid(ct.id)})"
-        style="pointer-events:stroke;cursor:pointer"
-        onclick="removeEdge('${edge.id}')"/>
-      <text x="${(f.x+t.x)/2}" y="${(f.y+t.y)/2-38}"
-        text-anchor="middle" font-size="10" fill="${ct.color}" opacity="0.6"
-        font-family="DM Mono, monospace">${esc(ct.name)}</text>`;
+  const defs=connTypes.map(ct=>`<marker id="a${sid(ct.id)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="${ct.color}" stroke-width="1.5" stroke-linecap="round"/></marker>`).join('');
+  const lw=1.8;
+  const paths=canvas.edges.map(edge=>{
+    const ct=connTypes.find(c=>c.id===edge.cid)||connTypes[0]; if(!ct) return '';
+    const f=nCenter(edge.from),t=nCenter(edge.to);
+    const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-28;
+    const dash=ct.style==='Tracejada'?`stroke-dasharray="${lw*4} ${lw*3}"`:ct.style==='Pontilhada'?`stroke-dasharray="${lw} ${lw*4}"`:'';
+    return `<path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}" fill="none" stroke="${ct.color}" stroke-width="${lw}" opacity=".85" ${dash} marker-end="url(#a${sid(ct.id)})" style="pointer-events:stroke;cursor:pointer" onclick="removeEdge('${edge.id}')"/>
+    <text x="${(f.x+t.x)/2}" y="${(f.y+t.y)/2-35}" text-anchor="middle" font-size="10" fill="${ct.color}" opacity=".65" font-family="DM Mono,monospace">${esc(ct.name)}</text>`;
   }).join('');
-
   svg.innerHTML=`<defs>${defs}</defs>${paths}`;
 }
 
-// ── Connect ────────────────────────────────────────────────────────────────
-function setTool(t) {
-  tool=t;
-  document.getElementById('tbtn-select').classList.toggle('active',t==='select');
-  document.getElementById('tbtn-connect').classList.toggle('active',t==='connect');
-  if(t!=='connect') cancelConnect();
+function removeEdge(id){
+  if(!confirm('Remover esta conexão?')) return;
+  canvas.edges=canvas.edges.filter(e=>e.id!==id);
+  saveLocal(); schedSave(); renderEdges(); updateChips();
 }
 
-function startConnect(nodeId) {
-  connectingFrom=nodeId;
-  document.getElementById('conn-banner').style.display='block';
-  document.querySelectorAll('.canvas-node').forEach(el=>{
+// ─── Connect ──────────────────────────────────────────────────────────────────
+function setTool(t){
+  tool=t;
+  document.getElementById('tbtn-sel').classList.toggle('on',t==='sel');
+  document.getElementById('tbtn-con').classList.toggle('on',t==='con');
+  if(t!=='con') cancelConn();
+}
+function startConn(nid){
+  connFrom=nid;
+  document.getElementById('cbanner').style.display='block';
+  document.querySelectorAll('.node').forEach(el=>{
     el.classList.add('connecting');
     el.onclick=()=>{
       const tid=el.id.replace('node-','');
-      if(tid!==connectingFrom){
-        if(!canvasData.edges.find(e=>e.from===connectingFrom&&e.to===tid)){
-          canvasData.edges.push({id:'e'+Date.now(),from:connectingFrom,to:tid,connId:selectedConn||connTypes[0]?.id});
-          saveLocal(); saveToSheets(); renderEdges(); updateChips();
-        }
+      if(tid!==connFrom && !canvas.edges.find(e=>e.from===connFrom&&e.to===tid)){
+        canvas.edges.push({id:'e'+Date.now(),from:connFrom,to:tid,cid:selConn||connTypes[0]?.id});
+        saveLocal(); schedSave(); renderEdges(); updateChips();
       }
-      cancelConnect();
+      cancelConn();
     };
   });
 }
-
-function cancelConnect() {
-  connectingFrom=null;
-  document.getElementById('conn-banner').style.display='none';
-  document.querySelectorAll('.canvas-node').forEach(el=>{el.classList.remove('connecting');el.onclick=null;});
+function cancelConn(){
+  connFrom=null;
+  document.getElementById('cbanner').style.display='none';
+  document.querySelectorAll('.node').forEach(el=>{el.classList.remove('connecting');el.onclick=null;});
 }
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){cancelConn();closeEP(true);}});
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelConnect();});
-
-function removeEdge(id) {
-  if(!confirm('Remover esta conexão?')) return;
-  canvasData.edges=canvasData.edges.filter(e=>e.id!==id);
-  saveLocal(); renderEdges(); updateChips();
-}
-
-async function doRefresh() {
-  setStatus('loading','Atualizando...');
-  try {
-    [modules,connTypes]=await Promise.all([loadModules(),loadConnTypes()]);
-    selectedConn=connTypes[0]?.id;
-    setStatus('ok',`${modules.length} módulos`);
-    renderSidebar(); renderCanvas();
-  } catch(e) { setStatus('err','Erro ao atualizar'); }
-}
-
-function clearCanvas() {
-  if(!confirm('Limpar todo o canvas?')) return;
-  canvasData={nodes:[],edges:[]};
-  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
-}
-
-function updateChips() {
-  document.getElementById('chip-nodes').textContent=canvasData.nodes.length+' módulo'+(canvasData.nodes.length!==1?'s':'');
-  document.getElementById('chip-edges').textContent=canvasData.edges.length+' conexão'+(canvasData.edges.length!==1?'ões':'');
-}
-
-
-// ── Listas de configuração ─────────────────────────────────────────────────
-let configLists = {
-  devs: ['Totvs','Salesforce','Microsoft','AW Interno','Externo','Open Source'],
-  ambientes: ['Local','Nuvem','Servidor AW','Híbrido','SaaS'],
-  status: ['Ativo','Em implantação','Protótipo','Legado','Descontinuado','Planejado']
-};
-
-function loadConfigLists() {
-  try { const s=localStorage.getItem('aw_config_lists'); if(s) configLists=JSON.parse(s); } catch(e) {}
-}
-function saveConfigLists() {
-  try { localStorage.setItem('aw_config_lists', JSON.stringify(configLists)); } catch(e) {}
-  renderConfigLists(); populateEditPanelSelects();
-}
-function renderConfigLists() {
-  ['devs','ambientes','status'].forEach(key => {
-    const el = document.getElementById('cfg-'+key+'-list');
-    if (!el) return;
-    el.innerHTML = configLists[key].map((item,i) => `
-      <div class="config-list-item">
-        <span>${esc(item)}</span>
-        <button class="config-list-del" onclick="removeConfigItem('${key}',${i})">×</button>
-      </div>`).join('');
-  });
-}
-function addConfigItem(key) {
-  const inputId = 'cfg-'+(key==='devs'?'dev':key==='ambientes'?'ambiente':'status')+'-input';
-  const val = document.getElementById(inputId)?.value.trim();
-  if (!val) return;
-  if (!configLists[key].includes(val)) { configLists[key].push(val); saveConfigLists(); }
-  if(document.getElementById(inputId)) document.getElementById(inputId).value='';
-}
-function removeConfigItem(key, idx) {
-  configLists[key].splice(idx,1); saveConfigLists();
-}
-function populateEditPanelSelects() {
-  const devSel=document.getElementById('ep-dev');
-  const ambSel=document.getElementById('ep-ambiente');
-  const staSel=document.getElementById('ep-status');
-  if (!devSel) return;
-  const cur={dev:devSel.value,amb:ambSel.value,sta:staSel.value};
-  devSel.innerHTML='<option value="">—</option>'+configLists.devs.map(d=>`<option>${esc(d)}</option>`).join('');
-  ambSel.innerHTML='<option value="">—</option>'+configLists.ambientes.map(a=>`<option>${esc(a)}</option>`).join('');
-  staSel.innerHTML='<option value="">—</option>'+configLists.status.map(s=>`<option>${esc(s)}</option>`).join('');
-  devSel.value=cur.dev; ambSel.value=cur.amb; staSel.value=cur.sta;
-}
-
-// ── Painel lateral de edição ───────────────────────────────────────────────
-let editingModuleId = null;
-
-let panelDirty = false; // tracks unsaved changes
-
-function markDirty() { panelDirty = true; }
-
-function openEditPanel(moduleId, nodeElRef) {
-  const mod = modules.find(m=>m.id===moduleId);
-  if (!mod) return;
-  editingModuleId = moduleId;
-  panelDirty = false;
-  document.getElementById('ep-id').value = moduleId;
-  document.getElementById('ep-name').value = mod.name||'';
-  document.getElementById('ep-area').value = mod.area||'';
-  document.getElementById('ep-desc').value = mod.desc||'';
-  document.getElementById('ep-color').value = mod.color||'#2563eb';
-  populateEditPanelSelects();
-  document.getElementById('ep-dev').value = mod.dev||'';
-  document.getElementById('ep-ambiente').value = mod.ambiente||'';
-  document.getElementById('ep-status').value = mod.status||'';
-  document.querySelectorAll('#ep-colors .cp-dot').forEach(d=>{
-    d.classList.toggle('selected', d.dataset.color===(mod.color||'#2563eb'));
-  });
-
-  // Highlight node
-  document.querySelectorAll('.canvas-node').forEach(el=>el.classList.remove('editing'));
-  const nodeEl = document.getElementById('node-' + (canvasData.nodes.find(n=>n.moduleId===moduleId)?.id||''));
-  if (nodeEl) nodeEl.classList.add('editing');
-
-  // Position panel next to node
-  const panel = document.getElementById('edit-panel');
-  panel.classList.add('open');
-  document.getElementById('edit-overlay').classList.add('open');
-
-  if (nodeEl) {
-    // Force a reflow so offsetHeight is accurate
-    panel.style.visibility = 'hidden';
-    panel.style.display = 'flex';
-    const panelW = 288;
-    const panelH = panel.offsetHeight;
-    panel.style.visibility = '';
-
-    const rect = nodeEl.getBoundingClientRect();
-    const margin = 12;
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
-
-    // Horizontal: prefer right of node, fallback left
-    let left = rect.right + margin;
-    if (left + panelW > viewW - 12) {
-      left = rect.left - panelW - margin;
-      panel.style.setProperty('--arrow-display', 'none');
-    } else {
-      panel.style.removeProperty('--arrow-display');
-    }
-    left = Math.max(12, left);
-
-    // Vertical: align top of panel with top of node
-    let top = rect.top;
-
-    // If panel goes below screen, align bottom of panel with bottom of node
-    if (top + panelH > viewH - 12) {
-      top = rect.bottom - panelH;
-    }
-
-    // Final clamp to keep inside screen
-    top = Math.max(12, Math.min(top, viewH - panelH - 12));
-
-    panel.style.left = left + 'px';
-    panel.style.top = top + 'px';
-    panel.style.transform = 'none';
-  } else {
-    // Fallback: center of screen
-    panel.style.left = '50%';
-    panel.style.top = '50%';
-    panel.style.transform = 'translate(-50%,-50%)';
-    panel.style.setProperty('--arrow-display','none');
-  }
-}
-
-async function closeEditPanel(skipCheck) {
-  if (!skipCheck && panelDirty) {
-    // Show custom confirm dialog
-    const choice = await showUnsavedDialog();
-    if (choice === 'save') {
-      await saveModuleFromPanel();
-      return;
-    } else if (choice === 'cancel') {
-      return; // stay open
-    }
-    // choice === 'discard' → fall through and close
-  }
-  panelDirty = false;
-  document.getElementById('edit-panel').classList.remove('open');
-  document.getElementById('edit-overlay').classList.remove('open');
-  document.querySelectorAll('.canvas-node').forEach(el=>el.classList.remove('editing'));
-  editingModuleId=null;
-}
-
-function showDeleteDialog(name) {
-  return new Promise(resolve => {
-    document.getElementById('del-module-name').textContent = name;
-    const dlg = document.getElementById('delete-dialog');
-    dlg.style.display = 'flex';
-    document.getElementById('dd-confirm').onclick = () => { dlg.style.display='none'; resolve(true); };
-    document.getElementById('dd-cancel').onclick = () => { dlg.style.display='none'; resolve(false); };
-  });
-}
-
-function showUnsavedDialog() {
-  return new Promise(resolve => {
-    const dlg = document.getElementById('unsaved-dialog');
-    dlg.style.display = 'flex';
-    document.getElementById('usd-save').onclick = () => { dlg.style.display='none'; resolve('save'); };
-    document.getElementById('usd-discard').onclick = () => { dlg.style.display='none'; resolve('discard'); };
-    document.getElementById('usd-cancel').onclick = () => { dlg.style.display='none'; resolve('cancel'); };
-  });
-}
-
-function epPickColor(c,el) {
-  document.getElementById('ep-color').value=c;
-  document.querySelectorAll('#ep-colors .cp-dot').forEach(d=>d.classList.remove('selected'));
-  el.classList.add('selected');
-  markDirty();
-}
-
-async function saveModuleFromPanel() {
-  const name=document.getElementById('ep-name').value.trim();
-  if (!name) { alert('Informe o nome.'); return; }
-  const mod = {
-    id: editingModuleId,
-    name,
-    area: document.getElementById('ep-area').value,
-    desc: document.getElementById('ep-desc').value,
-    dev: document.getElementById('ep-dev').value,
-    ambiente: document.getElementById('ep-ambiente').value,
-    status: document.getElementById('ep-status').value,
-    color: document.getElementById('ep-color').value,
+// ─── Edit popover ─────────────────────────────────────────────────────────────
+function fillSelects() {
+  const s=(id,arr,cur)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML='<option value="">—</option>'+(arr||[]).map(v=>`<option${v===cur?' selected':''}>${esc(v)}</option>`).join('');
   };
-  const idx=modules.findIndex(m=>m.id===editingModuleId);
-  if (idx>=0) modules[idx]=mod;
-  panelDirty = false;
-  closeEditPanel(true); // skip unsaved check — already saving
-  renderSidebar(); renderCanvas();
-  setStatus('loading','Salvando no banco...');
-  await saveModuleToSheets(mod);
-  setStatus('ok', modules.length+' módulos · salvo');
-  setTimeout(()=>setStatus('ok', modules.length+' módulos'), 2000);
+  const m=modules.find(x=>x.id===editId)||{};
+  s('ep-dev',cfg.devs,m.dev); s('ep-amb',cfg.ambs,m.amb); s('ep-sta',cfg.sts,m.sta);
 }
 
-async function deleteModuleFromPanel() {
-  const mod = modules.find(m=>m.id===editingModuleId);
-  const confirmed = await showDeleteDialog(mod?.name||'este módulo');
-  if (!confirmed) return;
-  const deletedId = editingModuleId;
-  modules=modules.filter(m=>m.id!==deletedId);
-  canvasData.nodes=canvasData.nodes.filter(n=>n.moduleId!==deletedId);
-  canvasData.edges=canvasData.edges.filter(e=>{
-    const from=canvasData.nodes.find(n=>n.id===e.from);
-    const to=canvasData.nodes.find(n=>n.id===e.to);
-    return from&&to;
+function openEP(mid, nid) {
+  const m=modules.find(x=>x.id===mid); if(!m) return;
+  editId=mid; dirty=false;
+  document.getElementById('ep-id').value=mid;
+  document.getElementById('ep-name').value=m.name||'';
+  document.getElementById('ep-area').value=m.area||'';
+  document.getElementById('ep-desc').value=m.desc||'';
+  document.getElementById('ep-col').value=m.color||'#2455c7';
+  fillSelects();
+  document.querySelectorAll('.cd').forEach(d=>d.classList.toggle('on',d.dataset.c===m.color));
+  document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
+  const nodeEl=document.getElementById('node-'+nid); if(nodeEl) nodeEl.classList.add('editing');
+
+  const ep=document.getElementById('ep');
+  ep.classList.add('open');
+  document.getElementById('eov').classList.add('open');
+
+  // Position: aligned to top of node, right side
+  if(nodeEl){
+    const rect=nodeEl.getBoundingClientRect();
+    const pw=292, margin=12, vw=window.innerWidth, vh=window.innerHeight;
+    ep.style.visibility='hidden'; ep.style.display='flex';
+    const ph=ep.offsetHeight; ep.style.visibility='';
+
+    let left=rect.right+margin;
+    if(left+pw>vw-12){left=rect.left-pw-margin;}
+    left=Math.max(12,left);
+
+    let top=rect.top;
+    if(top+ph>vh-12) top=rect.bottom-ph;
+    top=Math.max(12,Math.min(top,vh-ph-12));
+
+    ep.style.left=left+'px'; ep.style.top=top+'px';
+  } else {
+    ep.style.left='50%'; ep.style.top='50%'; ep.style.transform='translate(-50%,-50%)';
+  }
+}
+
+function tryCloseEP() {
+  if(dirty){
+    document.getElementById('dlg-unsaved').classList.add('open');
+  } else {
+    closeEP(true);
+  }
+}
+
+function closeEP(force){
+  if(!force && dirty) return;
+  dirty=false; editId=null;
+  document.getElementById('ep').classList.remove('open');
+  document.getElementById('eov').classList.remove('open');
+  document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
+  document.getElementById('ep').style.transform='';
+}
+
+function dlgUnsaved(choice){
+  document.getElementById('dlg-unsaved').classList.remove('open');
+  if(choice==='save') saveMod();
+  else if(choice==='discard') closeEP(true);
+  // 'cancel' → do nothing, stay open
+}
+
+function pickC(c,el){
+  document.getElementById('ep-col').value=c;
+  document.querySelectorAll('.cd').forEach(d=>d.classList.remove('on'));
+  el.classList.add('on'); dirty=true;
+}
+
+async function saveMod(){
+  const name=document.getElementById('ep-name').value.trim();
+  if(!name){alert('Informe o nome.');return;}
+  const mod={
+    id:editId, name,
+    area:document.getElementById('ep-area').value,
+    desc:document.getElementById('ep-desc').value,
+    dev: document.getElementById('ep-dev').value,
+    amb: document.getElementById('ep-amb').value,
+    sta: document.getElementById('ep-sta').value,
+    color:document.getElementById('ep-col').value,
+  };
+  const idx=modules.findIndex(m=>m.id===editId);
+  if(idx>=0) modules[idx]={...modules[idx],...mod};
+  dirty=false; closeEP(true);
+  renderSidebar(); renderCanvas();
+  setStatus('loading','Salvando...');
+  await postSheet({action:'saveModule',...mod});
+  setStatus('ok',modules.length+' módulos');
+}
+
+function confirmDelete(){
+  const m=modules.find(x=>x.id===editId); if(!m) return;
+  document.getElementById('del-name').textContent=m.name;
+  document.getElementById('dlg-del').classList.add('open');
+}
+async function dlgDel(yes){
+  document.getElementById('dlg-del').classList.remove('open');
+  if(!yes) return;
+  const id=editId;
+  modules=modules.filter(m=>m.id!==id);
+  canvas.nodes=canvas.nodes.filter(n=>n.mid!==id);
+  canvas.edges=canvas.edges.filter(e=>{
+    const f=canvas.nodes.find(n=>n.id===e.from), t=canvas.nodes.find(n=>n.id===e.to);
+    return f&&t;
   });
-  closeEditPanel();
-  saveLocal(); saveToSheets();
+  closeEP(true); saveLocal(); schedSave();
   renderSidebar(); renderCanvas(); updateChips();
-  // Delete from Sheets
-  await postToSheets({action:'deleteModule', id: deletedId});
+  await postSheet({action:'deleteModule',id});
+}
+
+// ─── New module ───────────────────────────────────────────────────────────────
+function openNewMod(){
+  const id='m'+Date.now();
+  const mod={id,name:'Novo módulo',color:'#2455c7',area:'',desc:'',dev:'',amb:'',sta:'',atua:''};
+  modules.push(mod);
+  // Place on canvas center
+  const w=document.getElementById('cw');
+  canvas.nodes.push({id:'n'+Date.now(),mid:id,x:w.offsetWidth/2-90,y:w.offsetHeight/2-35});
+  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
+  // Open edit panel
+  const node=canvas.nodes.find(n=>n.mid===id);
+  if(node) openEP(id,'node-'+node.id);
+}
+
+// ─── Misc ─────────────────────────────────────────────────────────────────────
+async function doRefresh(){
+  setStatus('loading','Atualizando...');
+  try{
+    [modules,connTypes]=await Promise.all([loadModules(),loadConnTypes()]);
+    const rc=await loadCanvasFromSheets();
+    if(rc&&rc.nodes&&rc.nodes.length){canvas=rc;saveLocal();}
+    if(!connTypes.length) connTypes=defaultConns();
+    selConn=connTypes[0]?.id;
+    setStatus('ok',modules.length+' módulos');
+    renderSidebar(); renderCanvas(); updateChips();
+  }catch(e){setStatus('err','Erro ao atualizar');}
+}
+
+function clearCanvas(){
+  if(!confirm('Limpar todo o canvas?')) return;
+  canvas={nodes:[],edges:[]};
+  saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
+}
+
+function updateChips(){
+  document.getElementById('chip-mods').textContent=canvas.nodes.length+' módulo'+(canvas.nodes.length!==1?'s':'');
+  document.getElementById('chip-edges').textContent=canvas.edges.length+' conexão'+(canvas.edges.length!==1?'ões':'');
 }
 
 init();
 </script>
-
-<!-- Modal de novo módulo -->
-<div id="module-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center">
-  <div style="background:var(--bg2);border-radius:16px;border:1px solid var(--border2);width:420px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.2);overflow:hidden">
-    <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <span id="modal-title-text" style="font-size:15px;font-weight:600;color:var(--text)">Novo módulo</span>
-      <button onclick="closeModuleModal()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer">×</button>
-    </div>
-    <div style="padding:20px">
-      <input type="hidden" id="mod-editing-id">
-      
-      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Nome do módulo *</label>
-      <input id="mod-name" type="text" placeholder="Ex: ERP Totvs, HubSpot..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;margin-bottom:14px;font-family:inherit;outline:none">
-      
-      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Cor</label>
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="mod-colors">
-        <div class="color-opt" data-color="#2563eb" style="width:22px;height:22px;border-radius:50%;background:#2563eb;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#2563eb',this)"></div>
-        <div class="color-opt" data-color="#059669" style="width:22px;height:22px;border-radius:50%;background:#059669;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#059669',this)"></div>
-        <div class="color-opt" data-color="#d97706" style="width:22px;height:22px;border-radius:50%;background:#d97706;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#d97706',this)"></div>
-        <div class="color-opt" data-color="#dc2626" style="width:22px;height:22px;border-radius:50%;background:#dc2626;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#dc2626',this)"></div>
-        <div class="color-opt" data-color="#7c3aed" style="width:22px;height:22px;border-radius:50%;background:#7c3aed;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#7c3aed',this)"></div>
-        <div class="color-opt" data-color="#db2777" style="width:22px;height:22px;border-radius:50%;background:#db2777;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#db2777',this)"></div>
-        <div class="color-opt" data-color="#0891b2" style="width:22px;height:22px;border-radius:50%;background:#0891b2;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#0891b2',this)"></div>
-        <div class="color-opt" data-color="#65a30d" style="width:22px;height:22px;border-radius:50%;background:#65a30d;cursor:pointer;border:2px solid transparent" onclick="pickModColor('#65a30d',this)"></div>
-      </div>
-      <input type="hidden" id="mod-color" value="#2563eb">
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-        <div>
-          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Ambiente</label>
-          <select id="mod-ambiente" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;outline:none">
-            <option value="">—</option>
-            <option>Local</option>
-            <option>Nuvem</option>
-            <option>Servidor AW</option>
-            <option>Híbrido</option>
-          </select>
-        </div>
-        <div>
-          <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Status</label>
-          <select id="mod-status" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;outline:none">
-            <option value="">—</option>
-            <option>Ativo</option>
-            <option>Em implantação</option>
-            <option>Legado</option>
-            <option>Descontinuado</option>
-            <option>Protótipo</option>
-          </select>
-        </div>
-      </div>
-
-      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Área</label>
-      <input id="mod-area" type="text" placeholder="Ex: Comercial, Financeiro, RH..." style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:13px;margin-bottom:14px;font-family:inherit;outline:none">
-
-      <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px">Atualização necessária</label>
-      <select id="mod-atualizacao" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;outline:none;margin-bottom:20px">
-        <option value="">—</option>
-        <option>Sim</option>
-        <option>Não</option>
-        <option>Em análise</option>
-      </select>
-
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button onclick="closeModuleModal()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit">Cancelar</button>
-        <button onclick="saveModule()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Salvar módulo</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Diálogo: sair sem salvar -->
-<div class="confirm-dialog" id="unsaved-dialog">
-  <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5)" onclick="document.getElementById('usd-cancel').click()"></div>
-  <div class="confirm-dialog-box">
-    <div class="confirm-dialog-icon">💾</div>
-    <div class="confirm-dialog-title">Alterações não salvas</div>
-    <div class="confirm-dialog-sub">Você fez alterações neste módulo.<br>O que deseja fazer?</div>
-    <div class="confirm-dialog-btns">
-      <button class="cdb ghost" id="usd-cancel">Continuar editando</button>
-      <button class="cdb ghost" id="usd-discard">Descartar</button>
-      <button class="cdb primary" id="usd-save">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Diálogo: confirmar exclusão -->
-<div class="confirm-dialog" id="delete-dialog">
-  <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5)" onclick="document.getElementById('dd-cancel').click()"></div>
-  <div class="confirm-dialog-box">
-    <div class="confirm-dialog-icon">🗑️</div>
-    <div class="confirm-dialog-title">Excluir módulo?</div>
-    <div class="confirm-dialog-sub">Tem certeza que deseja excluir<br><strong id="del-module-name"></strong>?<br>Esta ação não pode ser desfeita.</div>
-    <div class="confirm-dialog-btns">
-      <button class="cdb ghost" id="dd-cancel">Cancelar</button>
-      <button class="cdb danger" id="dd-confirm">Excluir</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
