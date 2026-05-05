@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.28</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.29</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -27,6 +27,7 @@
   --shadow2: 0 6px 28px rgba(0,0,0,0.12);
   --r: 10px; --rl: 14px;
   --sw: 260px;
+  --grid: 26px;
 }
 body.dark {
   --bg:#0f0f11; --bg2:#17171b; --bg3:#1f1f25;
@@ -171,6 +172,9 @@ select.fi{cursor:pointer;}
 .mm-item.danger { color:var(--red); }
 .mm-sep { height:1px; background:var(--border); margin:3px 0; }
 
+.grid-sz-btn { padding:3px 8px; border-radius:6px; border:1px solid var(--border2); background:var(--bg3); color:var(--text2); font-size:10px; cursor:pointer; font-family:inherit; transition:all .15s; }
+.grid-sz-btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
@@ -186,7 +190,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.28</div>
+      <div id="logo-ver">v1.29</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -218,6 +222,21 @@ select.fi{cursor:pointer;}
             <div id="theme-knob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
           </div>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span class="cfg-lbl" style="margin:0">Magnetismo no grid</span>
+          <div id="snap-tog" onclick="toggleSnap()" style="width:32px;height:18px;background:var(--border2);border-radius:9px;position:relative;cursor:pointer;transition:background .2s">
+            <div id="snap-knob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+          </div>
+        </div>
+        <div id="snap-size-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <span class="cfg-lbl" style="margin:0;opacity:.7">Tamanho do grid</span>
+          <div style="display:flex;gap:5px">
+            <button class="grid-sz-btn" data-g="14" onclick="setGridSize(14)">14px</button>
+            <button class="grid-sz-btn" data-g="26" onclick="setGridSize(26)">26px</button>
+            <button class="grid-sz-btn" data-g="52" onclick="setGridSize(52)">52px</button>
+          </div>
+        </div>
+
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
           <span class="cfg-lbl" style="margin:0">Largura dos cards</span>
           <div style="display:flex;align-items:center;gap:7px">
@@ -351,7 +370,7 @@ const CANVAS_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?t
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let modules = [], connTypes = [], canvas = {nodes:[], edges:[]};
-let settings = {dark:false, nw:180};
+let settings = {dark:false, nw:180, snap:false, gridSize:26};
 let cfg = {devs:['Totvs','Salesforce','Microsoft','AW Interno','Externo'], ambs:['Local','Nuvem','Servidor AW','Híbrido','SaaS'], sts:['Ativo','Em implantação','Protótipo','Legado','Descontinuado','Planejado']};
 let tool='sel', connFrom=null, selConn=null;
 let drag=null, dragOff={x:0,y:0};
@@ -514,6 +533,7 @@ function applySett() {
   if (tog) { tog.style.background = settings.dark?'var(--accent)':'var(--border2)'; }
   if (knob) knob.style.transform = settings.dark?'translateX(14px)':'none';
   applyNW(settings.nw, false);
+  applySnap();
 }
 function toggleTheme() { settings.dark=!settings.dark; applySett(); saveLocal(); }
 function applyNW(v, save=true) {
@@ -638,7 +658,18 @@ document.addEventListener('mousemove',e=>{
   renderEdges();
 });
 document.addEventListener('mouseup', e=>{
-  if(drag){ schedSave(); drag=null; return; }
+  if(drag){
+    // Snap to grid on release
+    const n = canvas.nodes.find(x=>x.id===drag);
+    if(n && settings.snap) {
+      n.x = snapToGrid(n.x);
+      n.y = snapToGrid(n.y);
+      const el = document.getElementById('node-'+drag);
+      if(el) { el.style.left=n.x+'px'; el.style.top=n.y+'px'; }
+      renderEdges();
+    }
+    schedSave(); drag=null; return;
+  }
   drag=null;
   // Handle connection click
   if(!connFrom) return;
@@ -899,6 +930,46 @@ function clearCanvas(){
 function updateChips(){
   document.getElementById('chip-mods').textContent=canvas.nodes.length+' módulo'+(canvas.nodes.length!==1?'s':'');
   document.getElementById('chip-edges').textContent=canvas.edges.length+' conexão'+(canvas.edges.length!==1?'ões':'');
+}
+
+
+
+// ── Grid snap ──────────────────────────────────────────────────────────────
+function toggleSnap() {
+  settings.snap = !settings.snap;
+  applySnap();
+  saveLocal();
+}
+
+function setGridSize(g) {
+  settings.gridSize = g;
+  document.querySelectorAll('.grid-sz-btn').forEach(b=>{
+    b.classList.toggle('on', Number(b.dataset.g)===g);
+  });
+  // Update grid dot pattern
+  document.getElementById('cw').style.backgroundSize = g+'px '+g+'px';
+  saveLocal();
+}
+
+function applySnap() {
+  const tog = document.getElementById('snap-tog');
+  const knob = document.getElementById('snap-knob');
+  const row = document.getElementById('snap-size-row');
+  if (tog) { tog.style.background = settings.snap ? 'var(--accent)' : 'var(--border2)'; }
+  if (knob) knob.style.transform = settings.snap ? 'translateX(14px)' : 'none';
+  if (row) row.style.opacity = settings.snap ? '1' : '.4';
+  // Update grid size buttons
+  document.querySelectorAll('.grid-sz-btn').forEach(b=>{
+    b.classList.toggle('on', Number(b.dataset.g)===settings.gridSize);
+  });
+  // Update canvas grid size
+  const cw = document.getElementById('cw');
+  if (cw) cw.style.backgroundSize = settings.gridSize+'px '+settings.gridSize+'px';
+}
+
+function snapToGrid(v) {
+  if (!settings.snap) return v;
+  return Math.round(v / settings.gridSize) * settings.gridSize;
 }
 
 
