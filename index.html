@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.19</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.20</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -499,7 +499,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.19</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.20</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -631,7 +631,6 @@
   <div id="statusbar">
     <div class="chip" id="chip-nodes">— módulos</div>
     <div class="chip" id="chip-edges">— conexões</div>
-    <div class="chip" id="chip-save-status" style="opacity:0;transition:opacity .3s">✓ salvo</div>
   </div>
   <div id="toolbar">
     <button class="tool-btn active" id="tbtn-select" onclick="setTool('select')">Selecionar</button>
@@ -756,40 +755,30 @@ async function loadCanvasFromSheets() {
 function saveLocal() {
   try { localStorage.setItem('aw_map_v3', JSON.stringify({canvas:canvasData,settings})); } catch(e) {}
 }
-async function saveToSheets() {
-  try {
-    await fetch(APPS_SCRIPT, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({action:'saveCanvas', canvas: canvasData})
-    });
-  } catch(e) { console.log('Sheets save failed', e); }
+async function postToSheets(payload) {
+  // POST no-cors
+  try { fetch(APPS_SCRIPT, {method:'POST', mode:'no-cors', body:JSON.stringify(payload)}); } catch(e) {}
+  // GET fallback
+  try { fetch(APPS_SCRIPT+'?data='+encodeURIComponent(JSON.stringify(payload)), {mode:'no-cors'}); } catch(e) {}
 }
 
-// Debounced version — waits 1.5s after last move before saving
+async function saveToSheets() {
+  await postToSheets({action:'saveCanvas', canvas:canvasData});
+}
+
 let _saveTimer = null;
 function saveToSheetsDebounced() {
   clearTimeout(_saveTimer);
-  // Show subtle saving indicator
   const chip = document.getElementById('chip-save-status');
   if (chip) { chip.textContent = '↑ salvando...'; chip.style.opacity='1'; }
   _saveTimer = setTimeout(async () => {
     saveLocal();
     await saveToSheets();
-    if (chip) {
-      chip.textContent = '✓ salvo';
-      setTimeout(()=>{ chip.style.opacity='0'; }, 1500);
-    }
+    if (chip) { chip.textContent = '✓ salvo'; setTimeout(()=>{ chip.style.opacity='0'; }, 2000); }
   }, 1500);
 }
 async function saveModuleToSheets(mod) {
-  try {
-    await fetch(APPS_SCRIPT, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({action:'saveModule', ...mod})
-    });
-  } catch(e) {}
+  await postToSheets({action:'saveModule', ...mod});
 }
 
 // ── Chave API ──────────────────────────────────────────────────────────────
@@ -1030,7 +1019,7 @@ document.getElementById('canvas-wrap').addEventListener('drop',e=>{
   if(!mid) return;
   const rect=document.getElementById('canvas-wrap').getBoundingClientRect();
   canvasData.nodes.push({id:'n'+Date.now(),moduleId:mid,x:e.clientX-rect.left-90,y:e.clientY-rect.top-35});
-  saveLocal(); saveToSheets(); renderCanvas(); renderSidebar(); updateChips();
+  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
 });
 
 // ── Canvas ─────────────────────────────────────────────────────────────────
@@ -1412,13 +1401,7 @@ async function deleteModuleFromPanel() {
   saveLocal(); saveToSheets();
   renderSidebar(); renderCanvas(); updateChips();
   // Delete from Sheets
-  try {
-    await fetch(APPS_SCRIPT, {
-      method:'POST', mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({action:'deleteModule', id: deletedId})
-    });
-  } catch(e) {}
+  await postToSheets({action:'deleteModule', id: deletedId});
 }
 
 init();
