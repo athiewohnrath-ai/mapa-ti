@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.35</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.36</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -280,7 +280,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.35</div>
+      <div id="logo-ver">v1.36</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -661,7 +661,13 @@ function saveLocal() {
 function loadLocal() {
   try {
     const s = localStorage.getItem('aw_v22');
-    if (s) { const p=JSON.parse(s); canvas=p.canvas||{nodes:[],edges:[]}; settings={...settings,...(p.settings||{})}; cfg={...cfg,...(p.cfg||{})}; }
+    if (s) {
+      const p=JSON.parse(s);
+      const c = p.canvas||{nodes:[],edges:[]};
+      // Migrate old moduleId -> mid
+      if(c.nodes) c.nodes = c.nodes.map(n=>({...n, mid: n.mid||n.moduleId}));
+      canvas=c; settings={...settings,...(p.settings||{})}; cfg={...cfg,...(p.cfg||{})};
+    }
   } catch(e){}
 }
 
@@ -763,6 +769,8 @@ async function init() {
     // Load canvas from Sheets (positions + edges)
     const remoteCanvas = await loadCanvasFromSheets();
     if (remoteCanvas && remoteCanvas.nodes && remoteCanvas.nodes.length) {
+      // Migrate old moduleId -> mid
+      remoteCanvas.nodes = remoteCanvas.nodes.map(n=>({...n, mid: n.mid||n.moduleId}));
       canvas = remoteCanvas;
       saveLocal();
     } else if (!canvas.nodes.length && modules.length) {
@@ -895,7 +903,7 @@ function renderCanvas() {
   const cv=document.getElementById('cv');
   cv.innerHTML='';
   canvas.nodes.forEach(node=>{
-    const m=modules.find(x=>x.id===node.mid); if(!m) return;
+    const mid = node.mid||node.moduleId; const m=modules.find(x=>x.id===mid); if(!m) return;
     const sc={Ativo:'s-ativo',Legado:'s-legado',Descontinuado:'s-desc'}[m.sta]||'';
     const t = getTipo(m.tipo);
     const isDark = settings.dark;
@@ -926,7 +934,7 @@ function renderCanvas() {
       <button class="ntb-btn x" onclick="removeNode('${node.id}')">×</button>
     </div>`;
     el.addEventListener('mousedown',ev=>{
-      if(ev.target.classList.contains('nbtn')) return;
+      if(ev.target.classList.contains('nbtn')||ev.target.classList.contains('ntb-btn')) return;
       if(connFrom) return; // in connect mode, let mouseup handle it
       if(tool==='con'){startConn(node.id);return;}
       drag=node.id;
@@ -983,7 +991,7 @@ function removeNode(id) {
 
 // ─── Edges ────────────────────────────────────────────────────────────────────
 function nCenter(id) {
-  const el=document.getElementById('node-'+id);
+  const el=document.getElementById('node-'+id)||document.getElementById('node-'+id);
   const w=document.getElementById('cw').getBoundingClientRect();
   if(!el) return {x:0,y:0};
   const r=el.getBoundingClientRect();
