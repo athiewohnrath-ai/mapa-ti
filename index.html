@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.43</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.44</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -280,7 +280,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.43</div>
+      <div id="logo-ver">v1.44</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1099,14 +1099,19 @@ function renderEdges() {
   const w=document.getElementById('cw');
   svg.setAttribute('width',w.offsetWidth); svg.setAttribute('height',w.offsetHeight);
   const sid=s=>(s||'').replace(/[^a-z0-9]/gi,'');
-  const defs=connTypes.map(ct=>`<marker id="a${sid(ct.id)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="${ct.color}" stroke-width="1.5" stroke-linecap="round"/></marker>`).join('');
+  const sid2=s=>(s||'').replace(/[^a-z0-9]/gi,'');
+  const defs = connTypes.map(ct => {
+    const ap = `<path d="M2 1L8 5L2 9" fill="none" stroke="${ct.color}" stroke-width="1.5" stroke-linecap="round"/>`;
+    return `<marker id="ae${sid2(ct.id)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${ap}</marker>
+            <marker id="as${sid2(ct.id)}" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">${ap}</marker>`;
+  }).join('');
   const lw=1.8;
   const paths=canvas.edges.map(edge=>{
     const ct=connTypes.find(c=>c.id===edge.cid)||connTypes[0]; if(!ct) return '';
     const f=nCenter(edge.from),t=nCenter(edge.to);
     const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-28;
     const dash=ct.style==='Tracejada'?`stroke-dasharray="${lw*4} ${lw*3}"`:ct.style==='Pontilhada'?`stroke-dasharray="${lw} ${lw*4}"`:'';
-    return `<path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}" fill="none" stroke="${ct.color}" stroke-width="${lw}" opacity=".85" ${dash} marker-end="url(#a${sid(ct.id)})" style="pointer-events:stroke;cursor:pointer" onclick="removeEdge('${edge.id}')"/>
+    return `<path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}" fill="none" stroke="${ct.color}" stroke-width="${ct.width||lw}" opacity=".85" ${dash} marker-end="url(#ae${sid(ct.id)})" marker-start="${(ct.arrow||'end')==='both'?'url(#as'+sid(ct.id)+')':''}" style="pointer-events:stroke;cursor:pointer" onclick="connMenu('${edge.id}',event)"/>
     <text x="${(f.x+t.x)/2}" y="${(f.y+t.y)/2-35}" text-anchor="middle" font-size="10" fill="${ct.color}" opacity=".65" font-family="DM Mono,monospace">${esc(ct.name)}</text>`;
   }).join('');
   svg.innerHTML=`<defs>${defs}</defs>${paths}`;
