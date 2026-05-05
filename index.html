@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.44</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.45</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -280,7 +280,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.44</div>
+      <div id="logo-ver">v1.45</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -509,7 +509,7 @@ select.tfi { cursor:pointer; }
       <!-- Título -->
       <div class="tfl full">
         <div class="section-lbl">Título</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 80px 100px;gap:8px">
           <div class="tfl">
             <label>Fonte</label>
             <select class="tfi" id="tp-title-font">
@@ -531,6 +531,15 @@ select.tfi { cursor:pointer; }
               <option value="500">Médio</option>
               <option value="600" selected>Semi</option>
               <option value="700">Bold</option>
+            </select>
+          </div>
+          <div class="tfl">
+            <label>Alinhamento</label>
+            <select class="tfi" id="tp-title-align">
+              <option value="auto">Auto</option>
+              <option value="left">← Esquerda</option>
+              <option value="center">↔ Centro</option>
+              <option value="right">→ Direita</option>
             </select>
           </div>
         </div>
@@ -1022,8 +1031,11 @@ function renderCanvas() {
     el.style.cssText = `left:${node.x}px;top:${node.y}px;position:absolute;width:${t.w||180}px;background:${bg};border:${t.borderW||1.5}px solid ${border};padding:11px 13px;`;
     if(t.h) el.style.minHeight = t.h+'px';
 
-    el.innerHTML=`<div class="ntop"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC}">${esc(m.name)}</div></div>
-      <div class="ntags">${tags}</div>
+        // Auto-center title if no tags visible
+    const hasFields = [t.showAmb&&m.amb, t.showSta&&m.sta, t.showDev&&m.dev, t.showArea&&m.area, t.showDesc&&m.desc].some(Boolean);
+    const align = t.titleAlign==='auto' ? (hasFields ? 'left' : 'center') : (t.titleAlign||'left');
+    el.innerHTML=`<div class="ntop" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'}"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC};text-align:${align}">${esc(m.name)}</div></div>
+      <div class="ntags" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'}">${tags}</div>
 `+`<div class="node-actions">
       <button class="ntb-btn p" onclick="startConn('${node.id}')">⟶ Conectar</button>
       <button class="ntb-btn" onclick="openEP('${m.id}','${node.id}')">✎ Editar</button>
@@ -1482,6 +1494,7 @@ function fillTipoForm(t) {
   document.getElementById('tp-title-font').value   = t.titleFont||"'DM Sans',sans-serif";
   document.getElementById('tp-title-size').value   = t.titleSize||12;
   document.getElementById('tp-title-weight').value = t.titleWeight||'600';
+  document.getElementById('tp-title-align').value = t.titleAlign||'auto';
   setColorPair('tp-title-light', t.titleLight||'#1a1916');
   setColorPair('tp-title-dark',  t.titleDark||'#e8e8ec');
   // Fields visibility
@@ -1530,6 +1543,7 @@ function readTipoForm() {
     titleFont:   document.getElementById('tp-title-font').value,
     titleSize:   Number(document.getElementById('tp-title-size').value)||12,
     titleWeight: document.getElementById('tp-title-weight').value,
+    titleAlign:  document.getElementById('tp-title-align').value || 'auto',
     titleLight: document.getElementById('tp-title-light').value,
     titleDark:  document.getElementById('tp-title-dark').value,
     showArea: document.getElementById('tp-show-area').checked,
