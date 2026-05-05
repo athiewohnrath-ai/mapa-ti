@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.09</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.10</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -343,7 +343,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.09</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.10</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -540,21 +540,19 @@ function resetSettings() { applyNodeWidth(180); applyLineWidth(1.8); }
 function syncSettingsUI() { applyTheme(); applyNodeWidth(settings.nodeWidth); applyLineWidth(settings.lineWidth); }
 
 // ── Notion API ─────────────────────────────────────────────────────────────
-// ── Notion API direta (sem Anthropic) ─────────────────────────────────────
-async function notionGet(path) {
-  const r = await fetch(N8N_PROXY, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ notionPath: path, token: NOTION_TOKEN })
-  });
-  return r.json();
-}
+// ── Notion API via proxy CORS ─────────────────────────────────────────────
+const CORS_PROXY = 'https://corsproxy.io/?';
 
-async function notionQueryDB(dbId, filter) {
-  const r = await fetch(N8N_PROXY, {
+async function notionQueryDB(dbId) {
+  const url = CORS_PROXY + encodeURIComponent('https://api.notion.com/v1/databases/'+dbId+'/query');
+  const r = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ notionPath: '/databases/'+dbId+'/query', token: NOTION_TOKEN, body: filter||{} })
+    headers: {
+      'Authorization': 'Bearer ' + NOTION_TOKEN,
+      'Notion-Version': '2022-06-28',
+      'Content-Type': 'application/json'
+    },
+    body: '{}'
   });
   return r.json();
 }
