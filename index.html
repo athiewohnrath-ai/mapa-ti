@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.38</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.40</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -280,7 +280,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.38</div>
+      <div id="logo-ver">v1.40</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -767,8 +767,8 @@ async function init() {
     // Load modules and conn types from Sheets
     [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
 
-    // Load tipos from Sheets
-    await loadTiposFromSheets();
+    // Load tipos from Sheets (non-blocking)
+    try { await loadTiposFromSheets(); } catch(e) { console.log('tipos load failed:', e); }
 
     // Load canvas from Sheets (positions + edges)
     const remoteCanvas = await loadCanvasFromSheets();
@@ -785,9 +785,11 @@ async function init() {
     selConn = connTypes[0]?.id;
     setStatus('ok', modules.length+' módulos · conectado');
   } catch(e) {
-    setStatus('err','Modo offline');
+    console.error('init error:', e);
+    setStatus('err','Modo offline — '+e.message);
     if (!modules.length) modules = [];
     if (!connTypes.length) connTypes = defaultConns();
+    if (!tipos.length) tipos = [{...DEFAULT_TIPO}];
     if (!canvas.nodes.length) seedCanvas();
   }
 
@@ -1273,24 +1275,24 @@ function loadTipos() {
 async function loadTiposFromSheets() {
   try {
     const r = await fetch(TIPOS_CSV + '&t=' + Date.now());
+    if (!r.ok) return false;
     const txt = await r.text();
+    if (!txt || txt.includes('<!DOCTYPE')) return false; // not a CSV
     const lines = txt.trim().split('\n');
-    if (lines.length >= 2) {
-      const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"');
-      if (raw && raw.startsWith('[')) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.length) {
-          // Merge: keep default tipo, add/update rest
-          const hasDefault = parsed.find(t=>t.id==='default');
-          if (!hasDefault) parsed.unshift({...DEFAULT_TIPO});
-          tipos = parsed;
-          saveTiposLocal();
-          return true;
-        }
-      }
-    }
-  } catch(e) { console.log('loadTiposFromSheets error:', e); }
-  return false;
+    if (lines.length < 2) return false;
+    const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
+    if (!raw || !raw.startsWith('[')) return false;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || !parsed.length) return false;
+    // Ensure default tipo exists
+    if (!parsed.find(t=>t.id==='default')) parsed.unshift({...DEFAULT_TIPO});
+    tipos = parsed;
+    saveTiposLocal();
+    return true;
+  } catch(e) {
+    console.log('loadTiposFromSheets error:', e);
+    return false;
+  }
 }
 
 function saveTiposLocal() {
@@ -1489,7 +1491,7 @@ async function saveTipo() {
   setTimeout(()=>setStatus('ok', modules.length+' módulos'), 2000);
 }
 
-function deleteTipo() {
+async function deleteTipo() {
   if (editingTipoId==='default') return;
   if (!confirm('Excluir este tipo? Os módulos que o usam voltarão ao padrão.')) return;
   tipos = tipos.filter(t=>t.id!==editingTipoId);
