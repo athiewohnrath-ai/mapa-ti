@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.22</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.23</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -176,7 +176,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.22</div>
+      <div id="logo-ver">v1.23</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -254,13 +254,13 @@ select.fi{cursor:pointer;}
 </div>
 
 <!-- Edit overlay -->
-<div id="eov" onclick="tryCloseEP()"></div>
+<div id="eov" onclick="tryCloseEP(event)"></div>
 
 <!-- Edit popover -->
 <div id="ep">
   <div id="ep-hd">
     <span id="ep-title">Editar módulo</span>
-    <button id="ep-close" onclick="tryCloseEP()">×</button>
+    <button id="ep-close" onclick="tryCloseEP(null)">×</button>
   </div>
   <div id="ep-body">
     <input type="hidden" id="ep-id">
@@ -734,7 +734,10 @@ function openEP(mid, nid) {
   }
 }
 
-function tryCloseEP() {
+function tryCloseEP(e) {
+  // Don't fire if a dialog is already open
+  if(document.getElementById('dlg-unsaved').classList.contains('open')) return;
+  if(document.getElementById('dlg-del').classList.contains('open')) return;
   if(dirty){
     document.getElementById('dlg-unsaved').classList.add('open');
   } else {
@@ -753,6 +756,7 @@ function closeEP(force){
 
 function dlgUnsaved(choice){
   document.getElementById('dlg-unsaved').classList.remove('open');
+  document.getElementById('eov').style.pointerEvents='';
   if(choice==='save') saveMod();
   else if(choice==='discard') closeEP(true);
   // 'cancel' → do nothing, stay open
@@ -786,12 +790,16 @@ async function saveMod(){
 }
 
 function confirmDelete(){
-  const m=modules.find(x=>x.id===editId); if(!m) return;
+  const m=modules.find(x=>x.id===editId);
+  if(!m){ alert('Módulo não encontrado.'); return; }
   document.getElementById('del-name').textContent=m.name;
+  // Pause the eov so it doesn't fire and close things
+  document.getElementById('eov').style.pointerEvents='none';
   document.getElementById('dlg-del').classList.add('open');
 }
 async function dlgDel(yes){
   document.getElementById('dlg-del').classList.remove('open');
+  document.getElementById('eov').style.pointerEvents='';
   if(!yes) return;
   const id=editId;
   modules=modules.filter(m=>m.id!==id);
