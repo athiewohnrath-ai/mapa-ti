@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.31</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.32</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -244,7 +244,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.31</div>
+      <div id="logo-ver">v1.32</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -377,6 +377,7 @@ select.tfi { cursor:pointer; }
       </div>
       <input type="hidden" id="ep-col" value="#2455c7">
     </div>
+    <div class="fl"><label>Tipo visual</label><select class="fi" id="ep-tipo" onchange="window.dirty=true;applyTipoPreview()"></select></div>
   </div>
   <div id="ep-ft">
     <button class="bd" onclick="hideModule()">Ocultar</button>
@@ -1387,6 +1388,29 @@ function duplicateTipo() {
   // Open the new duplicate for editing
   closeTipoPanel();
   setTimeout(() => openEditTipo(newTipo.id), 150);
+}
+
+
+function applyTipoPreview() {
+  // Instantly re-render the node being edited to preview the tipo
+  const nodeEl = document.querySelector('.node.editing');
+  if (!nodeEl || !editId) return;
+  const node = canvas.nodes.find(n=>{
+    const m = modules.find(x=>x.id===n.mid);
+    return m && m.id===editId;
+  });
+  if (!node) return;
+  // Temporarily apply selected tipo
+  const tipoId = document.getElementById('ep-tipo').value;
+  const m = modules.find(x=>x.id===editId);
+  if (m) {
+    const orig = m.tipo;
+    m.tipo = tipoId;
+    renderCanvas();
+    // Re-add editing class
+    const updatedEl = document.getElementById('node-'+node.id);
+    if (updatedEl) updatedEl.classList.add('editing');
+  }
 }
 
 async function saveTipo() {
