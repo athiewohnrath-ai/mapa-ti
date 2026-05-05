@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.26</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.27</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -186,7 +186,7 @@ select.fi{cursor:pointer;}
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.26</div>
+      <div id="logo-ver">v1.27</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -540,7 +540,8 @@ function renderSidebar() {
   ml.innerHTML = avail.length
     ? avail.map(m=>`<div class="mod-item" draggable="true" ondragstart="onDS(event,'${m.id}')">
         <div class="mdot" style="background:${m.color}"></div>
-        <div><div class="mname">${esc(m.name)}</div><div class="mmeta">${[m.amb,m.sta].filter(Boolean).join(' · ')}</div></div>
+        <div style="flex:1;min-width:0"><div class="mname">${esc(m.name)}</div><div class="mmeta">${[m.amb,m.sta].filter(Boolean).join(' · ')}</div></div>
+        <button class="mod-del-btn" onclick="askDeleteMod(event,'${m.id}')" title="Excluir">🗑</button>
       </div>`).join('')
     : '<div class="empty-list">Todos os módulos estão no canvas</div>';
 
