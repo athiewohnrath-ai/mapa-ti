@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.17</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.19</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
@@ -457,6 +457,33 @@
   }
   .canvas-node.editing { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 
+
+  /* ── Diálogos de confirmação ── */
+  .confirm-dialog {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 300;
+    align-items: center; justify-content: center;
+  }
+  .confirm-dialog-box {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 24px;
+    width: 300px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+    position: relative; z-index: 301;
+    text-align: center;
+  }
+  .confirm-dialog-icon { font-size: 28px; margin-bottom: 10px; }
+  .confirm-dialog-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .confirm-dialog-sub { font-size: 12px; color: var(--text3); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-dialog-btns { display: flex; gap: 8px; justify-content: center; }
+  .cdb { padding: 8px 18px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; border: none; }
+  .cdb.primary { background: var(--accent); color: #fff; }
+  .cdb.danger  { background: var(--red); color: #fff; }
+  .cdb.ghost   { background: var(--bg3); color: var(--text); border: 1px solid var(--border2); }
+
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -472,7 +499,7 @@
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.17</div>
+      <div style="margin-left:auto;font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);background:var(--bg3);border:1px solid var(--border);padding:3px 8px;border-radius:99px;white-space:nowrap">v1.19</div>
     </div>
     <div id="notion-status">
       <div class="status-dot loading" id="sdot"></div>
@@ -604,6 +631,7 @@
   <div id="statusbar">
     <div class="chip" id="chip-nodes">— módulos</div>
     <div class="chip" id="chip-edges">— conexões</div>
+    <div class="chip" id="chip-save-status" style="opacity:0;transition:opacity .3s">✓ salvo</div>
   </div>
   <div id="toolbar">
     <button class="tool-btn active" id="tbtn-select" onclick="setTool('select')">Selecionar</button>
@@ -616,45 +644,45 @@
   </div>
 
 <!-- Overlay escurecido -->
-<div id="edit-overlay" onclick="closeEditPanel()"></div>
+<div id="edit-overlay" onclick="closeEditPanel(false)"></div>
 
 <!-- Popover flutuante -->
 <div id="edit-panel">
   <div id="edit-panel-header">
       <span id="edit-panel-title">Editar módulo</span>
-      <button id="edit-panel-close" onclick="closeEditPanel()">×</button>
+      <button id="edit-panel-close" onclick="closeEditPanel(false)">×</button>
     </div>
     <div id="edit-panel-body">
       <input type="hidden" id="ep-id">
 
       <div class="field-group">
         <label class="field-lbl">Nome *</label>
-        <input class="field-inp" id="ep-name" type="text" placeholder="Nome do módulo">
+        <input class="field-inp" id="ep-name" type="text" placeholder="Nome do módulo" oninput="markDirty()">
       </div>
 
       <div class="field-group">
         <label class="field-lbl">Área</label>
-        <input class="field-inp" id="ep-area" type="text" placeholder="Ex: Comercial, RH...">
+        <input class="field-inp" id="ep-area" type="text" placeholder="Ex: Comercial, RH..." oninput="markDirty()">
       </div>
 
       <div class="field-group">
         <label class="field-lbl">Descrição</label>
-        <textarea class="field-inp" id="ep-desc" placeholder="O que este módulo faz?"></textarea>
+        <textarea class="field-inp" id="ep-desc" placeholder="O que este módulo faz?" oninput="markDirty()"></textarea>
       </div>
 
       <div class="field-group">
         <label class="field-lbl">Desenvolvedor</label>
-        <select class="field-inp" id="ep-dev"></select>
+        <select class="field-inp" id="ep-dev" onchange="markDirty()"></select>
       </div>
 
       <div class="field-group">
         <label class="field-lbl">Ambiente</label>
-        <select class="field-inp" id="ep-ambiente"></select>
+        <select class="field-inp" id="ep-ambiente" onchange="markDirty()"></select>
       </div>
 
       <div class="field-group">
         <label class="field-lbl">Status</label>
-        <select class="field-inp" id="ep-status"></select>
+        <select class="field-inp" id="ep-status" onchange="markDirty()"></select>
       </div>
 
       <div class="field-group">
@@ -736,6 +764,23 @@ async function saveToSheets() {
       body: JSON.stringify({action:'saveCanvas', canvas: canvasData})
     });
   } catch(e) { console.log('Sheets save failed', e); }
+}
+
+// Debounced version — waits 1.5s after last move before saving
+let _saveTimer = null;
+function saveToSheetsDebounced() {
+  clearTimeout(_saveTimer);
+  // Show subtle saving indicator
+  const chip = document.getElementById('chip-save-status');
+  if (chip) { chip.textContent = '↑ salvando...'; chip.style.opacity='1'; }
+  _saveTimer = setTimeout(async () => {
+    saveLocal();
+    await saveToSheets();
+    if (chip) {
+      chip.textContent = '✓ salvo';
+      setTimeout(()=>{ chip.style.opacity='0'; }, 1500);
+    }
+  }, 1500);
 }
 async function saveModuleToSheets(mod) {
   try {
@@ -985,7 +1030,7 @@ document.getElementById('canvas-wrap').addEventListener('drop',e=>{
   if(!mid) return;
   const rect=document.getElementById('canvas-wrap').getBoundingClientRect();
   canvasData.nodes.push({id:'n'+Date.now(),moduleId:mid,x:e.clientX-rect.left-90,y:e.clientY-rect.top-35});
-  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
+  saveLocal(); saveToSheets(); renderCanvas(); renderSidebar(); updateChips();
 });
 
 // ── Canvas ─────────────────────────────────────────────────────────────────
@@ -1203,10 +1248,15 @@ function populateEditPanelSelects() {
 // ── Painel lateral de edição ───────────────────────────────────────────────
 let editingModuleId = null;
 
+let panelDirty = false; // tracks unsaved changes
+
+function markDirty() { panelDirty = true; }
+
 function openEditPanel(moduleId, nodeElRef) {
   const mod = modules.find(m=>m.id===moduleId);
   if (!mod) return;
   editingModuleId = moduleId;
+  panelDirty = false;
   document.getElementById('ep-id').value = moduleId;
   document.getElementById('ep-name').value = mod.name||'';
   document.getElementById('ep-area').value = mod.area||'';
@@ -1276,17 +1326,50 @@ function openEditPanel(moduleId, nodeElRef) {
   }
 }
 
-function closeEditPanel() {
+async function closeEditPanel(skipCheck) {
+  if (!skipCheck && panelDirty) {
+    // Show custom confirm dialog
+    const choice = await showUnsavedDialog();
+    if (choice === 'save') {
+      await saveModuleFromPanel();
+      return;
+    } else if (choice === 'cancel') {
+      return; // stay open
+    }
+    // choice === 'discard' → fall through and close
+  }
+  panelDirty = false;
   document.getElementById('edit-panel').classList.remove('open');
   document.getElementById('edit-overlay').classList.remove('open');
   document.querySelectorAll('.canvas-node').forEach(el=>el.classList.remove('editing'));
   editingModuleId=null;
 }
 
+function showDeleteDialog(name) {
+  return new Promise(resolve => {
+    document.getElementById('del-module-name').textContent = name;
+    const dlg = document.getElementById('delete-dialog');
+    dlg.style.display = 'flex';
+    document.getElementById('dd-confirm').onclick = () => { dlg.style.display='none'; resolve(true); };
+    document.getElementById('dd-cancel').onclick = () => { dlg.style.display='none'; resolve(false); };
+  });
+}
+
+function showUnsavedDialog() {
+  return new Promise(resolve => {
+    const dlg = document.getElementById('unsaved-dialog');
+    dlg.style.display = 'flex';
+    document.getElementById('usd-save').onclick = () => { dlg.style.display='none'; resolve('save'); };
+    document.getElementById('usd-discard').onclick = () => { dlg.style.display='none'; resolve('discard'); };
+    document.getElementById('usd-cancel').onclick = () => { dlg.style.display='none'; resolve('cancel'); };
+  });
+}
+
 function epPickColor(c,el) {
   document.getElementById('ep-color').value=c;
   document.querySelectorAll('#ep-colors .cp-dot').forEach(d=>d.classList.remove('selected'));
   el.classList.add('selected');
+  markDirty();
 }
 
 async function saveModuleFromPanel() {
@@ -1304,15 +1387,19 @@ async function saveModuleFromPanel() {
   };
   const idx=modules.findIndex(m=>m.id===editingModuleId);
   if (idx>=0) modules[idx]=mod;
-  closeEditPanel();
+  panelDirty = false;
+  closeEditPanel(true); // skip unsaved check — already saving
   renderSidebar(); renderCanvas();
-  setStatus('loading','Salvando...');
+  setStatus('loading','Salvando no banco...');
   await saveModuleToSheets(mod);
-  setStatus('ok',modules.length+' módulos');
+  setStatus('ok', modules.length+' módulos · salvo');
+  setTimeout(()=>setStatus('ok', modules.length+' módulos'), 2000);
 }
 
 async function deleteModuleFromPanel() {
-  if (!confirm('Excluir este módulo do mapa e do banco?')) return;
+  const mod = modules.find(m=>m.id===editingModuleId);
+  const confirmed = await showDeleteDialog(mod?.name||'este módulo');
+  if (!confirmed) return;
   const deletedId = editingModuleId;
   modules=modules.filter(m=>m.id!==deletedId);
   canvasData.nodes=canvasData.nodes.filter(n=>n.moduleId!==deletedId);
@@ -1402,6 +1489,36 @@ init();
         <button onclick="closeModuleModal()" style="padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:none;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit">Cancelar</button>
         <button onclick="saveModule()" style="padding:8px 20px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit">Salvar módulo</button>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Diálogo: sair sem salvar -->
+<div class="confirm-dialog" id="unsaved-dialog">
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5)" onclick="document.getElementById('usd-cancel').click()"></div>
+  <div class="confirm-dialog-box">
+    <div class="confirm-dialog-icon">💾</div>
+    <div class="confirm-dialog-title">Alterações não salvas</div>
+    <div class="confirm-dialog-sub">Você fez alterações neste módulo.<br>O que deseja fazer?</div>
+    <div class="confirm-dialog-btns">
+      <button class="cdb ghost" id="usd-cancel">Continuar editando</button>
+      <button class="cdb ghost" id="usd-discard">Descartar</button>
+      <button class="cdb primary" id="usd-save">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Diálogo: confirmar exclusão -->
+<div class="confirm-dialog" id="delete-dialog">
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5)" onclick="document.getElementById('dd-cancel').click()"></div>
+  <div class="confirm-dialog-box">
+    <div class="confirm-dialog-icon">🗑️</div>
+    <div class="confirm-dialog-title">Excluir módulo?</div>
+    <div class="confirm-dialog-sub">Tem certeza que deseja excluir<br><strong id="del-module-name"></strong>?<br>Esta ação não pode ser desfeita.</div>
+    <div class="confirm-dialog-btns">
+      <button class="cdb ghost" id="dd-cancel">Cancelar</button>
+      <button class="cdb danger" id="dd-confirm">Excluir</button>
     </div>
   </div>
 </div>
