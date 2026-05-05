@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.33</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.34</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -93,7 +93,7 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 #cv   { position:absolute; top:0; left:0; width:100%; height:100%; }
 
 /* Nodes */
-.node { position:absolute; width:var(--nw,180px); background:var(--bg2); border:1.5px solid var(--border2); border-radius:var(--rl); padding:12px 14px; cursor:move; user-select:none; box-shadow:var(--shadow); transition:box-shadow .2s,border-color .2s,background .3s; }
+.node { position:relative; width:var(--nw,180px); background:var(--bg2); border:1.5px solid var(--border2); border-radius:var(--rl); padding:12px 14px; cursor:move; user-select:none; box-shadow:var(--shadow); transition:box-shadow .2s,border-color .2s,background .3s; }
 .node:hover{box-shadow:var(--shadow2);}
 .node.connecting{border-color:var(--amber);cursor:crosshair;}
 .node.editing{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
@@ -105,21 +105,25 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .ntag.s-ativo{color:var(--green);border-color:rgba(26,122,74,.25);}
 .ntag.s-legado{color:var(--amber);border-color:rgba(201,125,16,.25);}
 .ntag.s-desc{color:var(--red);}
-/* ── Floating node toolbar ── */
+/* ── Node wrap + floating toolbar ── */
+.node-wrap {
+  position:absolute;
+  display:inline-block;
+}
 .node-toolbar {
   position:absolute;
+  top:-32px; left:0;
   display:flex; gap:3px;
   opacity:0; pointer-events:none;
   transition:opacity .15s;
   z-index:10;
-  transform:translateY(0);
   filter:drop-shadow(0 2px 6px rgba(0,0,0,.15));
+  white-space:nowrap;
 }
-.node:hover ~ .node-toolbar,
-.node-toolbar:hover { opacity:1; pointer-events:auto; }
-#cv:has(.node:hover) .node-toolbar { opacity:0; pointer-events:none; }
-#cv .node:hover + .node-toolbar,
-#cv:hover .node-toolbar.show { opacity:1; }
+/* Show toolbar when hovering anywhere in the wrap */
+.node-wrap:hover .node-toolbar {
+  opacity:1; pointer-events:auto;
+}
 
 .ntb-btn {
   font-size:10px; font-weight:500;
@@ -268,7 +272,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.33</div>
+      <div id="logo-ver">v1.34</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -909,50 +913,39 @@ function renderCanvas() {
     el.innerHTML=`<div class="ntop"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC}">${esc(m.name)}</div></div>
       <div class="ntags">${tags}</div>
 `; // no actions inside node
-    el.addEventListener('mouseenter',()=>{
-      const tb=document.getElementById('tb-'+node.id);
-      if(tb) tb.style.opacity='1', tb.style.pointerEvents='auto';
-    });
-    el.addEventListener('mouseleave',(ev)=>{
-      // Keep visible if mouse moves to toolbar
-      setTimeout(()=>{
-        const tb=document.getElementById('tb-'+node.id);
-        if(!tb) return;
-        const tbRect=tb.getBoundingClientRect();
-        const mx=ev.clientX, my=ev.clientY;
-        if(mx>=tbRect.left&&mx<=tbRect.right&&my>=tbRect.top&&my<=tbRect.bottom) return;
-        tb.style.opacity='0'; tb.style.pointerEvents='none';
-      },50);
-    });
     el.addEventListener('mousedown',ev=>{
       if(ev.target.classList.contains('nbtn')) return;
       if(connFrom) return; // in connect mode, let mouseup handle it
       if(tool==='con'){startConn(node.id);return;}
       drag=node.id;
-      const r=el.getBoundingClientRect();
+      const wrapEl=document.getElementById('wrap-'+node.id);
+      const r=(wrapEl||el).getBoundingClientRect();
       dragOff={x:ev.clientX-r.left,y:ev.clientY-r.top};
       ev.preventDefault();
     });
-    // Floating toolbar above node
+    // Wrap node + toolbar in a container for reliable hover
+    const wrap = document.createElement('div');
+    wrap.className = 'node-wrap';
+    wrap.id = 'wrap-'+node.id;
+    wrap.style.left = node.x + 'px';
+    wrap.style.top  = node.y + 'px';
+
     const toolbar = document.createElement('div');
     toolbar.className = 'node-toolbar';
     toolbar.id = 'tb-'+node.id;
-    toolbar.style.left = node.x + 'px';
-    toolbar.style.top  = (node.y - 32) + 'px';
     toolbar.innerHTML = `
       <button class="ntb-btn p" onclick="startConn('${node.id}')">⟶ Conectar</button>
       <button class="ntb-btn" onclick="openEP('${m.id}','${node.id}')">✎ Editar</button>
       <button class="ntb-btn x" onclick="removeNode('${node.id}')">×</button>`;
-    cv.appendChild(toolbar);
 
-    toolbar.addEventListener('mouseleave',()=>{
-      toolbar.style.opacity='0'; toolbar.style.pointerEvents='none';
-    });
-    toolbar.addEventListener('mouseenter',()=>{
-      toolbar.style.opacity='1'; toolbar.style.pointerEvents='auto';
-    });
+    // Node position is now relative to wrap
+    el.style.left = '0px';
+    el.style.top  = '0px';
+    el.style.position = 'relative';
 
-    cv.appendChild(el);
+    wrap.appendChild(toolbar);
+    wrap.appendChild(el);
+    cv.appendChild(wrap);
   });
   renderEdges();
 }
@@ -963,10 +956,8 @@ document.addEventListener('mousemove',e=>{
   const n=canvas.nodes.find(x=>x.id===drag); if(!n) return;
   n.x=Math.max(0,e.clientX-w.left-dragOff.x);
   n.y=Math.max(0,e.clientY-w.top-dragOff.y);
-  const el=document.getElementById('node-'+drag);
-  if(el){el.style.left=n.x+'px';el.style.top=n.y+'px';}
-  const tb=document.getElementById('tb-'+drag);
-  if(tb){tb.style.left=n.x+'px';tb.style.top=(n.y-32)+'px';}
+  const wrap=document.getElementById('wrap-'+drag);
+  if(wrap){wrap.style.left=n.x+'px';wrap.style.top=n.y+'px';}
   renderEdges();
 });
 document.addEventListener('mouseup', e=>{
@@ -1003,7 +994,7 @@ function removeNode(id) {
 
 // ─── Edges ────────────────────────────────────────────────────────────────────
 function nCenter(id) {
-  const el=document.getElementById('node-'+id);
+  const el=document.getElementById('node-'+id)||document.getElementById('wrap-'+id);
   const w=document.getElementById('cw').getBoundingClientRect();
   if(!el) return {x:0,y:0};
   const r=el.getBoundingClientRect();
@@ -1076,7 +1067,10 @@ function openEP(mid, nid) {
   const curTipo=document.getElementById('ep-tipo'); if(curTipo) curTipo.value=m.tipo||'default';
   document.querySelectorAll('.cd').forEach(d=>d.classList.toggle('on',d.dataset.c===m.color));
   document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
+  document.querySelectorAll('.node-wrap').forEach(el=>el.classList.remove('editing-wrap'));
   const nodeEl=document.getElementById('node-'+nid); if(nodeEl) nodeEl.classList.add('editing');
+  document.querySelectorAll('.node-wrap').forEach(el=>el.classList.remove('editing-wrap'));
+  const wrapEl=document.getElementById('wrap-'+nid); if(wrapEl) wrapEl.classList.add('editing-wrap');
 
   const ep=document.getElementById('ep');
   ep.classList.add('open');
@@ -1125,6 +1119,7 @@ function closeEP(force){
   document.getElementById('eov').classList.remove('open');
   document.getElementById('eov').style.pointerEvents='';
   document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
+  document.querySelectorAll('.node-wrap').forEach(el=>el.classList.remove('editing-wrap'));
 }
 
 function dlgUnsaved(choice){
