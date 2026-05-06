@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.47</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.48</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -307,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.47</div>
+      <div id="logo-ver">v1.48</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -768,7 +768,8 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4mvK7fnaKnAGEeE96X
 const MODS_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
 const CONN_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es`;
 const CANVAS_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Canvas`;
-const TIPOS_CSV  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tipos`;
+const TIPOS_CSV       = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tipos`;
+const CONNTYPES_JSON_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=ConnTypes`;
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let modules = [], connTypes = [], canvas = {nodes:[], edges:[]};
@@ -827,6 +828,7 @@ async function loadModules() {
     atua: row['Atualização']||row['atualizacao']||'',
     desc: row['Descrição']||row['descricao']||'',
     dev:  row['Desenvolvedor']||row['desenvolvedor']||'',
+    tipo: row['Tipo']||row['tipo']||'default',
   })).filter(m=>m.name);
 }
 
@@ -838,6 +840,8 @@ async function loadConnTypes() {
     name: row['Nome']||row['nome']||'',
     color:row['Cor']||row['cor']||'#2455c7',
     style:row['Estilo']||row['estilo']||'Contínua',
+    width:Number(row['Espessura']||row['espessura']||2),
+    arrow:row['Seta']||row['seta']||'end',
     desc: row['Descrição']||row['descricao']||'',
   })).filter(c=>c.name);
 }
@@ -890,7 +894,11 @@ async function init() {
   try {
     // Load modules and conn types from Sheets
     [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
+    // Merge default conn fields if missing
+    connTypes = connTypes.map(ct=>({width:2,arrow:'end',...ct}));
 
+    // Load connTypes JSON from Sheets (overrides CSV if available)
+    try { await loadConnTypesFromSheets(); } catch(e) {}
     // Load tipos from Sheets (non-blocking)
     try { await loadTiposFromSheets(); } catch(e) { console.log('tipos load failed:', e); }
 
@@ -1397,6 +1405,7 @@ async function doRefresh(){
   setStatus('loading','Atualizando...');
   try{
     [modules,connTypes]=await Promise.all([loadModules(),loadConnTypes()]);
+    try { await loadConnTypesFromSheets(); } catch(e) {}
     await loadTiposFromSheets();
     const rc=await loadCanvasFromSheets();
     if(rc&&rc.nodes&&rc.nodes.length){canvas=rc;saveLocal();}
@@ -1443,6 +1452,24 @@ function loadTipos() {
     if (s) tipos = JSON.parse(s);
     if (!tipos.length) tipos = [{ ...DEFAULT_TIPO }];
   } catch(e) { tipos = [{ ...DEFAULT_TIPO }]; }
+}
+
+
+async function loadConnTypesFromSheets() {
+  try {
+    const r = await fetch(CONNTYPES_JSON_CSV + '&t=' + Date.now());
+    if (!r.ok) return false;
+    const txt = await r.text();
+    if (!txt || txt.includes('<!DOCTYPE')) return false;
+    const lines = txt.trim().split('\n');
+    if (lines.length < 2) return false;
+    const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
+    if (!raw || !raw.startsWith('[')) return false;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || !parsed.length) return false;
+    connTypes = parsed.map(ct=>({width:2,arrow:'end',...ct}));
+    return true;
+  } catch(e) { return false; }
 }
 
 async function loadTiposFromSheets() {
