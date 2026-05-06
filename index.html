@@ -1136,9 +1136,9 @@ function removeNode(id) {
 function nCenter(id) {
   const node = canvas.nodes.find(n=>n.id===id);
   if(!node) return {x:0,y:0,w:180,h:60};
-  const t = getTipo(modules.find(m=>m.id===node.mid)?.tipo);
-  const w = t?.w || settings.nw || 180;
+  // Use DOM height if available, else default
   const el = document.getElementById('node-'+id);
+  const w = el ? el.offsetWidth  : (settings.nw||180);
   const h = el ? el.offsetHeight : 60;
   return {x: node.x + w/2, y: node.y + h/2, w, h};
 };
