@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.46</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.47</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -281,13 +281,16 @@ select.tfi { cursor:pointer; }
   z-index:25;
   line-height:1;
   box-shadow:0 2px 6px rgba(0,0,0,.3);
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%) scale(0.6);
   opacity:0;
-  transition:opacity .2s, transform .15s;
+  transition:opacity .15s, transform .15s;
+  pointer-events:none;
+}
+.edge-del.visible {
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
   pointer-events:auto;
 }
-.edge-del { display:flex; opacity:0; transition:opacity .2s; }
-#cv:hover .edge-del { opacity:1; }
 .edge-del:hover { transform:translate(-50%,-50%) scale(1.2); }
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
@@ -304,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.46</div>
+      <div id="logo-ver">v1.47</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1152,14 +1155,13 @@ function renderEdges() {
   }).join('');
   svg.innerHTML=`<defs>${defs}</defs>${paths}`;
 
-  // Add delete buttons using node positions from data (not DOM)
+  // Add delete buttons using node positions
   document.querySelectorAll('.edge-del').forEach(e=>e.remove());
   canvas.edges.forEach(edge => {
     const nFrom = canvas.nodes.find(n=>n.id===edge.from);
     const nTo   = canvas.nodes.find(n=>n.id===edge.to);
     if(!nFrom||!nTo) return;
     const nw = settings.nw||180;
-    // Estimate node center from stored x,y + half width/height
     const fx = nFrom.x + nw/2, fy = nFrom.y + 40;
     const tx = nTo.x   + nw/2, ty = nTo.y   + 40;
     const mx = (fx+tx)/2, my = (fy+ty)/2 - 14;
@@ -1168,6 +1170,8 @@ function renderEdges() {
     btn.innerHTML = '×';
     btn.style.left = mx+'px';
     btn.style.top  = my+'px';
+    btn.dataset.mx = mx;
+    btn.dataset.my = my;
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       canvas.edges = canvas.edges.filter(x=>x.id!==edge.id);
@@ -1894,6 +1898,23 @@ function edgeMenuAction(action) {
   if (action==='disconnect') removeEdge(eid);
 }
 
+
+
+// Show edge delete buttons on proximity
+document.getElementById('cw').addEventListener('mousemove', function(e) {
+  const rect = this.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  document.querySelectorAll('.edge-del').forEach(btn => {
+    const bx = parseFloat(btn.dataset.mx);
+    const by = parseFloat(btn.dataset.my);
+    const dist = Math.sqrt((mx-bx)**2 + (my-by)**2);
+    btn.classList.toggle('visible', dist < 40);
+  });
+});
+document.getElementById('cw').addEventListener('mouseleave', function() {
+  document.querySelectorAll('.edge-del').forEach(btn => btn.classList.remove('visible'));
+});
 
 init();
 </script>
