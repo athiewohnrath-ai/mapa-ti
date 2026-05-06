@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.49</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.50</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -307,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.49</div>
+      <div id="logo-ver">v1.50</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1134,9 +1134,14 @@ function removeNode(id) {
 
 // ─── Edges ────────────────────────────────────────────────────────────────────
 function nCenter(id) {
-  const el=document.getElementById('node-'+id)||document.getElementById('node-'+id);
-  const w=document.getElementById('cw').getBoundingClientRect();
-  if(!el) return {x:0,y:0};
+  const node = canvas.nodes.find(n=>n.id===id);
+  if(!node) return {x:0,y:0,w:180,h:60};
+  const t = getTipo(modules.find(m=>m.id===node.mid)?.tipo);
+  const w = t?.w || settings.nw || 180;
+  const el = document.getElementById('node-'+id);
+  const h = el ? el.offsetHeight : 60;
+  return {x: node.x + w/2, y: node.y + h/2, w, h};
+};
   const r=el.getBoundingClientRect();
   return {x:r.left-w.left+r.width/2,y:r.top-w.top+r.height/2,w:r.width,h:r.height};
 }
