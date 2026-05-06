@@ -2,1576 +2,340 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.59</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Workflow · Athié Wohnrath</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
-
 :root {
-  --bg:      #f5f4f0;
-  --bg2:     #ffffff;
-  --bg3:     #eeecea;
-  --border:  rgba(0,0,0,0.07);
-  --border2: rgba(0,0,0,0.13);
-  --text:    #1a1916;
-  --text2:   #5a5950;
-  --text3:   #9a9890;
-  --accent:  #2455c7;
-  --accent-dim: rgba(36,85,199,0.1);
-  --green:   #1a7a4a;
-  --amber:   #c97d10;
-  --red:     #c42b2b;
-  --purple:  #6830c4;
-  --dot:     rgba(0,0,0,0.1);
-  --shadow:  0 2px 12px rgba(0,0,0,0.07);
-  --shadow2: 0 6px 28px rgba(0,0,0,0.12);
-  --r: 10px; --rl: 14px;
-  --sw: 260px;
-  --grid: 26px;
+  --bg:     #f0ede8;
+  --bg2:    #faf9f7;
+  --bg3:    #e8e4de;
+  --border: rgba(0,0,0,.08);
+  --border2:rgba(0,0,0,.14);
+  --text:   #1a1814;
+  --text2:  #6b6560;
+  --text3:  #a8a39d;
+  --accent: #1a56db;
+  --accent2:#f0f4ff;
+  --red:    #c42b2b;
+  --green:  #15803d;
+  --amber:  #b45309;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.06);
+  --shadow2:0 2px 8px rgba(0,0,0,.08), 0 12px 40px rgba(0,0,0,.1);
+  --r: 12px; --rl: 16px;
 }
 body.dark {
-  --bg:#0f0f11; --bg2:#17171b; --bg3:#1f1f25;
-  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
-  --text:#e8e8ec; --text2:#8a8a9a; --text3:#55556a;
-  --accent:#4f8ef7; --accent-dim:rgba(79,142,247,0.12);
-  --green:#2dd4a0; --amber:#f0a832; --red:#f05454; --purple:#a78bfa;
-  --dot:rgba(255,255,255,0.045);
-  --shadow:0 2px 16px rgba(0,0,0,0.4); --shadow2:0 8px 32px rgba(0,0,0,0.5);
+  --bg:#111010; --bg2:#191817; --bg3:#201f1e;
+  --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.13);
+  --text:#edeae6; --text2:#8a8480; --text3:#554f4a;
+  --accent:#4f8ef7; --accent2:rgba(79,142,247,.1);
+  --red:#f05454; --green:#34d399; --amber:#fbbf24;
+  --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.3);
+  --shadow2:0 2px 8px rgba(0,0,0,.4),0 12px 40px rgba(0,0,0,.4);
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; height:100vh; display:flex; transition:background .3s,color .3s; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
 
-/* ── Sidebar ── */
-#sidebar { width:var(--sw); min-width:var(--sw); background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:100; transition:background .3s; }
-#sh { padding:16px 14px 12px; border-bottom:1px solid var(--border); }
-#logo { display:flex; align-items:center; gap:9px; margin-bottom:10px; }
-#logo-mark { width:28px; height:28px; background:linear-gradient(135deg,var(--accent),var(--purple)); border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
-#logo-text { font-size:12px; font-weight:600; color:var(--text); }
-#logo-sub  { font-size:10px; color:var(--text3); margin-top:1px; }
-#logo-ver  { margin-left:auto; font-size:9px; font-family:'DM Mono',monospace; color:var(--text3); background:var(--bg3); border:1px solid var(--border); padding:2px 7px; border-radius:99px; }
-#status-bar { font-size:11px; color:var(--text3); padding:4px 8px; background:var(--bg3); border-radius:6px; border:1px solid var(--border); display:flex; align-items:center; gap:5px; }
-.sdot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
-.sdot.ok{background:var(--green);} .sdot.err{background:var(--red);} .sdot.loading{background:var(--amber);animation:blink 1s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* ── HOME ── */
+#home { display:flex; flex-direction:column; min-height:100vh; }
 
-#tabs { display:flex; border-bottom:1px solid var(--border); padding:0 4px; }
-.tab { flex:1; padding:8px 4px; font-size:11px; font-weight:500; color:var(--text3); background:none; border:none; cursor:pointer; border-bottom:2px solid transparent; transition:all .15s; font-family:inherit; }
-.tab:hover{color:var(--text2);} .tab.on{color:var(--text);border-bottom-color:var(--accent);}
-
-#sc { flex:1; overflow-y:auto; padding:10px; scrollbar-width:thin; scrollbar-color:var(--border2) transparent; }
-
-.add-btn { width:100%; margin-bottom:8px; padding:7px 12px; background:none; border:1px dashed var(--border2); border-radius:var(--r); color:var(--text3); font-size:11px; font-weight:500; cursor:pointer; font-family:inherit; text-align:left; transition:all .15s; display:flex; align-items:center; gap:6px; }
-.add-btn:hover{background:var(--bg3);color:var(--text2);}
-
-.mod-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:5px; cursor:grab; transition:all .15s; }
-.mod-item:hover{border-color:var(--border2);transform:translateX(2px);}
-.mod-item:active{cursor:grabbing;}
-.mdot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.mname { font-size:12px; font-weight:500; color:var(--text); }
-.mmeta { font-size:10px; color:var(--text3); margin-top:1px; }
-.empty-list { text-align:center; padding:24px 10px; color:var(--text3); font-size:11px; }
-
-.conn-item { display:flex; align-items:center; gap:9px; padding:8px 11px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:5px; cursor:pointer; transition:all .15s; }
-.conn-item:hover{border-color:var(--border2);}
-.conn-item.on{border-color:var(--accent);background:var(--accent-dim);}
-.cname{font-size:12px;font-weight:500;color:var(--text);}
-.cdesc{font-size:10px;color:var(--text3);}
-
-/* Config lists */
-.cfg-lbl { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; display:block; margin-bottom:6px; }
-.cfg-item { display:flex; align-items:center; padding:6px 10px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:4px; font-size:12px; color:var(--text); }
-.cfg-item span{flex:1;}
-.cfg-del { background:none; border:none; color:var(--text3); cursor:pointer; font-size:15px; line-height:1; }
-.cfg-del:hover{color:var(--red);}
-.cfg-add { display:flex; gap:6px; margin-bottom:14px; }
-.cfg-add input{flex:1;}
-.cfg-add button{padding:7px 11px;border-radius:var(--r);border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:11px;cursor:pointer;font-family:inherit;}
-
-/* ── Canvas ── */
-#cw { flex:1; position:relative; overflow:hidden; background:var(--bg); background-image:radial-gradient(circle,var(--dot) 1px,transparent 1px); background-size:26px 26px; transition:background .3s; }
-#esvg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
-.edge-path { pointer-events:stroke; cursor:pointer; }
-#cv   { position:absolute; top:0; left:0; width:100%; height:100%; }
-
-/* Nodes */
-.node { position:absolute; width:var(--nw,180px); background:var(--bg2); border:1.5px solid var(--border2); border-radius:var(--rl); padding:12px 14px; cursor:move; user-select:none; box-shadow:var(--shadow); transition:box-shadow .2s,border-color .2s,background .3s; }
-.node:hover{box-shadow:var(--shadow2);}
-.node.connecting{border-color:var(--amber);cursor:crosshair;}
-.node.editing{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
-.ntop{display:flex;align-items:center;margin-bottom:7px;}
-/* ncol removed */
-.ntitle{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;}
-.ntags{display:flex;flex-wrap:wrap;gap:3px;min-height:0;}
-.ntag{font-size:9px;padding:2px 7px;border-radius:99px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);font-family:'DM Mono',monospace;}
-.ntag.s-ativo{color:var(--green);border-color:rgba(26,122,74,.25);}
-.ntag.s-legado{color:var(--amber);border-color:rgba(201,125,16,.25);}
-.ntag.s-desc{color:var(--red);}
-/* ── Node action bar (inside, bottom) ── */
-.node-actions {
-  display:flex; gap:3px;
-  margin-top:0; padding-top:0;
-  border-top:none;
-  opacity:0; pointer-events:none;
-  max-height:0; overflow:hidden;
-  transition:opacity .15s, max-height .2s, margin-top .2s, padding-top .2s;
-}
-.node:hover .node-actions {
-  opacity:1; pointer-events:auto;
-  max-height:32px;
-  margin-top:7px; padding-top:7px;
-  border-top:1px solid var(--border);
-}
-.ntb-btn {
-  font-size:9px; font-weight:500;
-  padding:3px 9px; border-radius:6px;
-  border:1px solid var(--border2);
-  background:var(--bg3);
-  color:var(--text2);
-  cursor:pointer; font-family:inherit;
-  transition:all .12s;
-}
-.ntb-btn:hover{background:var(--bg);color:var(--text);}
-.ntb-btn.p{color:var(--accent);border-color:rgba(36,85,199,.25);}
-.ntb-btn.x{color:var(--red);}
-
-.ntb-btn {
-  font-size:10px; font-weight:500;
-  padding:4px 10px; border-radius:6px;
-  border:1px solid var(--border2);
+/* Header */
+#home-hd {
+  padding:20px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid var(--border);
   background:var(--bg2);
-  color:var(--text2);
-  cursor:pointer; font-family:inherit;
-  transition:all .12s; white-space:nowrap;
-  box-shadow:0 1px 4px rgba(0,0,0,.08);
+  position:sticky; top:0; z-index:10;
 }
-.ntb-btn:hover{background:var(--bg3);color:var(--text);}
-.ntb-btn.p{color:var(--accent);border-color:rgba(36,85,199,.25);background:var(--bg2);}
-.ntb-btn.x{color:var(--red);padding:4px 8px;}
-
-/* Toolbar */
-#tb { position:absolute; bottom:18px; left:50%; transform:translateX(-50%); display:flex; gap:3px; align-items:center; background:var(--bg2); border:1px solid var(--border2); border-radius:99px; padding:5px 10px; box-shadow:var(--shadow2); z-index:50; transition:background .3s; }
-.tbtn { font-size:11px; font-weight:500; padding:5px 13px; border-radius:99px; border:none; background:none; color:var(--text2); cursor:pointer; font-family:inherit; transition:all .15s; }
-.tbtn:hover{background:var(--bg3);color:var(--text);}
-.tbtn.on{background:var(--accent);color:#fff;}
-.tsep{width:1px;height:15px;background:var(--border);margin:0 3px;}
-
-/* Chips */
-#chips { position:absolute; top:12px; right:12px; display:flex; gap:5px; z-index:50; }
-.chip { font-size:10px; padding:3px 10px; border-radius:99px; background:var(--bg2); border:1px solid var(--border); color:var(--text3); font-family:'DM Mono',monospace; transition:background .3s; }
-#chip-save { opacity:0; transition:opacity .4s; }
-
-/* Connect banner */
-#cbanner { display:none; position:absolute; top:12px; left:50%; transform:translateX(-50%); background:var(--amber); color:#fff; font-size:11px; font-weight:600; padding:6px 16px; border-radius:99px; z-index:60; }
-
-/* ── Edit popover ── */
-#eov { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; backdrop-filter:blur(2px); }
-#ep  { display:none; position:fixed; width:292px; background:var(--bg2); border:1px solid var(--border2); border-radius:var(--rl); box-shadow:0 8px 40px rgba(0,0,0,.25); z-index:201; flex-direction:column; max-height:88vh; overflow:hidden; }
-#ep.open,#eov.open{display:flex;}
-#ep-hd { padding:13px 15px 11px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-#ep-title { font-size:13px; font-weight:600; color:var(--text); }
-#ep-close { background:none; border:none; font-size:20px; color:var(--text3); cursor:pointer; line-height:1; }
-#ep-body { overflow-y:auto; padding:14px 15px; flex:1; scrollbar-width:thin; }
-.fl { margin-bottom:13px; }
-.fl label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.07em; display:block; margin-bottom:4px; }
-.fi { width:100%; padding:7px 10px; border-radius:8px; border:1px solid var(--border2); background:var(--bg3); color:var(--text); font-size:12px; font-family:inherit; outline:none; transition:border-color .15s; }
-.fi:focus{border-color:var(--accent);}
-textarea.fi{resize:vertical;min-height:58px;}
-select.fi{cursor:pointer;}
-.cr{display:flex;gap:6px;flex-wrap:wrap;}
-.cd{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;}
-.cd:hover{transform:scale(1.15);}
-.cd.on{border-color:var(--text);}
-#ep-ft { padding:11px 15px; border-top:1px solid var(--border); display:flex; gap:8px; flex-shrink:0; }
-.bs { flex:1; padding:8px; border-radius:8px; border:none; background:var(--accent); color:#fff; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
-.bd { padding:8px 12px; border-radius:8px; border:1px solid var(--border2); background:none; color:var(--red); font-size:12px; cursor:pointer; font-family:inherit; }
-
-/* ── Dialogs ── */
-.dlg { display:none; position:fixed; inset:0; z-index:300; align-items:center; justify-content:center; }
-.dlg.open{display:flex;}
-.dlg-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);}
-.dlg-box { position:relative; z-index:301; background:var(--bg2); border:1px solid var(--border2); border-radius:14px; padding:22px; width:300px; box-shadow:0 12px 48px rgba(0,0,0,.25); text-align:center; }
-.dlg-ico{font-size:26px;margin-bottom:9px;}
-.dlg-t{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;}
-.dlg-s{font-size:12px;color:var(--text3);margin-bottom:18px;line-height:1.5;}
-.dlg-btns{display:flex;gap:7px;justify-content:center;}
-.db{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;border:none;}
-.db.p{background:var(--accent);color:#fff;}
-.db.d{background:var(--red);color:#fff;}
-.db.g{background:var(--bg3);color:var(--text);border:1px solid var(--border2);}
-
-.mod-del-btn { font-size:13px; color:var(--text3); padding:3px 5px; line-height:1; flex-shrink:0; background:none; border:none; cursor:pointer; border-radius:5px; transition:all .15s; }
-.mod-del-btn:hover { color:var(--red); background:var(--bg); }
-
-#mod-menu { display:none; position:fixed; z-index:400; background:var(--bg2); border:1px solid var(--border2); border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,.2); overflow:hidden; min-width:160px; }
-#mod-menu.open { display:block; }
-.mm-item { padding:9px 14px; font-size:12px; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:8px; transition:background .1s; }
-.mm-item:hover { background:var(--bg3); }
-.mm-item.danger { color:var(--red); }
-.mm-sep { height:1px; background:var(--border); margin:3px 0; }
-
-.grid-sz-btn { padding:3px 8px; border-radius:6px; border:1px solid var(--border2); background:var(--bg3); color:var(--text2); font-size:10px; cursor:pointer; font-family:inherit; transition:all .15s; }
-.grid-sz-btn.on { background:var(--accent); color:#fff; border-color:var(--accent); }
-
-
-/* ── Tipos visuais ── */
-.tipo-item { display:flex; align-items:center; gap:9px; padding:9px 11px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--r); margin-bottom:5px; cursor:pointer; transition:all .15s; }
-.tipo-item:hover { border-color:var(--border2); }
-.tipo-preview { width:32px; height:24px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-.tipo-name { font-size:12px; font-weight:500; color:var(--text); flex:1; }
-.tipo-edit { font-size:11px; color:var(--text3); background:none; border:none; cursor:pointer; padding:2px 6px; border-radius:5px; }
-.tipo-edit:hover { background:var(--bg); color:var(--accent); }
-
-/* Tipo editor panel */
-#tipo-panel { display:none; position:fixed; inset:0; z-index:250; align-items:center; justify-content:center; }
-#tipo-panel.open { display:flex; }
-#tipo-panel-bg { position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(2px); }
-#tipo-box { position:relative; z-index:251; background:var(--bg2); border:1px solid var(--border2); border-radius:16px; width:560px; max-width:96vw; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 12px 48px rgba(0,0,0,.25); overflow:hidden; }
-#tipo-box-hd { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-#tipo-box-title { font-size:14px; font-weight:600; color:var(--text); }
-#tipo-box-close { background:none; border:none; font-size:20px; color:var(--text3); cursor:pointer; }
-#tipo-box-body { overflow-y:auto; padding:18px; flex:1; display:grid; grid-template-columns:1fr 1fr; gap:14px 20px; }
-#tipo-box-body .full { grid-column:1/-1; }
-#tipo-box-ft { padding:13px 18px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
-
-.tfl { display:flex; flex-direction:column; gap:4px; }
-.tfl label { font-size:10px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; }
-.tfi { padding:7px 10px; border-radius:8px; border:1px solid var(--border2); background:var(--bg3); color:var(--text); font-size:12px; font-family:inherit; outline:none; width:100%; }
-.tfi:focus { border-color:var(--accent); }
-select.tfi { cursor:pointer; }
-
-.shape-row { display:flex; gap:6px; flex-wrap:wrap; }
-.shape-opt { width:42px; height:36px; border-radius:6px; border:1.5px solid var(--border2); background:var(--bg3); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; transition:all .15s; }
-.shape-opt:hover { border-color:var(--accent); }
-.shape-opt.on { border-color:var(--accent); background:var(--accent-dim); }
-
-.color-pair { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.color-pair label { font-size:9px; color:var(--text3); font-weight:600; text-transform:uppercase; letter-spacing:.05em; margin-bottom:2px; display:block; }
-.color-inp { display:flex; gap:5px; align-items:center; }
-.color-inp input[type=color] { width:28px; height:28px; border-radius:6px; border:1px solid var(--border2); cursor:pointer; padding:0; }
-.color-inp input[type=text] { flex:1; }
-
-.field-check { display:flex; flex-wrap:wrap; gap:6px; }
-.fchk { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text); cursor:pointer; }
-.fchk input { cursor:pointer; }
-
-.section-lbl { font-size:11px; font-weight:600; color:var(--text2); padding-bottom:6px; border-bottom:1px solid var(--border); margin-bottom:2px; }
-
-/* Canvas node shapes */
-.node.shape-oval { border-radius:50px; }
-.node.shape-circle { border-radius:50%; aspect-ratio:1; }
-.node.shape-diamond { border-radius:0; transform:rotate(45deg); }
-.node.shape-diamond .node-inner { transform:rotate(-45deg); }
-.node.shape-hexagon { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; }
-.node.shape-star { clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); border-radius:0; }
-.node.shape-parallelogram { clip-path:polygon(10% 0%,100% 0%,90% 100%,0% 100%); border-radius:0; }
-.node.shape-cloud { border-radius:50% 50% 50% 50%/40% 40% 60% 60%; }
-
-
-/* ── Edge delete buttons ── */
-.edge-del {
-  position:absolute;
-  width:20px; height:20px;
-  background:var(--red);
-  color:#fff;
-  border:none; border-radius:50%;
-  font-size:13px; font-weight:700;
-  cursor:pointer;
-  display:flex;
-  align-items:center; justify-content:center;
-  z-index:25;
-  line-height:1;
-  box-shadow:0 2px 6px rgba(0,0,0,.3);
-  transform:translate(-50%,-50%) scale(0.6);
-  opacity:0;
-  transition:opacity .15s, transform .15s;
-  pointer-events:none;
+#home-logo { display:flex; align-items:center; gap:12px; }
+#home-logo-mark {
+  width:36px; height:36px;
+  background:linear-gradient(135deg,#1a56db,#6366f1);
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; flex-shrink:0;
 }
-.edge-del.visible {
-  opacity:1;
-  transform:translate(-50%,-50%) scale(1);
-  pointer-events:auto;
+#home-logo-title { font-size:15px; font-weight:600; color:var(--text); letter-spacing:-.01em; }
+#home-logo-sub   { font-size:11px; color:var(--text3); margin-top:1px; }
+#home-hd-right   { display:flex; align-items:center; gap:10px; }
+.hd-btn {
+  padding:7px 16px; border-radius:8px; font-size:12px; font-weight:500;
+  font-family:inherit; cursor:pointer; transition:all .15s;
+  border:1px solid var(--border2); background:var(--bg3); color:var(--text2);
 }
-.edge-del:hover { transform:translate(-50%,-50%) scale(1.2); }
+.hd-btn:hover{background:var(--bg);color:var(--text);}
+.hd-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+.hd-btn.primary:hover{opacity:.88;}
 
-/* ── Viewport / Canvas infinito ── */
-#cv-wrap {
-  position:absolute; inset:0;
-  overflow:hidden;
-  cursor:default;
+/* Grid */
+#home-body { flex:1; padding:32px; max-width:1100px; margin:0 auto; width:100%; }
+#home-toolbar {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px;
 }
-#cv-transform {
-  position:absolute;
-  top:0; left:0;
-  transform-origin:0 0;
-  will-change:transform;
-}
-#esvg {
-  position:absolute;
-  top:0; left:0;
-  width:100000px; height:100000px;
-  pointer-events:none;
-  overflow:visible;
-}
-#cv {
-  position:absolute;
-  top:0; left:0;
-  width:100000px; height:100000px;
-}
-#cw { overflow:hidden; }
+#home-title { font-size:22px; font-weight:600; letter-spacing:-.02em; color:var(--text); }
+#home-count { font-size:12px; color:var(--text3); margin-top:2px; font-family:'DM Mono',monospace; }
 
-/* Zoom controls */
-#zoom-ctrl {
-  position:absolute;
-  bottom:60px; right:14px;
-  display:flex; flex-direction:column; gap:4px;
-  z-index:50;
+#wf-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:16px;
 }
-.zoom-btn {
-  width:32px; height:32px;
-  background:var(--bg2); border:1px solid var(--border2);
-  border-radius:8px; cursor:pointer;
-  font-size:14px; font-weight:600;
-  color:var(--text2); display:flex;
-  align-items:center; justify-content:center;
+
+/* Workflow card */
+.wf-card {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:var(--rl); padding:20px;
+  cursor:pointer; transition:all .18s;
+  display:flex; flex-direction:column; gap:12px;
   box-shadow:var(--shadow);
-  transition:all .15s;
+  position:relative; overflow:hidden;
 }
-.zoom-btn:hover { background:var(--bg3); color:var(--text); }
-#zoom-level {
-  font-size:9px; text-align:center;
-  color:var(--text3); font-family:'DM Mono',monospace;
-  padding:2px 0;
+.wf-card:hover { border-color:var(--border2); box-shadow:var(--shadow2); transform:translateY(-1px); }
+.wf-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.wf-card-name { font-size:15px; font-weight:600; color:var(--text); letter-spacing:-.01em; line-height:1.3; }
+.wf-card-desc { font-size:12px; color:var(--text3); line-height:1.5; flex:1; }
+.wf-card-meta {
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:12px; border-top:1px solid var(--border);
 }
-.tool-pan #cv-wrap { cursor:grab; }
-.tool-pan.panning #cv-wrap { cursor:grabbing; }
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.wf-badge {
+  font-size:10px; font-weight:600; padding:3px 9px;
+  border-radius:99px; font-family:'DM Mono',monospace; letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.wf-badge.dev     { background:#fef3c7; color:#92400e; }
+.wf-badge.val     { background:#d1fae5; color:#065f46; }
+.wf-badge.sup     { background:var(--bg3); color:var(--text3); }
+body.dark .wf-badge.dev { background:rgba(251,191,36,.15); color:#fbbf24; }
+body.dark .wf-badge.val { background:rgba(52,211,153,.12); color:#34d399; }
+.wf-date { font-size:10px; color:var(--text3); font-family:'DM Mono',monospace; }
+
+.wf-actions { display:flex; gap:5px; }
+.wf-act {
+  width:28px; height:28px; border-radius:7px;
+  border:1px solid var(--border); background:var(--bg3);
+  color:var(--text3); font-size:13px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all .12s; flex-shrink:0;
+}
+.wf-act:hover { color:var(--text); border-color:var(--border2); background:var(--bg); }
+.wf-act.danger:hover { color:var(--red); border-color:rgba(196,43,43,.3); }
+
+/* New card */
+.wf-new {
+  border:1.5px dashed var(--border2); background:transparent;
+  color:var(--text3); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:8px;
+  min-height:160px; cursor:pointer; transition:all .18s;
+  border-radius:var(--rl);
+}
+.wf-new:hover { border-color:var(--accent); color:var(--accent); background:var(--accent2); }
+.wf-new-icon { font-size:24px; }
+.wf-new-label { font-size:13px; font-weight:500; }
+
+/* Empty state */
+#empty-state {
+  grid-column:1/-1; text-align:center; padding:60px 20px;
+  color:var(--text3);
+}
+#empty-state .ico { font-size:48px; margin-bottom:16px; }
+#empty-state h3 { font-size:18px; font-weight:600; color:var(--text2); margin-bottom:8px; }
+#empty-state p  { font-size:13px; line-height:1.6; }
+
+/* ── DIALOG ── */
+.dlg-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.45); backdrop-filter:blur(3px);
+  z-index:200; align-items:center; justify-content:center;
+}
+.dlg-overlay.open { display:flex; }
+.dlg-box {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:var(--rl); width:420px; max-width:95vw;
+  box-shadow:var(--shadow2); overflow:hidden;
+  animation:dlgIn .18s ease;
+}
+@keyframes dlgIn { from{opacity:0;transform:scale(.96) translateY(-8px)} to{opacity:1;transform:none} }
+.dlg-hd {
+  padding:16px 20px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.dlg-title { font-size:14px; font-weight:600; color:var(--text); }
+.dlg-close { background:none; border:none; font-size:20px; color:var(--text3); cursor:pointer; }
+.dlg-body { padding:20px; }
+.dlg-ft { padding:14px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; }
+
+.fld { margin-bottom:14px; }
+.fld label { font-size:11px; font-weight:600; color:var(--text3); text-transform:uppercase; letter-spacing:.06em; display:block; margin-bottom:5px; }
+.fld input, .fld textarea, .fld select {
+  width:100%; padding:8px 12px; border-radius:9px;
+  border:1px solid var(--border2); background:var(--bg3);
+  color:var(--text); font-size:13px; font-family:inherit; outline:none;
+  transition:border-color .15s;
+}
+.fld input:focus, .fld textarea:focus, .fld select:focus { border-color:var(--accent); }
+.fld textarea { resize:vertical; min-height:70px; }
+.fld select { cursor:pointer; }
+
+.btn { padding:8px 18px; border-radius:9px; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; border:none; transition:all .15s; }
+.btn.primary { background:var(--accent); color:#fff; }
+.btn.primary:hover { opacity:.88; }
+.btn.ghost { background:var(--bg3); color:var(--text2); border:1px solid var(--border2); }
+.btn.ghost:hover { background:var(--bg); color:var(--text); }
+.btn.danger { background:var(--red); color:#fff; }
+
+/* Confirm dialog */
+.dlg-confirm-icon { font-size:32px; text-align:center; margin-bottom:10px; }
+.dlg-confirm-t    { font-size:15px; font-weight:600; color:var(--text); text-align:center; margin-bottom:6px; }
+.dlg-confirm-s    { font-size:12px; color:var(--text3); text-align:center; line-height:1.6; margin-bottom:20px; }
+
+/* Status badges inline */
+.status-opts { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+.status-opt {
+  padding:6px 14px; border-radius:99px; font-size:11px; font-weight:600;
+  cursor:pointer; border:2px solid transparent; transition:all .15s;
+  font-family:'DM Mono',monospace; text-transform:uppercase; letter-spacing:.04em;
+}
+.status-opt.dev { background:#fef3c7; color:#92400e; }
+.status-opt.val { background:#d1fae5; color:#065f46; }
+.status-opt.sup { background:var(--bg3); color:var(--text3); }
+.status-opt.selected { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent2); }
+body.dark .status-opt.dev { background:rgba(251,191,36,.15); color:#fbbf24; }
+body.dark .status-opt.val { background:rgba(52,211,153,.12); color:#34d399; }
+
+/* Toast */
+#toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--text); color:var(--bg2); padding:10px 20px;
+  border-radius:99px; font-size:12px; font-weight:500;
+  box-shadow:var(--shadow2); z-index:500;
+  opacity:0; transition:opacity .2s; pointer-events:none;
+}
+#toast.show { opacity:1; }
 </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<div id="sidebar">
-  <div id="sh">
-    <div id="logo">
-      <div id="logo-mark">🗺</div>
+<!-- HOME SCREEN -->
+<div id="home">
+  <div id="home-hd">
+    <div id="home-logo">
+      <div id="home-logo-mark">⚡</div>
       <div>
-        <div id="logo-text">Athié Wohnrath</div>
-        <div id="logo-sub">Mapa de Sistemas de TI</div>
+        <div id="home-logo-title">Workflow</div>
+        <div id="home-logo-sub">Athié Wohnrath</div>
       </div>
-      <div id="logo-ver">v1.59</div>
     </div>
-    <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
+    <div id="home-hd-right">
+      <button class="hd-btn" onclick="toggleTheme()" id="theme-btn">🌙</button>
+      <button class="hd-btn primary" onclick="openNewWF()">+ Novo workflow</button>
+    </div>
   </div>
 
-  <div id="tabs">
-    <button class="tab on" onclick="tab('mods')">Módulos</button>
-    <button class="tab" onclick="tab('conns')">Conexões</button>
-    <button class="tab" onclick="tab('tipos')">Tipos</button>
-    <button class="tab" onclick="tab('cfg')">Config.</button>
-  </div>
-
-  <div id="sc">
-    <!-- Módulos -->
-    <div id="t-mods">
-      <button class="add-btn" onclick="openNewMod()">+ Novo módulo</button>
-      <div id="mods-list"></div>
-    </div>
-
-    <!-- Conexões -->
-    <div id="t-conns" style="display:none">
-      <button class="add-btn" onclick="openNewConn()">+ Novo tipo de conexão</button>
-      <div id="conns-list"></div>
-    </div>
-
-
-    <!-- Tipos Visuais -->
-    <div id="t-tipos" style="display:none">
-      <button class="add-btn" onclick="openNewTipo()">+ Novo tipo visual</button>
-      <div id="tipos-list"></div>
-    </div>
-
-    <!-- Config -->
-    <div id="t-cfg" style="display:none">
-      <div style="margin-bottom:18px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span class="cfg-lbl" style="margin:0">Modo escuro</span>
-          <div id="theme-tog" onclick="toggleTheme()" style="width:32px;height:18px;background:var(--border2);border-radius:9px;position:relative;cursor:pointer;transition:background .2s">
-            <div id="theme-knob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <span class="cfg-lbl" style="margin:0">Magnetismo no grid</span>
-          <div id="snap-tog" onclick="toggleSnap()" style="width:32px;height:18px;background:var(--border2);border-radius:9px;position:relative;cursor:pointer;transition:background .2s">
-            <div id="snap-knob" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-          </div>
-        </div>
-        <div id="snap-size-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <span class="cfg-lbl" style="margin:0;opacity:.7">Tamanho do grid</span>
-          <div style="display:flex;gap:5px">
-            <button class="grid-sz-btn" data-g="14" onclick="setGridSize(14)">14px</button>
-            <button class="grid-sz-btn" data-g="26" onclick="setGridSize(26)">26px</button>
-            <button class="grid-sz-btn" data-g="52" onclick="setGridSize(52)">52px</button>
-          </div>
-        </div>
-
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span class="cfg-lbl" style="margin:0">Largura dos cards</span>
-          <div style="display:flex;align-items:center;gap:7px">
-            <input type="range" id="sl-nw" min="140" max="300" step="10" value="180" style="-webkit-appearance:none;width:90px;height:3px;border-radius:2px;background:var(--border2);outline:none;cursor:pointer" oninput="applyNW(this.value)">
-            <span id="nw-val" style="font-size:10px;font-family:'DM Mono',monospace;color:var(--accent);min-width:32px">180px</span>
-          </div>
-        </div>
+  <div id="home-body">
+    <div id="home-toolbar">
+      <div>
+        <div id="home-title">Meus Workflows</div>
+        <div id="home-count">— workflows</div>
       </div>
-
-      <span class="cfg-lbl">Desenvolvedores</span>
-      <div id="cfg-devs"></div>
-      <div class="cfg-add"><input class="fi" id="in-dev" placeholder="Nova empresa..."><button onclick="addCfg('devs')">+</button></div>
-
-      <span class="cfg-lbl">Ambientes</span>
-      <div id="cfg-ambs"></div>
-      <div class="cfg-add"><input class="fi" id="in-amb" placeholder="Novo ambiente..."><button onclick="addCfg('ambs')">+</button></div>
-
-      <span class="cfg-lbl">Status</span>
-      <div id="cfg-sts"></div>
-      <div class="cfg-add"><input class="fi" id="in-sta" placeholder="Novo status..."><button onclick="addCfg('sts')">+</button></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="filter-status" onchange="renderGrid()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer">
+          <option value="">Todos os status</option>
+          <option value="dev">Em desenvolvimento</option>
+          <option value="val">Validado</option>
+          <option value="sup">Superado</option>
+        </select>
+      </div>
     </div>
+    <div id="wf-grid"></div>
   </div>
 </div>
 
-<!-- Canvas -->
-<div id="cw">
-  <div id="cv-wrap">
-    <div id="cv-transform">
-      <svg id="esvg"></svg>
-      <div id="cv"></div>
+<!-- Dialog: novo/editar workflow -->
+<div class="dlg-overlay" id="dlg-wf">
+  <div class="dlg-box">
+    <div class="dlg-hd">
+      <span class="dlg-title" id="dlg-wf-title">Novo workflow</span>
+      <button class="dlg-close" onclick="closeDlgWF()">×</button>
     </div>
-  </div>
-  
-<div id="zoom-ctrl">
-  <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">+</button>
-  <div id="zoom-level">100%</div>
-  <button class="zoom-btn" onclick="zoomOut()" title="Zoom out">−</button>
-  <button class="zoom-btn" onclick="zoomFit()" title="Ajustar tudo" style="font-size:11px">⊡</button>
-  <button class="zoom-btn" id="pan-btn" onclick="togglePan()" title="Mão / Mover" style="font-size:14px">✋</button>
-</div>
-
-  <div id="cbanner">Clique em outro módulo para conectar — ESC para cancelar</div>
-  <div id="chips">
-    <div class="chip" id="chip-mods">—</div>
-    <div class="chip" id="chip-edges">—</div>
-    <div class="chip" id="chip-save">✓ salvo</div>
-  </div>
-  <div id="tb">
-    <button class="tbtn on" id="tbtn-sel" onclick="setTool('sel')">Selecionar</button>
-    <button class="tbtn" id="tbtn-con" onclick="setTool('con')">Conectar</button>
-    <div class="tsep"></div>
-    <button class="tbtn" onclick="doRefresh()">↺ Atualizar</button>
-    <button class="tbtn" onclick="clearCanvas()">Limpar</button>
-    <div class="tsep"></div>
-    <button id="theme-btn" onclick="toggleTheme()" style="font-size:14px;padding:3px 7px;border-radius:99px;border:none;background:none;cursor:pointer;">🌙</button>
-  </div>
-</div>
-
-<!-- Edit overlay -->
-<div id="eov" onclick="tryCloseEP(event)"></div>
-
-<!-- Edit popover -->
-<div id="ep">
-  <div id="ep-hd">
-    <span id="ep-title">Editar módulo</span>
-    <button id="ep-close" onclick="tryCloseEP(null)">×</button>
-  </div>
-  <div id="ep-body">
-    <input type="hidden" id="ep-id">
-    <div class="fl"><label>Nome *</label><input class="fi" id="ep-name" oninput="window.dirty=true" placeholder="Nome do módulo"></div>
-    <div class="fl"><label>Área</label><input class="fi" id="ep-area" oninput="window.dirty=true" placeholder="Ex: Comercial, RH..."></div>
-    <div class="fl"><label>Descrição</label><textarea class="fi" id="ep-desc" oninput="window.dirty=true" placeholder="O que este módulo faz?"></textarea></div>
-    <div class="fl"><label>Desenvolvedor</label><select class="fi" id="ep-dev" onchange="window.dirty=true"></select></div>
-    <div class="fl"><label>Ambiente</label><select class="fi" id="ep-amb" onchange="window.dirty=true"></select></div>
-    <div class="fl"><label>Status</label><select class="fi" id="ep-sta" onchange="window.dirty=true"></select></div>
-<!-- cor removida — usa tipo visual -->
-    <div class="fl"><label>Tipo visual</label><select class="fi" id="ep-tipo" onchange="window.dirty=true;applyTipoPreview()"></select></div>
-  </div>
-  <div id="ep-ft">
-    <button class="bd" onclick="hideModule()">Ocultar</button>
-    <button class="bs" onclick="saveMod()">Salvar</button>
-  </div>
-</div>
-
-
-<!-- Module context menu -->
-<div id="mod-menu">
-  <div class="mm-item" onclick="modMenuAction('canvas')">↗ Adicionar ao canvas</div>
-  <div class="mm-sep"></div>
-  <div class="mm-item danger" onclick="modMenuAction('delete')">🗑 Excluir definitivamente</div>
-</div>
-
-<!-- Delete confirm dialog (reuse existing dlg-del) -->
-
-<!-- Tipo Visual Editor -->
-<div id="tipo-panel">
-  <div id="tipo-panel-bg" onclick="closeTipoPanel()"></div>
-  <div id="tipo-box">
-    <div id="tipo-box-hd">
-      <span id="tipo-box-title">Novo tipo visual</span>
-      <button id="tipo-box-close" onclick="closeTipoPanel()">×</button>
-    </div>
-    <div id="tipo-box-body">
-      <input type="hidden" id="tp-id">
-
-      <!-- Nome -->
-      <div class="tfl full">
-        <label>Nome do tipo</label>
-        <input class="tfi" id="tp-name" placeholder="Ex: Sistema crítico, Legado, Em desenvolvimento...">
+    <div class="dlg-body">
+      <input type="hidden" id="wf-edit-id">
+      <div class="fld">
+        <label>Nome *</label>
+        <input id="wf-name" type="text" placeholder="Ex: Fluxo Comercial, Integração ERP...">
       </div>
-
-      <!-- Forma -->
-      <div class="tfl full">
-        <label>Forma do card</label>
-        <div class="shape-row" id="tp-shapes">
-          <div class="shape-opt on" data-shape="rect" onclick="pickShape('rect',this)" title="Retângulo">▭</div>
-          <div class="shape-opt" data-shape="oval" onclick="pickShape('oval',this)" title="Oval">⬭</div>
-          <div class="shape-opt" data-shape="circle" onclick="pickShape('circle',this)" title="Círculo">●</div>
-          <div class="shape-opt" data-shape="diamond" onclick="pickShape('diamond',this)" title="Diamante">◆</div>
-          <div class="shape-opt" data-shape="hexagon" onclick="pickShape('hexagon',this)" title="Hexágono">⬡</div>
-          <div class="shape-opt" data-shape="star" onclick="pickShape('star',this)" title="Estrela">★</div>
-          <div class="shape-opt" data-shape="parallelogram" onclick="pickShape('parallelogram',this)" title="Paralelogramo">▱</div>
-          <div class="shape-opt" data-shape="cloud" onclick="pickShape('cloud',this)" title="Nuvem">☁</div>
-        </div>
-        <input type="hidden" id="tp-shape" value="rect">
-      </div>
-
-      <!-- Tamanho -->
-      <div class="tfl">
-        <label>Largura (px)</label>
-        <input class="tfi" id="tp-w" type="number" min="80" max="400" value="180">
-      </div>
-      <div class="tfl">
-        <label>Altura mínima (px)</label>
-        <input class="tfi" id="tp-h" type="number" min="40" max="400" value="0" placeholder="Auto">
-      </div>
-
-      <!-- Fundo -->
-      <div class="tfl full">
-        <div class="section-lbl">Fundo do card</div>
-        <div class="color-pair">
-          <div>
-            <label>☀️ Modo dia</label>
-            <div class="color-inp">
-              <input type="color" id="tp-bg-light" value="#ffffff">
-              <input class="tfi" id="tp-bg-light-txt" value="#ffffff" oninput="syncColor('tp-bg-light',this.value)">
-            </div>
-          </div>
-          <div>
-            <label>🌙 Modo noite</label>
-            <div class="color-inp">
-              <input type="color" id="tp-bg-dark" value="#17171b">
-              <input class="tfi" id="tp-bg-dark-txt" value="#17171b" oninput="syncColor('tp-bg-dark',this.value)">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Borda -->
-      <div class="tfl full">
-        <div class="section-lbl">Borda</div>
-        <div class="color-pair">
-          <div>
-            <label>☀️ Cor dia</label>
-            <div class="color-inp">
-              <input type="color" id="tp-border-light" value="#e0e0e0">
-              <input class="tfi" id="tp-border-light-txt" value="#e0e0e0" oninput="syncColor('tp-border-light',this.value)">
-            </div>
-          </div>
-          <div>
-            <label>🌙 Cor noite</label>
-            <div class="color-inp">
-              <input type="color" id="tp-border-dark" value="#2a2a35">
-              <input class="tfi" id="tp-border-dark-txt" value="#2a2a35" oninput="syncColor('tp-border-dark',this.value)">
-            </div>
-          </div>
-        </div>
-        <div style="margin-top:8px">
-          <label style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Espessura da borda (px)</label>
-          <input class="tfi" id="tp-border-w" type="number" min="0" max="10" value="1.5" step="0.5" style="width:80px;margin-top:4px">
-        </div>
-      </div>
-
-      <!-- Título -->
-      <div class="tfl full">
-        <div class="section-lbl">Título</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 80px 100px;gap:8px">
-          <div class="tfl">
-            <label>Fonte</label>
-            <select class="tfi" id="tp-title-font">
-              <option value="'DM Sans',sans-serif">DM Sans</option>
-              <option value="'Georgia',serif">Georgia</option>
-              <option value="'DM Mono',monospace">DM Mono</option>
-              <option value="'Arial',sans-serif">Arial</option>
-              <option value="'Courier New',monospace">Courier New</option>
-            </select>
-          </div>
-          <div class="tfl">
-            <label>Tamanho</label>
-            <input class="tfi" id="tp-title-size" type="number" min="8" max="32" value="12">
-          </div>
-          <div class="tfl">
-            <label>Peso</label>
-            <select class="tfi" id="tp-title-weight">
-              <option value="400">Normal</option>
-              <option value="500">Médio</option>
-              <option value="600" selected>Semi</option>
-              <option value="700">Bold</option>
-            </select>
-          </div>
-          <div class="tfl">
-            <label>Alinhamento</label>
-            <select class="tfi" id="tp-title-align">
-              <option value="auto">Auto</option>
-              <option value="left">← Esquerda</option>
-              <option value="center">↔ Centro</option>
-              <option value="right">→ Direita</option>
-            </select>
-          </div>
-        </div>
-        <div class="color-pair" style="margin-top:8px">
-          <div>
-            <label>☀️ Cor dia</label>
-            <div class="color-inp">
-              <input type="color" id="tp-title-light" value="#1a1916">
-              <input class="tfi" id="tp-title-light-txt" value="#1a1916" oninput="syncColor('tp-title-light',this.value)">
-            </div>
-          </div>
-          <div>
-            <label>🌙 Cor noite</label>
-            <div class="color-inp">
-              <input type="color" id="tp-title-dark" value="#e8e8ec">
-              <input class="tfi" id="tp-title-dark-txt" value="#e8e8ec" oninput="syncColor('tp-title-dark',this.value)">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Campos visíveis -->
-      <div class="tfl full">
-        <div class="section-lbl">Campos visíveis no card</div>
-        <div class="field-check">
-          <label class="fchk"><input type="checkbox" id="tp-show-area" checked> Área</label>
-          <label class="fchk"><input type="checkbox" id="tp-show-sta" checked> Status</label>
-          <label class="fchk"><input type="checkbox" id="tp-show-amb" checked> Ambiente</label>
-          <label class="fchk"><input type="checkbox" id="tp-show-dev"> Desenvolvedor</label>
-          <label class="fchk"><input type="checkbox" id="tp-show-desc"> Descrição</label>
-        </div>
-      </div>
-
-      <!-- Fonte dos campos -->
-      <div class="tfl full">
-        <div class="section-lbl">Fonte dos campos</div>
-        <div style="display:grid;grid-template-columns:1fr 80px;gap:8px">
-          <div class="tfl">
-            <label>Fonte</label>
-            <select class="tfi" id="tp-field-font">
-              <option value="'DM Mono',monospace">DM Mono</option>
-              <option value="'DM Sans',sans-serif">DM Sans</option>
-              <option value="'Arial',sans-serif">Arial</option>
-            </select>
-          </div>
-          <div class="tfl">
-            <label>Tamanho</label>
-            <input class="tfi" id="tp-field-size" type="number" min="7" max="16" value="9">
-          </div>
-        </div>
-        <div class="color-pair" style="margin-top:8px">
-          <div>
-            <label>☀️ Cor dia</label>
-            <div class="color-inp">
-              <input type="color" id="tp-field-light" value="#9a9890">
-              <input class="tfi" id="tp-field-light-txt" value="#9a9890" oninput="syncColor('tp-field-light',this.value)">
-            </div>
-          </div>
-          <div>
-            <label>🌙 Cor noite</label>
-            <div class="color-inp">
-              <input type="color" id="tp-field-dark" value="#55556a">
-              <input class="tfi" id="tp-field-dark-txt" value="#55556a" oninput="syncColor('tp-field-dark',this.value)">
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-    <div id="tipo-box-ft">
-      <button class="db d" id="tp-del-btn" onclick="deleteTipo()" style="margin-right:auto">Excluir tipo</button>
-      <button class="db g" id="tp-dup-btn" onclick="duplicateTipo()">Duplicar</button>
-      <button class="db g" onclick="closeTipoPanel()">Cancelar</button>
-      <button class="bs" onclick="saveTipo()">Salvar tipo</button>
-    </div>
-  </div>
-</div>
-
-
-<!-- Edge context menu -->
-<div id="edge-menu" style="display:none;position:fixed;z-index:400;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.2);overflow:hidden;min-width:160px;">
-  <div style="padding:8px 12px 6px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Conexão</div>
-  <div class="mm-item" onclick="edgeMenuAction('disconnect')">⊗ Desconectar</div>
-</div>
-<style>
-#edge-menu.open { display:block; }
-</style>
-
-<!-- Conn Type Editor -->
-<div id="conn-panel" style="display:none;position:fixed;inset:0;z-index:250;align-items:center;justify-content:center;">
-  <div style="position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(2px)" onclick="closeConnPanel()"></div>
-  <div style="position:relative;z-index:251;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:420px;max-width:96vw;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 12px 48px rgba(0,0,0,.25);overflow:hidden;">
-    <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <span id="conn-panel-title" style="font-size:14px;font-weight:600;color:var(--text)">Nova conexão</span>
-      <button onclick="closeConnPanel()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer">×</button>
-    </div>
-    <div style="overflow-y:auto;padding:18px;flex:1">
-      <input type="hidden" id="cp-id">
-
-      <div class="tfl" style="margin-bottom:13px">
-        <label>Nome</label>
-        <input class="tfi" id="cp-name" placeholder="Ex: Fluxo de dados, Necessidade...">
-      </div>
-      <div class="tfl" style="margin-bottom:13px">
+      <div class="fld">
         <label>Descrição</label>
-        <input class="tfi" id="cp-desc" placeholder="O que representa esta conexão?">
+        <textarea id="wf-desc" placeholder="O que este workflow representa?"></textarea>
       </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:13px">
-        <div class="tfl">
-          <label>Cor</label>
-          <div style="display:flex;gap:6px;align-items:center">
-            <input type="color" id="cp-color" value="#2455c7" style="width:36px;height:32px;border-radius:6px;border:1px solid var(--border2);cursor:pointer;padding:0">
-            <input class="tfi" id="cp-color-txt" value="#2455c7" style="flex:1" oninput="document.getElementById('cp-color').value=this.value">
-          </div>
+      <div class="fld">
+        <label>Status</label>
+        <div class="status-opts">
+          <div class="status-opt dev selected" data-s="dev" onclick="pickStatus('dev')">Em desenvolvimento</div>
+          <div class="status-opt val" data-s="val" onclick="pickStatus('val')">Validado</div>
+          <div class="status-opt sup" data-s="sup" onclick="pickStatus('sup')">Superado</div>
         </div>
-        <div class="tfl">
-          <label>Espessura (px)</label>
-          <input class="tfi" id="cp-width" type="number" min="0.5" max="10" step="0.5" value="2">
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:13px">
-        <div class="tfl">
-          <label>Estilo da linha</label>
-          <select class="tfi" id="cp-style">
-            <option value="Contínua">Contínua ——</option>
-            <option value="Tracejada">Tracejada - - -</option>
-            <option value="Pontilhada">Pontilhada · · ·</option>
-          </select>
-        </div>
-        <div class="tfl">
-          <label>Seta</label>
-          <select class="tfi" id="cp-arrow">
-            <option value="end">→ Uma direção</option>
-            <option value="both">↔ Dupla</option>
-            <option value="none">— Sem seta</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Preview -->
-      <div style="margin-top:8px;padding:12px;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
-        <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Preview</div>
-        <svg id="cp-preview" width="100%" height="32" viewBox="0 0 300 32">
-          <defs>
-            <marker id="prev-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-              <path d="M2 1L8 5L2 9" fill="none" stroke="#2455c7" stroke-width="1.5" stroke-linecap="round"/>
-            </marker>
-            <marker id="prev-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-              <path d="M2 1L8 5L2 9" fill="none" stroke="#2455c7" stroke-width="1.5" stroke-linecap="round"/>
-            </marker>
-          </defs>
-          <path id="cp-prev-path" d="M20,16 L280,16" fill="none" stroke="#2455c7" stroke-width="2" marker-end="url(#prev-end)"/>
-        </svg>
+        <input type="hidden" id="wf-status" value="dev">
       </div>
     </div>
-    <div style="padding:13px 18px;border-top:1px solid var(--border);display:flex;gap:8px;flex-shrink:0">
-      <button class="db d" id="cp-del-btn" onclick="deleteConnType()" style="margin-right:auto">Excluir</button>
-      <button class="db g" onclick="closeConnPanel()">Cancelar</button>
-      <button class="bs" onclick="saveConnType()">Salvar</button>
+    <div class="dlg-ft">
+      <button class="btn ghost" onclick="closeDlgWF()">Cancelar</button>
+      <button class="btn primary" onclick="saveWF()">Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- Dialog: unsaved -->
-<div class="dlg" id="dlg-unsaved">
-  <div class="dlg-bg" onclick="dlgUnsaved('cancel')"></div>
+<!-- Dialog: confirmar exclusão -->
+<div class="dlg-overlay" id="dlg-del">
   <div class="dlg-box">
-    <div class="dlg-ico">💾</div>
-    <div class="dlg-t">Alterações não salvas</div>
-    <div class="dlg-s">Você fez alterações neste módulo.<br>O que deseja fazer?</div>
-    <div class="dlg-btns">
-      <button class="db g" onclick="dlgUnsaved('cancel')">Continuar editando</button>
-      <button class="db g" onclick="dlgUnsaved('discard')">Descartar</button>
-      <button class="db p" onclick="dlgUnsaved('save')">Salvar</button>
+    <div class="dlg-body" style="padding:28px 24px">
+      <div class="dlg-confirm-icon">🗑️</div>
+      <div class="dlg-confirm-t">Excluir workflow?</div>
+      <div class="dlg-confirm-s">Tem certeza que deseja excluir<br><strong id="del-wf-name"></strong>?<br>Esta ação não pode ser desfeita.</div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn ghost" onclick="document.getElementById('dlg-del').classList.remove('open')">Cancelar</button>
+        <button class="btn danger" id="del-confirm-btn">Excluir</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Dialog: delete -->
-<div class="dlg" id="dlg-del">
-  <div class="dlg-bg" onclick="dlgDel(false)"></div>
-  <div class="dlg-box">
-    <div class="dlg-ico">🗑️</div>
-    <div class="dlg-t">Excluir módulo?</div>
-    <div class="dlg-s">Tem certeza que deseja excluir<br><strong id="del-name"></strong>?<br>Esta ação não pode ser desfeita.</div>
-    <div class="dlg-btns">
-      <button class="db g" onclick="dlgDel(false)">Cancelar</button>
-      <button class="db d" onclick="dlgDel(true)">Excluir</button>
-    </div>
-  </div>
-</div>
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-const SHEET_ID   = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4mvK7fnaKnAGEeE96XxBnBcP_MywkIYTCq4yawxhXNy1CXGPoOpCqPXec6zV8xB_Q/exec';
-const MODS_CSV      = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
-const MODS_JSON_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=ModulosJSON`;
-const CONN_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es`;
-const CANVAS_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Canvas`;
-const TIPOS_CSV       = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tipos`;
-const CONNTYPES_JSON_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=ConnTypes`;
+const SHEET_ID   = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
+const WF_CSV     = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Workflows`;
+const WF_JSON_CSV= `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=WorkflowsJSON`;
 
 // ─── State ────────────────────────────────────────────────────────────────────
-let modules = [], connTypes = [], canvas = {nodes:[], edges:[]};
-let settings = {dark:false, nw:180, snap:false, gridSize:26};
-let cfg = {devs:['Totvs','Salesforce','Microsoft','AW Interno','Externo'], ambs:['Local','Nuvem','Servidor AW','Híbrido','SaaS'], sts:['Ativo','Em implantação','Protótipo','Legado','Descontinuado','Planejado']};
-let tool='sel', connFrom=null, selConn=null;
-let vp = {x:0, y:0, scale:1}; // viewport: pan + zoom
-let isPanning=false, panStart={x:0,y:0}, panOrigin={x:0,y:0};
-let drag=null, dragOff={x:0,y:0};
-let editId=null; window.dirty=false;
-let _saveTimer=null;
+let workflows = [];
+let settings  = {dark: false};
 
-// ─── Persist local ────────────────────────────────────────────────────────────
+// ─── Persist ──────────────────────────────────────────────────────────────────
 function saveLocal() {
-  try { localStorage.setItem('aw_v22', JSON.stringify({canvas, settings, cfg, vp})); } catch(e){}
+  try { localStorage.setItem('aw_workflows_home', JSON.stringify({workflows, settings})); } catch(e){}
 }
 function loadLocal() {
   try {
-    const s = localStorage.getItem('aw_v22');
-    if (s) {
-      const p=JSON.parse(s);
-      const c = p.canvas||{nodes:[],edges:[]};
-      // Migrate old moduleId -> mid
-      if(c.nodes) c.nodes = c.nodes.map(n=>({...n, mid: n.mid||n.moduleId}));
-      canvas=c; settings={...settings,...(p.settings||{})}; cfg={...cfg,...(p.cfg||{})}; if(p.vp) vp={...vp,...p.vp};
-    }
+    const s = localStorage.getItem('aw_workflows_home');
+    if (s) { const p=JSON.parse(s); workflows=p.workflows||[]; settings={...settings,...(p.settings||{})}; }
   } catch(e){}
 }
 
-// ─── Google Sheets: read ──────────────────────────────────────────────────────
-function parseCSV(txt) {
-  const lines = txt.trim().split('\n');
-  if (lines.length < 2) return [];
-  const hdrs = lines[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(line => {
-    const vals=[], cur={v:'',q:false};
-    for (const c of line+',') {
-      if (c==='"') cur.q=!cur.q;
-      else if (c===',' && !cur.q) { vals.push(cur.v.replace(/^"|"$/g,'')); cur.v=''; }
-      else cur.v+=c;
-    }
-    const obj={};
-    hdrs.forEach((h,i)=>obj[h]=(vals[i]||'').trim());
-    return obj;
-  });
-}
-
-async function loadModules() {
-  const r = await fetch(MODS_CSV);
-  const rows = parseCSV(await r.text());
-  return rows.map((row,i)=>({
-    id:   row['ID']||row['id']||'m'+i,
-    name: row['Nome']||row['nome']||'',
-    color:row['Cor']||row['cor']||'#2455c7',
-    amb:  row['Ambiente']||row['ambiente']||'',
-    sta:  row['Status']||row['status']||'',
-    area: row['Área']||row['area']||row['Area']||'',
-    atua: row['Atualização']||row['atualizacao']||'',
-    desc: row['Descrição']||row['descricao']||'',
-    dev:  row['Desenvolvedor']||row['desenvolvedor']||'',
-    tipo: row['Tipo']||row['tipo']||row['TIPO']||'default',
-  })).filter(m=>m.name);
-}
-
-async function loadConnTypes() {
-  const r = await fetch(CONN_CSV);
-  const rows = parseCSV(await r.text());
-  return rows.map((row,i)=>({
-    id:   row['ID']||row['id']||'ct'+i,
-    name: row['Nome']||row['nome']||'',
-    color:row['Cor']||row['cor']||'#2455c7',
-    style:row['Estilo']||row['estilo']||'Contínua',
-    width:Number(row['Espessura']||row['espessura']||2),
-    arrow:row['Seta']||row['seta']||'end',
-    desc: row['Descrição']||row['descricao']||'',
-  })).filter(c=>c.name);
-}
-
-async function loadCanvasFromSheets() {
-  try {
-    const r = await fetch(CANVAS_CSV+'&t='+Date.now());
-    const txt = await r.text();
-    const lines = txt.trim().split('\n');
-    if (lines.length >= 2) {
-      const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"');
-      if (raw && raw.startsWith('{')) {
-        const p = JSON.parse(raw);
-        if (p && (p.nodes||p.edges)) return p;
-      }
-    }
-  } catch(e){}
-  return null;
-}
-
-// ─── Google Sheets: write ─────────────────────────────────────────────────────
-
-// Test sync connection
-async function testSync() {
-  setStatus('loading', 'Testando conexão...');
-  try {
-    const url = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify({action:'ping'}));
-    const r = await fetch(url); // WITH cors to get response
-    const json = await r.json();
-    setStatus('ok', 'Conexão OK: ' + JSON.stringify(json));
-  } catch(e) {
-    setStatus('err', 'Falha: ' + e.message);
-  }
-}
-
+// ─── Sheets sync ──────────────────────────────────────────────────────────────
 async function postSheet(payload) {
   const url = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
-  console.log('[SYNC] Sending:', payload.action, payload.id||'', payload.name||'');
+  try { await fetch(url, {mode:'no-cors'}); } catch(e) {}
+}
+
+async function loadWorkflowsFromSheets() {
   try {
-    await fetch(url, {mode:'no-cors'});
-    console.log('[SYNC] Request sent (no-cors, cannot confirm arrival)');
-  } catch(e) {
-    console.error('[SYNC] Failed:', e);
-    setStatus('err', 'Erro ao sincronizar: ' + e.message);
-  }
-}
-
-function schedSave() {
-  clearTimeout(_saveTimer);
-  showChip('↑ salvando...',true);
-  _saveTimer = setTimeout(async ()=>{
-    saveLocal();
-    await postSheet({action:'saveCanvas', canvas});
-    showChip('✓ salvo',false);
-    setTimeout(()=>{ document.getElementById('chip-save').style.opacity='0'; }, 2000);
-  }, 1200);
-}
-
-function showChip(txt, persist) {
-  const c = document.getElementById('chip-save');
-  c.textContent = txt; c.style.opacity = '1';
-}
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
-async function init() {
-  loadLocal();
-  loadTipos();
-  applySett();
-  setStatus('loading','Carregando...');
-
-  try {
-    // Load modules and conn types from Sheets
-    // Try JSON blob first (most reliable), fall back to CSV
-    const [csvMods, csvConns] = await Promise.all([loadModules(), loadConnTypes()]);
-    const jsonMods = await loadModulesFromJSON();
-    modules = jsonMods || csvMods;
-    connTypes = csvConns.map(ct=>({width:2,arrow:'end',...ct}));
-
-    // Load connTypes JSON from Sheets (overrides CSV if available)
-    try { await loadConnTypesFromSheets(); } catch(e) {}
-    // Load tipos from Sheets (non-blocking)
-    try { await loadTiposFromSheets(); } catch(e) { console.log('tipos load failed:', e); }
-
-    // Load canvas from Sheets (positions + edges)
-    const remoteCanvas = await loadCanvasFromSheets();
-    if (remoteCanvas && remoteCanvas.nodes && remoteCanvas.nodes.length) {
-      // Migrate old moduleId -> mid
-      remoteCanvas.nodes = remoteCanvas.nodes.map(n=>({...n, mid: n.mid||n.moduleId}));
-      canvas = remoteCanvas;
-      saveLocal();
-    } else if (!canvas.nodes.length && modules.length) {
-      seedCanvas();
-    }
-
-    if (!connTypes.length) connTypes = defaultConns();
-    selConn = connTypes[0]?.id;
-    setStatus('ok', modules.length+' módulos · conectado');
-  } catch(e) {
-    console.error('init error:', e);
-    setStatus('err','Modo offline — '+e.message);
-    if (!modules.length) modules = [];
-    if (!connTypes.length) connTypes = defaultConns();
-    if (!tipos.length) tipos = [{...DEFAULT_TIPO}];
-    if (!canvas.nodes.length) seedCanvas();
-  }
-
-  renderSidebar(); renderCanvas(); updateChips(); applyVP();
-}
-
-function defaultConns() {
-  return [
-    {id:'ct0',name:'Fluxo de dados',color:'#2455c7',style:'Contínua',width:2,arrow:'end',desc:'Dados entre sistemas'},
-    {id:'ct1',name:'Necessidade',color:'#c97d10',style:'Tracejada',width:2,arrow:'end',desc:'Integração a desenvolver'},
-    {id:'ct2',name:'Desejo futuro',color:'#6830c4',style:'Pontilhada',width:1.5,arrow:'none',desc:'Não priorizado'},
-    {id:'ct3',name:'Dependência crítica',color:'#c42b2b',style:'Contínua',width:3,arrow:'both',desc:'Obrigatória'},
-  ];
-}
-
-function seedCanvas() {
-  const pos=[{x:80,y:100},{x:340,y:70},{x:340,y:280},{x:80,y:280}];
-  canvas.nodes = modules.slice(0,4).map((m,i)=>({id:'n'+i,mid:m.id,x:pos[i]?.x||80,y:pos[i]?.y||100}));
-  canvas.edges = [];
-}
-
-function setStatus(t,msg) {
-  document.getElementById('sdot').className='sdot '+t;
-  document.getElementById('slabel').textContent=msg;
-}
-
-// ─── Settings ─────────────────────────────────────────────────────────────────
-function applySett() {
-  document.body.classList.toggle('dark', settings.dark);
-  document.getElementById('theme-btn').textContent = settings.dark?'☀️':'🌙';
-  const tog = document.getElementById('theme-tog');
-  const knob = document.getElementById('theme-knob');
-  if (tog) { tog.style.background = settings.dark?'var(--accent)':'var(--border2)'; }
-  if (knob) knob.style.transform = settings.dark?'translateX(14px)':'none';
-  applyNW(settings.nw, false);
-  applySnap();
-}
-function toggleTheme() { settings.dark=!settings.dark; applySett(); saveLocal(); renderCanvas(); }
-function applyNW(v, save=true) {
-  settings.nw=Number(v);
-  document.documentElement.style.setProperty('--nw', v+'px');
-  const el=document.getElementById('sl-nw'); if(el) el.value=v;
-  const vl=document.getElementById('nw-val'); if(vl) vl.textContent=v+'px';
-  if(save) saveLocal();
-}
-
-// ─── Tabs ─────────────────────────────────────────────────────────────────────
-function tab(t) {
-  document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',['mods','conns','tipos','cfg'][i]===t));
-  ['mods','conns','tipos','cfg'].forEach(id=>{document.getElementById('t-'+id).style.display=id===t?'':'none';});
-  if(t==='tipos') renderTiposList();
-  if(t==='cfg') renderCfgLists();
-}
-
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-function renderSidebar() {
-  // Modules — hide those on canvas
-  const onCV = new Set(canvas.nodes.map(n=>n.mid));
-  const avail = modules.filter(m=>!onCV.has(m.id));
-  const ml = document.getElementById('mods-list');
-  ml.innerHTML = avail.length
-    ? avail.map(m=>`<div class="mod-item" draggable="true" ondragstart="onDS(event,'${m.id}')">
-        <div class="mdot" style="background:${m.color}"></div>
-        <div style="flex:1;min-width:0"><div class="mname">${esc(m.name)}</div><div class="mmeta">${[m.amb,m.sta].filter(Boolean).join(' · ')}</div></div>
-        <button class="mod-del-btn" onclick="askDeleteMod(event,'${m.id}')" title="Excluir">🗑</button>
-      </div>`).join('')
-    : '<div class="empty-list">Todos os módulos estão no canvas</div>';
-
-  // Conn types
-  const cl = document.getElementById('conns-list');
-  cl.innerHTML = connTypes.map(ct=>`
-    <div class="conn-item ${selConn===ct.id?'on':''}" onclick="selC('${ct.id}')">
-      <div style="width:26px;flex-shrink:0;${connStyle(ct)}"></div>
-      <div style="flex:1"><div class="cname">${esc(ct.name)}</div><div class="cdesc">${esc(ct.desc||'')}</div></div>
-      <button class="tipo-edit" onclick="openEditConn(event,'${ct.id}')">Editar</button>
-    </div>`).join('');
-}
-
-function connStyle(ct) {
-  const w = Math.min(ct.width||2, 4)+'px';
-  if (ct.style==='Tracejada') return `height:0;border-top:${w} dashed ${ct.color};`;
-  if (ct.style==='Pontilhada') return `height:0;border-top:${w} dotted ${ct.color};`;
-  return `height:${w};background:${ct.color};border-radius:1px;`;
-}
-function selC(id){selConn=id;renderSidebar();}
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-// ─── Config lists ─────────────────────────────────────────────────────────────
-function renderCfgLists() {
-  ['devs','ambs','sts'].forEach(key=>{
-    const el=document.getElementById('cfg-'+key);
-    if(!el) return;
-    el.innerHTML=(cfg[key]||[]).map((v,i)=>`<div class="cfg-item"><span>${esc(v)}</span><button class="cfg-del" onclick="delCfg('${key}',${i})">×</button></div>`).join('');
-  });
-}
-function addCfg(key) {
-  const map={devs:'in-dev',ambs:'in-amb',sts:'in-sta'};
-  const inp=document.getElementById(map[key]); if(!inp) return;
-  const v=inp.value.trim(); if(!v) return;
-  if(!cfg[key]) cfg[key]=[];
-  if(!cfg[key].includes(v)) { cfg[key].push(v); saveLocal(); renderCfgLists(); fillSelects(); }
-  inp.value='';
-}
-function delCfg(key,idx) { cfg[key].splice(idx,1); saveLocal(); renderCfgLists(); fillSelects(); }
-
-// ─── Drag sidebar → canvas ────────────────────────────────────────────────────
-function onDS(e,mid){e.dataTransfer.setData('mid',mid);}
-document.getElementById('cw').addEventListener('dragover',e=>e.preventDefault());
-document.getElementById('cw').addEventListener('drop',e=>{
-  e.preventDefault();
-  const mid=e.dataTransfer.getData('mid'); if(!mid) return;
-  const r=document.getElementById('cw').getBoundingClientRect();
-  const dropX = (e.clientX-r.left - vp.x) / vp.scale - 90;
-  const dropY = (e.clientY-r.top  - vp.y) / vp.scale - 35;
-  canvas.nodes.push({id:'n'+Date.now(),mid,x:dropX,y:dropY});
-  saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
-});
-
-// ─── Canvas ───────────────────────────────────────────────────────────────────
-function renderCanvas() {
-  const cv=document.getElementById('cv');
-  cv.innerHTML='';
-  canvas.nodes.forEach(node=>{
-    const mid = node.mid||node.moduleId; const m=modules.find(x=>x.id===mid); if(!m) return;
-    const sc={Ativo:'s-ativo',Legado:'s-legado',Descontinuado:'s-desc'}[m.sta]||'';
-    const t = getTipo(m.tipo);
-    const isDark = settings.dark;
-    const bg     = isDark ? t.bgDark    : t.bgLight;
-    const border = isDark ? t.borderDark: t.borderLight;
-    const titleC = isDark ? t.titleDark : t.titleLight;
-    const fieldC = isDark ? t.fieldDark : t.fieldLight;
-
-    const tags = [
-      t.showAmb && m.amb  ? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.amb)}</span>` : '',
-      t.showSta && m.sta  ? `<span class="ntag ${sc}" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px">${esc(m.sta)}</span>` : '',
-      t.showDev && m.dev  ? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.dev)}</span>` : '',
-      t.showArea && m.area? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.area.split(',')[0].trim())}</span>` : '',
-      t.showDesc && m.desc? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC};max-width:100%;overflow:hidden;text-overflow:ellipsis">${esc(m.desc.substring(0,40))}</span>` : '',
-    ].join('');
-
-    const el=document.createElement('div');
-    const shapeClass = t.shape && t.shape!=='rect' ? 'node shape-'+t.shape : 'node';
-    el.className=shapeClass; el.id='node-'+node.id;
-    el.style.cssText = `left:${node.x}px;top:${node.y}px;position:absolute;width:${t.w||180}px;background:${bg};border:${t.borderW||1.5}px solid ${border};padding:11px 13px;`;
-    if(t.h) el.style.minHeight = t.h+'px';
-
-        // Auto-center title if no tags visible
-    const hasFields = [t.showAmb&&m.amb, t.showSta&&m.sta, t.showDev&&m.dev, t.showArea&&m.area, t.showDesc&&m.desc].some(Boolean);
-    const align = t.titleAlign==='auto' ? (hasFields ? 'left' : 'center') : (t.titleAlign||'left');
-    el.innerHTML=`<div class="ntop" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'}"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC};text-align:${align}">${esc(m.name)}</div></div>
-      <div class="ntags" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'}">${tags}</div>
-`+`<div class="node-actions">
-      <button class="ntb-btn p" onclick="startConn('${node.id}')">⟶ Conectar</button>
-      <button class="ntb-btn" onclick="openEP('${m.id}','${node.id}')">✎ Editar</button>
-      <button class="ntb-btn x" onclick="removeNode('${node.id}')">×</button>
-    </div>`;
-    el.addEventListener('mousedown',ev=>{
-      if(ev.target.classList.contains('nbtn')||ev.target.classList.contains('ntb-btn')) return;
-      if(connFrom) return; // in connect mode, let mouseup handle it
-      if(tool==='con'){startConn(node.id);return;}
-      drag=node.id;
-      const r=el.getBoundingClientRect();
-      dragOff={x:(ev.clientX-r.left)/vp.scale,y:(ev.clientY-r.top)/vp.scale};
-      ev.preventDefault();
-    });
-    cv.appendChild(el);
-  });
-  renderEdges();
-}
-
-document.addEventListener('mousemove',e=>{
-  if(!drag) return;
-  const w=document.getElementById('cw').getBoundingClientRect();
-  const n=canvas.nodes.find(x=>x.id===drag); if(!n) return;
-  n.x=Math.max(0,(e.clientX-w.left-dragOff.x*vp.scale - vp.x)/vp.scale);
-  n.y=Math.max(0,(e.clientY-w.top -dragOff.y*vp.scale - vp.y)/vp.scale);
-  const el=document.getElementById('node-'+drag);
-  if(el){el.style.left=n.x+'px';el.style.top=n.y+'px';}
-  renderEdges();
-});
-document.addEventListener('mouseup', e=>{
-  if(drag){
-    // Snap to grid on release
-    const n = canvas.nodes.find(x=>x.id===drag);
-    if(n && settings.snap) {
-      n.x = snapToGrid(n.x);
-      n.y = snapToGrid(n.y);
-      const el = document.getElementById('node-'+drag);
-      if(el) { el.style.left=n.x+'px'; el.style.top=n.y+'px'; }
-      renderEdges();
-    }
-    schedSave(); drag=null; return;
-  }
-  drag=null;
-  // Handle connection click
-  if(!connFrom) return;
-  const target = e.target.closest('.node') || e.target.closest('.node-actions')?.closest('.node');
-  if (!target) { const t2 = e.target; }
-  if(!target) return;
-  const tid = target.id.replace('node-','');
-  if(tid===connFrom) return;
-  if(canvas.edges.find(e=>e.from===connFrom&&e.to===tid)) { cancelConn(); return; }
-  canvas.edges.push({id:'e'+Date.now(), from:connFrom, to:tid, cid:selConn||connTypes[0]?.id});
-  saveLocal(); schedSave(); renderEdges(); updateChips();
-  cancelConn();
-});
-
-function removeNode(id) {
-  canvas.nodes=canvas.nodes.filter(n=>n.id!==id);
-  canvas.edges=canvas.edges.filter(e=>e.from!==id&&e.to!==id);
-  saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
-}
-
-// ─── Edges ────────────────────────────────────────────────────────────────────
-function nCenter(id) {
-  const node = canvas.nodes.find(n=>n.id===id);
-  if(!node) return {x:0,y:0,w:180,h:60};
-  // Use DOM height if available, else default
-  const el = document.getElementById('node-'+id);
-  const w = el ? el.offsetWidth  : (settings.nw||180);
-  const h = el ? el.offsetHeight : 60;
-  return {x: node.x + w/2, y: node.y + h/2, w, h};
-}
-
-function nEdge(id, tx, ty) {
-  const c=nCenter(id);
-  if(!c || (!c.x && !c.y)) return {x:0,y:0};
-  const w2 = (c.w||settings.nw||180)/2 + 4;
-  const h2 = (c.h||60)/2 + 4;
-  const dx=tx-c.x, dy=ty-c.y;
-  const len=Math.sqrt(dx*dx+dy*dy);
-  if(len<1) return c;
-  const ux=dx/len, uy=dy/len;
-  const t=Math.min(w2/Math.max(Math.abs(ux),0.001), h2/Math.max(Math.abs(uy),0.001));
-  return {x:c.x+ux*t, y:c.y+uy*t};
-}
-function renderEdges() {
-  const svg=document.getElementById('esvg');
-  const w=document.getElementById('cw');
-  // SVG covers infinite canvas, no need to resize
-  const sid=s=>(s||'').replace(/[^a-z0-9]/gi,'');
-  const sid2=s=>(s||'').replace(/[^a-z0-9]/gi,'');
-  const defs = connTypes.map(ct => {
-    const ap = `<path d="M2 1L8 5L2 9" fill="none" stroke="${ct.color}" stroke-width="1.5" stroke-linecap="round"/>`;
-    return `<marker id="ae${sid2(ct.id)}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">${ap}</marker>
-            <marker id="as${sid2(ct.id)}" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">${ap}</marker>`;
-  }).join('');
-  const lw=1.8;
-  const paths=canvas.edges.map(edge=>{
-    const ct=connTypes.find(c=>c.id===edge.cid)||connTypes[0]; if(!ct) return '';
-    const cf2=nCenter(edge.from), ct2=nCenter(edge.to);
-    const f=nEdge(edge.from, ct2.x, ct2.y);
-    const t=nEdge(edge.to, cf2.x, cf2.y);
-    const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-28;
-    const dash=ct.style==='Tracejada'?`stroke-dasharray="${lw*4} ${lw*3}"`:ct.style==='Pontilhada'?`stroke-dasharray="${lw} ${lw*4}"`:'';
-    return `<path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}" fill="none" stroke="${ct.color}" stroke-width="${ct.width||lw}" opacity=".85" ${dash} marker-end="url(#ae${sid(ct.id)})" marker-start="${(ct.arrow||'end')==='both'?'url(#as'+sid(ct.id)+')':''}" style="pointer-events:stroke;cursor:pointer" data-eid="${edge.id}" class="edge-path"/>
-    <text x="${(f.x+t.x)/2}" y="${(f.y+t.y)/2-35}" text-anchor="middle" font-size="10" fill="${ct.color}" opacity=".65" font-family="DM Mono,monospace">${esc(ct.name)}</text>`;
-  }).join('');
-  svg.innerHTML=`<defs>${defs}</defs>${paths}`;
-
-  // Add delete buttons using node positions
-  document.querySelectorAll('.edge-del').forEach(e=>e.remove());
-  canvas.edges.forEach(edge => {
-    const nFrom = canvas.nodes.find(n=>n.id===edge.from);
-    const nTo   = canvas.nodes.find(n=>n.id===edge.to);
-    if(!nFrom||!nTo) return;
-    const nw = settings.nw||180;
-    const fx = nFrom.x + nw/2, fy = nFrom.y + 40;
-    const tx = nTo.x   + nw/2, ty = nTo.y   + 40;
-    const mx = (fx+tx)/2, my = (fy+ty)/2 - 14;
-    const btn = document.createElement('button');
-    btn.className = 'edge-del';
-    btn.innerHTML = '×';
-    btn.style.left = mx+'px';
-    btn.style.top  = my+'px';
-    btn.dataset.mx = mx;
-    btn.dataset.my = my;
-    btn.addEventListener('click', (ev) => {
-      ev.stopPropagation();
-      canvas.edges = canvas.edges.filter(x=>x.id!==edge.id);
-      saveLocal(); schedSave(); renderEdges(); updateChips();
-    });
-    document.getElementById('cv').appendChild(btn);
-  });
-}
-
-function connMenu(id, e) {
-  e.stopPropagation();
-  const edge = canvas.edges.find(x=>x.id===id);
-  if (!edge) return;
-  // Show edge context menu
-  const menu = document.getElementById('edge-menu');
-  menu.dataset.eid = id;
-  menu.classList.add('open');
-  const vw=window.innerWidth, vh=window.innerHeight;
-  const mw=180, mh=80;
-  menu.style.left = Math.min(e.clientX, vw-mw-8)+'px';
-  menu.style.top  = Math.min(e.clientY, vh-mh-8)+'px';
-}
-
-function removeEdge(id){
-  canvas.edges=canvas.edges.filter(e=>e.id!==id);
-  saveLocal(); schedSave(); renderEdges(); updateChips();
-}
-
-document.addEventListener('click', e=>{
-  const em = document.getElementById('edge-menu');
-  if (em && !em.contains(e.target)) em.classList.remove('open');
-});
-
-// ─── Connect ──────────────────────────────────────────────────────────────────
-function setTool(t){
-  tool=t;
-  document.getElementById('tbtn-sel').classList.toggle('on',t==='sel');
-  document.getElementById('tbtn-con').classList.toggle('on',t==='con');
-  if(t!=='con') cancelConn();
-}
-function startConn(nid){
-  connFrom=nid;
-  document.getElementById('cbanner').style.display='block';
-  document.querySelectorAll('.node').forEach(el=>el.classList.add('connecting'));
-}
-function cancelConn(){
-  connFrom=null;
-  document.getElementById('cbanner').style.display='none';
-  document.querySelectorAll('.node').forEach(el=>el.classList.remove('connecting'));
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){cancelConn();closeEP(true);}});
-
-// ─── Edit popover ─────────────────────────────────────────────────────────────
-function fillSelects() {
-  const s=(id,arr,cur)=>{
-    const el=document.getElementById(id); if(!el) return;
-    el.innerHTML='<option value="">—</option>'+(arr||[]).map(v=>`<option${v===cur?' selected':''}>${esc(v)}</option>`).join('');
-  };
-  const m=modules.find(x=>x.id===editId)||{};
-  s('ep-dev',cfg.devs,m.dev); s('ep-amb',cfg.ambs,m.amb); s('ep-sta',cfg.sts,m.sta);
-}
-
-function openEP(mid, nid) {
-  const m=modules.find(x=>x.id===mid); if(!m) return;
-  editId=mid; window.dirty=false;
-  document.getElementById('ep-id').value=mid;
-  document.getElementById('ep-name').value=m.name||'';
-  document.getElementById('ep-area').value=m.area||'';
-  document.getElementById('ep-desc').value=m.desc||'';
-  // ep-col removed (color now via tipo)
-  fillSelects();
-  fillTipoSelect();
-  const curTipo=document.getElementById('ep-tipo'); if(curTipo) curTipo.value=m.tipo||'default';
-  // color dots removed
-  document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
-
-  const nodeEl=document.getElementById('node-'+nid); if(nodeEl) nodeEl.classList.add('editing');
-
-
-  const ep=document.getElementById('ep');
-  ep.classList.add('open');
-  document.getElementById('eov').classList.add('open');
-
-  // Position: aligned to top of node, right side
-  if(nodeEl){
-    const rect=nodeEl.getBoundingClientRect();
-    const pw=292, margin=12, vw=window.innerWidth, vh=window.innerHeight;
-    ep.style.visibility='hidden'; ep.style.display='flex';
-    const ph=ep.offsetHeight; ep.style.visibility='';
-
-    let left=rect.right+margin;
-    if(left+pw>vw-12){left=rect.left-pw-margin;}
-    left=Math.max(12,left);
-
-    let top=rect.top;
-    if(top+ph>vh-12) top=rect.bottom-ph;
-    top=Math.max(12,Math.min(top,vh-ph-12));
-
-    ep.style.left=left+'px'; ep.style.top=top+'px';
-  } else {
-    ep.style.left='50%'; ep.style.top='50%'; ep.style.transform='translate(-50%,-50%)';
-  }
-}
-
-function tryCloseEP(e) {
-  // Don't fire if a dialog is already open
-  if(document.getElementById('dlg-unsaved').classList.contains('open')) return;
-  if(document.getElementById('dlg-del').classList.contains('open')) return;
-  if(window.dirty){
-    document.getElementById('dlg-unsaved').classList.add('open');
-  } else {
-    closeEP(true);
-  }
-}
-
-function closeEP(force){
-  if(!force && window.dirty) return;
-  window.dirty=false; editId=null;
-  const ep=document.getElementById('ep');
-  ep.classList.remove('open');
-  ep.style.display='';
-  ep.style.visibility='';
-  ep.style.transform='';
-  document.getElementById('eov').classList.remove('open');
-  document.getElementById('eov').style.pointerEvents='';
-  document.querySelectorAll('.node').forEach(el=>el.classList.remove('editing'));
-
-}
-
-function dlgUnsaved(choice){
-  document.getElementById('dlg-unsaved').classList.remove('open');
-  document.getElementById('eov').style.pointerEvents='';
-  if(choice==='save') saveMod();
-  else if(choice==='discard') closeEP(true);
-  // 'cancel' → do nothing, stay open
-}
-
-function pickC(c,el){ window.dirty=true; } // color picker removed
-
-async function saveMod(){
-  const name=document.getElementById('ep-name').value.trim();
-  if(!name){alert('Informe o nome.');return;}
-  const mod={
-    id:editId, name,
-    area:document.getElementById('ep-area').value,
-    desc:document.getElementById('ep-desc').value,
-    dev: document.getElementById('ep-dev').value,
-    amb: document.getElementById('ep-amb').value,
-    sta: document.getElementById('ep-sta').value,
-    color: (modules.find(x=>x.id===editId)||{}).color || '#2455c7',
-    tipo: document.getElementById('ep-tipo').value || 'default',
-  };
-  const idx=modules.findIndex(m=>m.id===editId);
-  if(idx>=0) modules[idx]={...modules[idx],...mod};
-  window.dirty=false; closeEP(true);
-  renderSidebar(); renderCanvas();
-  setStatus('loading','Salvando...');
-  // Save individual module AND full modules JSON for reliable sync
-  await postSheet({action:'saveModule',...mod});
-  await postSheet({action:'saveModules', modules});
-  setStatus('ok', modules.length+' módulos · salvo ✓');
-  setTimeout(()=>setStatus('ok', modules.length+' módulos · conectado'), 3000);
-}
-
-function hideModule(){
-  // Remove from canvas but keep in modules list (returns to sidebar)
-  const id = editId;
-  canvas.nodes = canvas.nodes.filter(n=>n.mid!==id);
-  canvas.edges = canvas.edges.filter(e=>{
-    const f=canvas.nodes.find(n=>n.id===e.from);
-    const t=canvas.nodes.find(n=>n.id===e.to);
-    return f&&t;
-  });
-  window.dirty = false;
-  closeEP(true);
-  saveLocal(); schedSave();
-  renderCanvas(); renderSidebar(); updateChips();
-}
-
-function confirmDelete(){
-  // Capture editId NOW before anything can reset it
-  const capturedId = editId;
-  const m = modules.find(x=>x.id===capturedId);
-  if(!m){ console.log('editId=',editId,'modules=',modules.map(x=>x.id)); return; }
-  document.getElementById('del-name').textContent = m.name;
-  document.getElementById('eov').style.pointerEvents = 'none';
-  // Store captured id in data attribute for safety
-  document.getElementById('dlg-del').dataset.delId = capturedId;
-  document.getElementById('dlg-del').classList.add('open');
-}
-async function dlgDel(yes){
-  const dlg = document.getElementById('dlg-del');
-  const id = dlg.dataset.delId || editId;
-  dlg.classList.remove('open');
-  document.getElementById('eov').style.pointerEvents='';
-  if(!yes) return;
-  // Close edit panel if open for this module
-  if (editId === id) { window.dirty=false; closeEP(true); }
-  modules=modules.filter(m=>m.id!==id);
-  canvas.nodes=canvas.nodes.filter(n=>n.mid!==id);
-  canvas.edges=canvas.edges.filter(e=>{
-    const f=canvas.nodes.find(n=>n.id===e.from), t=canvas.nodes.find(n=>n.id===e.to);
-    return f&&t;
-  });
-  closeEP(true); saveLocal(); schedSave();
-  renderSidebar(); renderCanvas(); updateChips(); applyVP();
-  await postSheet({action:'deleteModule',id});
-  await postSheet({action:'saveModules', modules});
-}
-
-// ─── New module ───────────────────────────────────────────────────────────────
-function openNewMod(){
-  const id='m'+Date.now();
-  const mod={id,name:'Novo módulo',color:'#2455c7',area:'',desc:'',dev:'',amb:'',sta:'',atua:''};
-  modules.push(mod);
-  // Place on canvas center
-  const w=document.getElementById('cw');
-  canvas.nodes.push({id:'n'+Date.now(),mid:id,x:w.offsetWidth/2-90,y:w.offsetHeight/2-35});
-  saveLocal(); renderCanvas(); renderSidebar(); updateChips();
-  // Open edit panel
-  const node=canvas.nodes.find(n=>n.mid===id);
-  if(node) openEP(id,'node-'+node.id);
-}
-
-// ─── Misc ─────────────────────────────────────────────────────────────────────
-async function doRefresh(){
-  setStatus('loading','Atualizando...');
-  try{
-    [modules,connTypes]=await Promise.all([loadModules(),loadConnTypes()]);
-    try { await loadConnTypesFromSheets(); } catch(e) {}
-    await loadTiposFromSheets();
-    const rc=await loadCanvasFromSheets();
-    if(rc&&rc.nodes&&rc.nodes.length){canvas=rc;saveLocal();}
-    if(!connTypes.length) connTypes=defaultConns();
-    selConn=connTypes[0]?.id;
-    setStatus('ok',modules.length+' módulos');
-    renderSidebar(); renderCanvas(); updateChips(); applyVP();
-  }catch(e){setStatus('err','Erro ao atualizar');}
-}
-
-function clearCanvas(){
-  if(!confirm('Limpar todo o canvas?')) return;
-  canvas={nodes:[],edges:[]};
-  saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
-}
-
-function updateChips(){
-  document.getElementById('chip-mods').textContent=canvas.nodes.length+' módulo'+(canvas.nodes.length!==1?'s':'');
-  document.getElementById('chip-edges').textContent=canvas.edges.length+' conexão'+(canvas.edges.length!==1?'ões':'');
-}
-
-
-
-
-// ── Tipos Visuais ──────────────────────────────────────────────────────────
-let tipos = [];
-let editingTipoId = null;
-
-const DEFAULT_TIPO = {
-  id:'default', name:'Padrão',
-  shape:'rect', w:180, h:0,
-  bgLight:'#ffffff', bgDark:'#17171b',
-  borderLight:'#e0e0e0', borderDark:'#2a2a35', borderW:1.5,
-  titleFont:"'DM Sans',sans-serif", titleSize:12, titleWeight:'600',
-  titleLight:'#1a1916', titleDark:'#e8e8ec',
-  showArea:true, showSta:true, showAmb:true, showDev:false, showDesc:false,
-  fieldFont:"'DM Mono',monospace", fieldSize:9,
-  fieldLight:'#9a9890', fieldDark:'#55556a'
-};
-
-function loadTipos() {
-  try {
-    const s = localStorage.getItem('aw_tipos');
-    if (s) tipos = JSON.parse(s);
-    if (!tipos.length) tipos = [{ ...DEFAULT_TIPO }];
-  } catch(e) { tipos = [{ ...DEFAULT_TIPO }]; }
-}
-
-
-async function loadConnTypesFromSheets() {
-  try {
-    const r = await fetch(CONNTYPES_JSON_CSV + '&t=' + Date.now());
+    const r = await fetch(WF_JSON_CSV + '&t=' + Date.now());
     if (!r.ok) return false;
     const txt = await r.text();
     if (!txt || txt.includes('<!DOCTYPE')) return false;
@@ -1580,627 +344,228 @@ async function loadConnTypesFromSheets() {
     const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
     if (!raw || !raw.startsWith('[')) return false;
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || !parsed.length) return false;
-    connTypes = parsed.map(ct=>({width:2,arrow:'end',...ct}));
+    if (!Array.isArray(parsed)) return false;
+    workflows = parsed;
+    saveLocal();
     return true;
   } catch(e) { return false; }
 }
 
-
-async function loadModulesFromJSON() {
-  try {
-    const r = await fetch(MODS_JSON_CSV + '&t=' + Date.now());
-    if (!r.ok) return null;
-    const txt = await r.text();
-    if (!txt || txt.includes('<!DOCTYPE')) return null;
-    const lines = txt.trim().split('\n');
-    if (lines.length < 2) return null;
-    const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
-    if (!raw || !raw.startsWith('[')) return null;
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || !parsed.length) return null;
-    return parsed;
-  } catch(e) { return null; }
+async function saveWorkflowsToSheets() {
+  await postSheet({action:'saveWorkflows', workflows});
 }
 
-async function saveModulesToSheets() {
-  await postSheet({action:'saveModules', modules});
-}
+// ─── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  loadLocal();
+  applySett();
+  updateCount();
+  renderGrid();
 
-async function loadTiposFromSheets() {
+  // Load from Sheets
   try {
-    const r = await fetch(TIPOS_CSV + '&t=' + Date.now());
-    if (!r.ok) return false;
-    const txt = await r.text();
-    if (!txt || txt.includes('<!DOCTYPE')) return false; // not a CSV
-    const lines = txt.trim().split('\n');
-    if (lines.length < 2) return false;
-    const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
-    if (!raw || !raw.startsWith('[')) return false;
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || !parsed.length) return false;
-    // Ensure default tipo exists
-    if (!parsed.find(t=>t.id==='default')) parsed.unshift({...DEFAULT_TIPO});
-    tipos = parsed;
-    saveTiposLocal();
-    return true;
-  } catch(e) {
-    console.log('loadTiposFromSheets error:', e);
-    return false;
+    await loadWorkflowsFromSheets();
+    renderGrid();
+  } catch(e) {}
+
+  // Check URL hash - if has workflow ID, open it
+  const hash = location.hash.replace('#','');
+  if (hash && hash.startsWith('wf_')) {
+    const wf = workflows.find(w=>w.id===hash);
+    if (wf) openWorkflow(wf);
   }
 }
 
-function saveTiposLocal() {
-  try { localStorage.setItem('aw_tipos', JSON.stringify(tipos)); } catch(e) {}
+// ─── Settings ─────────────────────────────────────────────────────────────────
+function applySett() {
+  document.body.classList.toggle('dark', settings.dark);
+  document.getElementById('theme-btn').textContent = settings.dark ? '☀️' : '🌙';
+}
+function toggleTheme() { settings.dark=!settings.dark; applySett(); saveLocal(); }
+
+// ─── Render grid ──────────────────────────────────────────────────────────────
+function updateCount() {
+  const el = document.getElementById('home-count');
+  if (el) el.textContent = workflows.length + ' workflow' + (workflows.length!==1?'s':'');
 }
 
-async function saveTiposToSheets() {
-  await postSheet({ action: 'saveTipos', tipos });
-}
+function renderGrid() {
+  const grid = document.getElementById('wf-grid');
+  const filter = document.getElementById('filter-status').value;
+  const filtered = filter ? workflows.filter(w=>w.status===filter) : workflows;
 
-function getTipo(tipoId) {
-  return tipos.find(t=>t.id===tipoId) || tipos[0] || DEFAULT_TIPO;
-}
+  updateCount();
 
-function renderTiposList() {
-  const list = document.getElementById('tipos-list');
-  if (!list) return;
-  list.innerHTML = tipos.map(t => `
-    <div class="tipo-item">
-      <div class="tipo-preview">${shapePreviewSVG(t)}</div>
-      <div class="tipo-name">${esc(t.name)}</div>
-      <button class="tipo-edit" onclick="openEditTipo('${t.id}')">Editar</button>
+  if (!filtered.length && !workflows.length) {
+    grid.innerHTML = `
+      <div id="empty-state">
+        <div class="ico">⚡</div>
+        <h3>Nenhum workflow ainda</h3>
+        <p>Crie seu primeiro workflow para começar<br>a mapear processos e sistemas.</p>
+      </div>
+      <div class="wf-new" onclick="openNewWF()">
+        <div class="wf-new-icon">+</div>
+        <div class="wf-new-label">Novo workflow</div>
+      </div>`;
+    return;
+  }
+
+  const statusLabel = {dev:'Em desenvolvimento', val:'Validado', sup:'Superado'};
+  const cards = filtered.map(wf => `
+    <div class="wf-card" onclick="openWorkflow(${JSON.stringify(wf).replace(/"/g,'&quot;')})">
+      <div class="wf-card-top">
+        <div>
+          <div class="wf-card-name">${esc(wf.name)}</div>
+          ${wf.desc ? `<div class="wf-card-desc" style="margin-top:5px">${esc(wf.desc)}</div>` : ''}
+        </div>
+        <div class="wf-actions" onclick="event.stopPropagation()">
+          <button class="wf-act" onclick="openEditWF('${wf.id}')" title="Editar">✎</button>
+          <button class="wf-act" onclick="duplicateWF('${wf.id}')" title="Duplicar">⎘</button>
+          <button class="wf-act danger" onclick="confirmDeleteWF('${wf.id}')" title="Excluir">🗑</button>
+        </div>
+      </div>
+      <div class="wf-card-meta">
+        <span class="wf-badge ${wf.status||'dev'}">${statusLabel[wf.status||'dev']}</span>
+        <span class="wf-date">${formatDate(wf.updatedAt||wf.createdAt)}</span>
+      </div>
     </div>`).join('');
+
+  grid.innerHTML = cards + `
+    <div class="wf-new" onclick="openNewWF()">
+      <div class="wf-new-icon">+</div>
+      <div class="wf-new-label">Novo workflow</div>
+    </div>`;
 }
 
-function shapePreviewSVG(t) {
-  const shapes = {
-    rect:'<rect x="2" y="4" width="28" height="16" rx="2" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    oval:'<rect x="2" y="4" width="28" height="16" rx="8" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    circle:'<circle cx="16" cy="12" r="10" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    diamond:'<polygon points="16,2 30,12 16,22 2,12" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    hexagon:'<polygon points="8,4 24,4 32,12 24,20 8,20 0,12" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    star:'<polygon points="16,2 19,10 28,10 21,15 24,23 16,18 8,23 11,15 4,10 13,10" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    parallelogram:'<polygon points="6,4 32,4 26,20 0,20" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-    cloud:'<ellipse cx="16" cy="14" rx="14" ry="9" fill="'+t.bgLight+'" stroke="'+t.borderLight+'" stroke-width="1.5"/>',
-  };
-  return '<svg width="32" height="24" viewBox="0 0 32 24">'+(shapes[t.shape]||shapes.rect)+'</svg>';
+// ─── Utils ────────────────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+}
+function toast(msg, dur=2500) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
 }
 
-function openNewTipo() {
-  editingTipoId = null;
-  fillTipoForm({ ...DEFAULT_TIPO, id:'', name:'' });
-  document.getElementById('tipo-box-title').textContent = 'Novo tipo visual';
-  document.getElementById('tp-del-btn').style.display = 'none';
-  document.getElementById('tipo-panel').classList.add('open');
+// ─── Workflow CRUD ─────────────────────────────────────────────────────────────
+function openNewWF() {
+  document.getElementById('wf-edit-id').value = '';
+  document.getElementById('wf-name').value = '';
+  document.getElementById('wf-desc').value = '';
+  pickStatus('dev');
+  document.getElementById('dlg-wf-title').textContent = 'Novo workflow';
+  document.getElementById('dlg-wf').classList.add('open');
+  setTimeout(()=>document.getElementById('wf-name').focus(), 100);
 }
 
-function openEditTipo(id) {
-  const t = tipos.find(x=>x.id===id);
-  if (!t) return;
-  editingTipoId = id;
-  fillTipoForm(t);
-  document.getElementById('tipo-box-title').textContent = 'Editar tipo: ' + t.name;
-  document.getElementById('tp-del-btn').style.display = id==='default' ? 'none' : '';
-  document.getElementById('tipo-panel').classList.add('open');
+function openEditWF(id) {
+  const wf = workflows.find(w=>w.id===id);
+  if (!wf) return;
+  document.getElementById('wf-edit-id').value = id;
+  document.getElementById('wf-name').value = wf.name||'';
+  document.getElementById('wf-desc').value = wf.desc||'';
+  pickStatus(wf.status||'dev');
+  document.getElementById('dlg-wf-title').textContent = 'Editar workflow';
+  document.getElementById('dlg-wf').classList.add('open');
+  setTimeout(()=>document.getElementById('wf-name').focus(), 100);
 }
 
-function closeTipoPanel() {
-  document.getElementById('tipo-panel').classList.remove('open');
-  editingTipoId = null;
-}
+function closeDlgWF() { document.getElementById('dlg-wf').classList.remove('open'); }
 
-function fillTipoForm(t) {
-  document.getElementById('tp-id').value = t.id||'';
-  document.getElementById('tp-name').value = t.name||'';
-  document.getElementById('tp-shape').value = t.shape||'rect';
-  document.getElementById('tp-w').value = t.w||180;
-  document.getElementById('tp-h').value = t.h||0;
-  // Shape buttons
-  document.querySelectorAll('.shape-opt').forEach(el=>el.classList.toggle('on',el.dataset.shape===(t.shape||'rect')));
-  // Colors
-  setColorPair('tp-bg-light', t.bgLight||'#ffffff');
-  setColorPair('tp-bg-dark',  t.bgDark||'#17171b');
-  setColorPair('tp-border-light', t.borderLight||'#e0e0e0');
-  setColorPair('tp-border-dark',  t.borderDark||'#2a2a35');
-  document.getElementById('tp-border-w').value = t.borderW||1.5;
-  // Title
-  document.getElementById('tp-title-font').value   = t.titleFont||"'DM Sans',sans-serif";
-  document.getElementById('tp-title-size').value   = t.titleSize||12;
-  document.getElementById('tp-title-weight').value = t.titleWeight||'600';
-  document.getElementById('tp-title-align').value = t.titleAlign||'auto';
-  setColorPair('tp-title-light', t.titleLight||'#1a1916');
-  setColorPair('tp-title-dark',  t.titleDark||'#e8e8ec');
-  // Fields visibility
-  document.getElementById('tp-show-area').checked = t.showArea!==false;
-  document.getElementById('tp-show-sta').checked  = t.showSta!==false;
-  document.getElementById('tp-show-amb').checked  = t.showAmb!==false;
-  document.getElementById('tp-show-dev').checked  = !!t.showDev;
-  document.getElementById('tp-show-desc').checked = !!t.showDesc;
-  // Field font
-  document.getElementById('tp-field-font').value = t.fieldFont||"'DM Mono',monospace";
-  document.getElementById('tp-field-size').value = t.fieldSize||9;
-  setColorPair('tp-field-light', t.fieldLight||'#9a9890');
-  setColorPair('tp-field-dark',  t.fieldDark||'#55556a');
-}
-
-function setColorPair(id, val) {
-  const el = document.getElementById(id);
-  const txt = document.getElementById(id+'-txt');
-  if (el) el.value = val;
-  if (txt) txt.value = val;
-}
-
-function syncColor(id, val) {
-  const el = document.getElementById(id);
-  if (el && /^#[0-9a-fA-F]{6}$/.test(val)) el.value = val;
-}
-
-function pickShape(shape, el) {
-  document.getElementById('tp-shape').value = shape;
-  document.querySelectorAll('.shape-opt').forEach(e=>e.classList.remove('on'));
-  el.classList.add('on');
-}
-
-function readTipoForm() {
-  return {
-    id: document.getElementById('tp-id').value || 't'+Date.now(),
-    name: document.getElementById('tp-name').value.trim() || 'Sem nome',
-    shape: document.getElementById('tp-shape').value,
-    w: Number(document.getElementById('tp-w').value)||180,
-    h: Number(document.getElementById('tp-h').value)||0,
-    bgLight: document.getElementById('tp-bg-light').value,
-    bgDark:  document.getElementById('tp-bg-dark').value,
-    borderLight: document.getElementById('tp-border-light').value,
-    borderDark:  document.getElementById('tp-border-dark').value,
-    borderW: Number(document.getElementById('tp-border-w').value)||1.5,
-    titleFont:   document.getElementById('tp-title-font').value,
-    titleSize:   Number(document.getElementById('tp-title-size').value)||12,
-    titleWeight: document.getElementById('tp-title-weight').value,
-    titleAlign:  document.getElementById('tp-title-align').value || 'auto',
-    titleLight: document.getElementById('tp-title-light').value,
-    titleDark:  document.getElementById('tp-title-dark').value,
-    showArea: document.getElementById('tp-show-area').checked,
-    showSta:  document.getElementById('tp-show-sta').checked,
-    showAmb:  document.getElementById('tp-show-amb').checked,
-    showDev:  document.getElementById('tp-show-dev').checked,
-    showDesc: document.getElementById('tp-show-desc').checked,
-    fieldFont: document.getElementById('tp-field-font').value,
-    fieldSize: Number(document.getElementById('tp-field-size').value)||9,
-    fieldLight: document.getElementById('tp-field-light').value,
-    fieldDark:  document.getElementById('tp-field-dark').value,
-  };
-}
-
-
-function duplicateTipo() {
-  const t = readTipoForm();
-  const newTipo = {
-    ...t,
-    id: 't' + Date.now(),
-    name: t.name + ' (cópia)',
-  };
-  tipos.push(newTipo);
-  saveTiposLocal();
-  renderTiposList();
-  fillTipoSelect();
-  // Open the new duplicate for editing
-  closeTipoPanel();
-  setTimeout(() => openEditTipo(newTipo.id), 150);
-}
-
-
-function applyTipoPreview() {
-  // Instantly re-render the node being edited to preview the tipo
-  const nodeEl = document.querySelector('.node.editing');
-  if (!nodeEl || !editId) return;
-  const node = canvas.nodes.find(n=>{
-    const m = modules.find(x=>x.id===n.mid);
-    return m && m.id===editId;
+function pickStatus(s) {
+  document.getElementById('wf-status').value = s;
+  document.querySelectorAll('.status-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.s===s);
   });
-  if (!node) return;
-  // Temporarily apply selected tipo
-  const tipoId = document.getElementById('ep-tipo').value;
-  const m = modules.find(x=>x.id===editId);
-  if (m) {
-    const orig = m.tipo;
-    m.tipo = tipoId;
-    renderCanvas();
-    // Re-add editing class
-    const updatedEl = document.getElementById('node-'+node.id);
-    if (updatedEl) updatedEl.classList.add('editing');
+}
+
+async function saveWF() {
+  const name = document.getElementById('wf-name').value.trim();
+  if (!name) { alert('Informe o nome do workflow.'); return; }
+  const editId = document.getElementById('wf-edit-id').value;
+  const now = new Date().toISOString();
+
+  if (editId) {
+    const idx = workflows.findIndex(w=>w.id===editId);
+    if (idx>=0) {
+      workflows[idx] = {...workflows[idx],
+        name, desc:document.getElementById('wf-desc').value,
+        status:document.getElementById('wf-status').value,
+        updatedAt:now
+      };
+    }
+    toast('Workflow atualizado ✓');
+  } else {
+    const wf = {
+      id: 'wf_' + Date.now(),
+      name, desc:document.getElementById('wf-desc').value,
+      status:document.getElementById('wf-status').value,
+      createdAt:now, updatedAt:now
+    };
+    workflows.unshift(wf);
+    toast('Workflow criado ✓');
   }
-}
 
-async function saveTipo() {
-  const t = readTipoForm();
-  if (!t.name) { alert('Dê um nome ao tipo.'); return; }
-  const idx = tipos.findIndex(x=>x.id===t.id);
-  if (idx>=0) tipos[idx] = t; else tipos.push(t);
-  saveTiposLocal();
-  closeTipoPanel();
-  renderTiposList();
-  fillTipoSelect();
-  renderCanvas();
-  setStatus('loading','Salvando tipo...');
-  await saveTiposToSheets();
-  setStatus('ok', modules.length+' módulos · tipo salvo');
-  setTimeout(()=>setStatus('ok', modules.length+' módulos'), 2000);
-}
-
-async function deleteTipo() {
-  if (editingTipoId==='default') return;
-  if (!confirm('Excluir este tipo? Os módulos que o usam voltarão ao padrão.')) return;
-  tipos = tipos.filter(t=>t.id!==editingTipoId);
-  modules.forEach(m=>{ if(m.tipo===editingTipoId) m.tipo='default'; });
-  saveTiposLocal();
-  closeTipoPanel();
-  renderTiposList();
-  fillTipoSelect();
-  renderCanvas();
-  await saveTiposToSheets();
-}
-
-function fillTipoSelect() {
-  const sel = document.getElementById('ep-tipo');
-  if (!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = tipos.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
-  sel.value = cur || 'default';
-}
-
-
-
-// ── Viewport: Pan & Zoom ──────────────────────────────────────────────────────
-function applyVP() {
-  const t = document.getElementById('cv-transform');
-  if (t) t.style.transform = `translate(${vp.x}px,${vp.y}px) scale(${vp.scale})`;
-  const zl = document.getElementById('zoom-level');
-  if (zl) zl.textContent = Math.round(vp.scale*100)+'%';
-  // Update svg size and position
-  renderEdges();
-}
-
-function zoomAt(cx, cy, factor) {
-  const newScale = Math.min(3, Math.max(0.1, vp.scale * factor));
-  const sf = newScale / vp.scale;
-  vp.x = cx - sf*(cx - vp.x);
-  vp.y = cy - sf*(cy - vp.y);
-  vp.scale = newScale;
-  applyVP();
+  closeDlgWF();
   saveLocal();
+  renderGrid();
+  await saveWorkflowsToSheets();
 }
 
-function zoomIn()  { const c=cwCenter(); zoomAt(c.x,c.y,1.25); }
-function zoomOut() { const c=cwCenter(); zoomAt(c.x,c.y,0.8); }
-
-function cwCenter() {
-  const cw = document.getElementById('cw').getBoundingClientRect();
-  return {x: cw.width/2, y: cw.height/2};
-}
-
-function zoomFit() {
-  if (!canvas.nodes.length) { vp={x:0,y:0,scale:1}; applyVP(); return; }
-  const cw = document.getElementById('cw');
-  const W = cw.offsetWidth - 80, H = cw.offsetHeight - 80;
-  const nw = settings.nw||180, nh = 80;
-  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
-  canvas.nodes.forEach(n => {
-    minX=Math.min(minX,n.x); minY=Math.min(minY,n.y);
-    maxX=Math.max(maxX,n.x+nw); maxY=Math.max(maxY,n.y+nh);
-  });
-  const rangeX=maxX-minX, rangeY=maxY-minY;
-  const scaleX=W/(rangeX||1), scaleY=H/(rangeY||1);
-  vp.scale = Math.min(scaleX, scaleY, 1.5);
-  vp.x = (W - rangeX*vp.scale)/2 + 40 - minX*vp.scale;
-  vp.y = (H - rangeY*vp.scale)/2 + 40 - minY*vp.scale;
-  applyVP();
+async function duplicateWF(id) {
+  const wf = workflows.find(w=>w.id===id);
+  if (!wf) return;
+  const now = new Date().toISOString();
+  const copy = {...wf, id:'wf_'+Date.now(), name:wf.name+' (cópia)', status:'dev', createdAt:now, updatedAt:now};
+  workflows.unshift(copy);
   saveLocal();
+  renderGrid();
+  toast('Workflow duplicado ✓');
+  await saveWorkflowsToSheets();
 }
 
-function togglePan() {
-  tool = tool==='pan' ? 'sel' : 'pan';
-  document.body.classList.toggle('tool-pan', tool==='pan');
-  const btn = document.getElementById('pan-btn');
-  if (btn) btn.style.background = tool==='pan' ? 'var(--accent-dim)' : '';
-  document.getElementById('tbtn-sel').classList.toggle('on', tool==='sel');
-  document.getElementById('tbtn-con').classList.toggle('on', false);
-}
-
-// Mouse wheel zoom
-document.getElementById('cw').addEventListener('wheel', e=>{
-  e.preventDefault();
-  const rect = document.getElementById('cw').getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  const cy = e.clientY - rect.top;
-  zoomAt(cx, cy, e.deltaY < 0 ? 1.1 : 0.9);
-}, {passive:false});
-
-// Pan with mouse drag on canvas background
-const cvWrap = document.getElementById('cv-wrap');
-cvWrap.addEventListener('mousedown', e=>{
-  if (tool!=='pan') return;
-  if (e.target.closest('.node,.ntb-btn,.edge-del,.node-actions')) return;
-  isPanning=true;
-  panStart={x:e.clientX, y:e.clientY};
-  panOrigin={x:vp.x, y:vp.y};
-  document.body.classList.add('panning');
-  e.preventDefault();
-});
-document.addEventListener('mousemove', e=>{
-  if (!isPanning) return;
-  vp.x = panOrigin.x + (e.clientX-panStart.x);
-  vp.y = panOrigin.y + (e.clientY-panStart.y);
-  applyVP();
-});
-document.addEventListener('mouseup', e=>{
-  if (isPanning) { isPanning=false; document.body.classList.remove('panning'); saveLocal(); }
-});
-
-// Also pan with middle mouse button (regardless of tool)
-document.getElementById('cw').addEventListener('mousedown', e=>{
-  if (e.button!==1) return;
-  isPanning=true;
-  panStart={x:e.clientX, y:e.clientY};
-  panOrigin={x:vp.x, y:vp.y};
-  e.preventDefault();
-});
-
-// Touch: pinch-to-zoom + pan
-let touches={}, lastPinchDist=0;
-cvWrap.addEventListener('touchstart', e=>{
-  Array.from(e.touches).forEach(t=>touches[t.identifier]={x:t.clientX,y:t.clientY});
-  if(e.touches.length===2){
-    const t0=e.touches[0],t1=e.touches[1];
-    lastPinchDist=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY);
-  }
-},{passive:true});
-cvWrap.addEventListener('touchmove', e=>{
-  if(e.touches.length===2){
-    const t0=e.touches[0],t1=e.touches[1];
-    const dist=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY);
-    const factor=dist/lastPinchDist;
-    lastPinchDist=dist;
-    const cx=(t0.clientX+t1.clientX)/2, cy=(t0.clientY+t1.clientY)/2;
-    const rect=document.getElementById('cw').getBoundingClientRect();
-    zoomAt(cx-rect.left,cy-rect.top,factor);
-  }
-},{passive:true});
-
-
-// ── Grid snap ──────────────────────────────────────────────────────────────
-function toggleSnap() {
-  settings.snap = !settings.snap;
-  applySnap();
-  saveLocal();
-}
-
-function setGridSize(g) {
-  settings.gridSize = g;
-  document.querySelectorAll('.grid-sz-btn').forEach(b=>{
-    b.classList.toggle('on', Number(b.dataset.g)===g);
-  });
-  // Update grid dot pattern
-  document.getElementById('cw').style.backgroundSize = g+'px '+g+'px';
-  saveLocal();
-}
-
-function applySnap() {
-  const tog = document.getElementById('snap-tog');
-  const knob = document.getElementById('snap-knob');
-  const row = document.getElementById('snap-size-row');
-  if (tog) { tog.style.background = settings.snap ? 'var(--accent)' : 'var(--border2)'; }
-  if (knob) knob.style.transform = settings.snap ? 'translateX(14px)' : 'none';
-  if (row) row.style.opacity = settings.snap ? '1' : '.4';
-  // Update grid size buttons
-  document.querySelectorAll('.grid-sz-btn').forEach(b=>{
-    b.classList.toggle('on', Number(b.dataset.g)===settings.gridSize);
-  });
-  // Update canvas grid size
-  const cw = document.getElementById('cw');
-  if (cw) cw.style.backgroundSize = settings.gridSize+'px '+settings.gridSize+'px';
-}
-
-function snapToGrid(v) {
-  if (!settings.snap) return v;
-  return Math.round(v / settings.gridSize) * settings.gridSize;
-}
-
-
-// ── Module sidebar menu ───────────────────────────────────────────────────────
-let menuModId = null;
-
-
-function askDeleteMod(e, mid) {
-  e.stopPropagation();
-  e.preventDefault();
-  const m = modules.find(x=>x.id===mid);
-  if (!m) return;
-  document.getElementById('del-name').textContent = m.name;
-  document.getElementById('dlg-del').dataset.delId = mid;
+let pendingDeleteId = null;
+function confirmDeleteWF(id) {
+  const wf = workflows.find(w=>w.id===id);
+  if (!wf) return;
+  pendingDeleteId = id;
+  document.getElementById('del-wf-name').textContent = wf.name;
   document.getElementById('dlg-del').classList.add('open');
-}
-
-function showModMenu(e, mid) {
-  e.stopPropagation();
-  menuModId = mid;
-  const menu = document.getElementById('mod-menu');
-  menu.classList.add('open');
-
-  // Position near click
-  const x = e.clientX, y = e.clientY;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const mw = 170, mh = 90;
-  menu.style.left = Math.min(x, vw-mw-8) + 'px';
-  menu.style.top  = Math.min(y, vh-mh-8) + 'px';
-}
-
-function closeModMenu() {
-  document.getElementById('mod-menu').classList.remove('open');
-  menuModId = null;
-}
-
-function modMenuAction(action) {
-  closeModMenu();
-  if (action === 'canvas') {
-    // Add to canvas center
-    const already = canvas.nodes.find(n=>n.mid===menuModId);
-    if (already) return;
-    const w = document.getElementById('cw');
-    canvas.nodes.push({id:'n'+Date.now(), mid:menuModId, x:w.offsetWidth/2-90, y:w.offsetHeight/2-35});
-    saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
-  } else if (action === 'delete') {
-    const m = modules.find(x=>x.id===menuModId);
-    if (!m) return;
-    document.getElementById('del-name').textContent = m.name;
-    document.getElementById('dlg-del').dataset.delId = menuModId;
-    document.getElementById('dlg-del').classList.add('open');
-  }
-}
-
-// Close menu on outside click
-document.addEventListener('click', (e)=>{
-  const menu = document.getElementById('mod-menu');
-  if (menu && !menu.contains(e.target)) closeModMenu();
-});
-
-
-// ── Conn Type Editor ──────────────────────────────────────────────────────────
-let editingConnId = null;
-
-function openNewConn() {
-  editingConnId = null;
-  document.getElementById('cp-id').value = '';
-  document.getElementById('cp-name').value = '';
-  document.getElementById('cp-desc').value = '';
-  document.getElementById('cp-color').value = '#2455c7';
-  document.getElementById('cp-color-txt').value = '#2455c7';
-  document.getElementById('cp-width').value = 2;
-  document.getElementById('cp-style').value = 'Contínua';
-  document.getElementById('cp-arrow').value = 'end';
-  document.getElementById('conn-panel-title').textContent = 'Novo tipo de conexão';
-  document.getElementById('cp-del-btn').style.display = 'none';
-  document.getElementById('conn-panel').style.display = 'flex';
-  updateConnPreview();
-}
-
-function openEditConn(e, id) {
-  e.stopPropagation();
-  const ct = connTypes.find(c=>c.id===id); if(!ct) return;
-  editingConnId = id;
-  document.getElementById('cp-id').value = id;
-  document.getElementById('cp-name').value = ct.name||'';
-  document.getElementById('cp-desc').value = ct.desc||'';
-  document.getElementById('cp-color').value = ct.color||'#2455c7';
-  document.getElementById('cp-color-txt').value = ct.color||'#2455c7';
-  document.getElementById('cp-width').value = ct.width||2;
-  document.getElementById('cp-style').value = ct.style||'Contínua';
-  document.getElementById('cp-arrow').value = ct.arrow||'end';
-  document.getElementById('conn-panel-title').textContent = 'Editar: '+ct.name;
-  document.getElementById('cp-del-btn').style.display = '';
-  document.getElementById('conn-panel').style.display = 'flex';
-  updateConnPreview();
-}
-
-function closeConnPanel() {
-  document.getElementById('conn-panel').style.display = 'none';
-  editingConnId = null;
-}
-
-function updateConnPreview() {
-  const color = document.getElementById('cp-color').value;
-  const width = document.getElementById('cp-width').value;
-  const style = document.getElementById('cp-style').value;
-  const arrow = document.getElementById('cp-arrow').value;
-
-  const path = document.getElementById('cp-prev-path');
-  if (!path) return;
-
-  const dash = style==='Tracejada' ? `${width*4} ${width*3}` : style==='Pontilhada' ? `${width} ${width*4}` : '';
-  path.setAttribute('stroke', color);
-  path.setAttribute('stroke-width', width);
-  path.setAttribute('stroke-dasharray', dash);
-  path.setAttribute('marker-end', arrow==='end'||arrow==='both' ? 'url(#prev-end)' : '');
-  path.setAttribute('marker-start', arrow==='both' ? 'url(#prev-start)' : '');
-
-  // Update marker colors
-  document.querySelectorAll('#cp-preview marker path').forEach(p=>p.setAttribute('stroke',color));
-}
-
-// Live preview on input change
-['cp-color','cp-width','cp-style','cp-arrow'].forEach(id=>{
-  const el = document.getElementById(id);
-  if(el) el.addEventListener('input', updateConnPreview);
-  if(el) el.addEventListener('change', updateConnPreview);
-});
-document.getElementById('cp-color')?.addEventListener('input', e=>{
-  document.getElementById('cp-color-txt').value = e.target.value;
-  updateConnPreview();
-});
-
-function saveConnType() {
-  const id = document.getElementById('cp-id').value || 'ct'+Date.now();
-  const ct = {
-    id,
-    name:  document.getElementById('cp-name').value.trim() || 'Sem nome',
-    desc:  document.getElementById('cp-desc').value,
-    color: document.getElementById('cp-color').value,
-    width: Number(document.getElementById('cp-width').value)||2,
-    style: document.getElementById('cp-style').value,
-    arrow: document.getElementById('cp-arrow').value,
+  document.getElementById('del-confirm-btn').onclick = async () => {
+    workflows = workflows.filter(w=>w.id!==pendingDeleteId);
+    document.getElementById('dlg-del').classList.remove('open');
+    saveLocal();
+    renderGrid();
+    toast('Workflow excluído');
+    await saveWorkflowsToSheets();
   };
-  const idx = connTypes.findIndex(c=>c.id===id);
-  if(idx>=0) connTypes[idx]=ct; else connTypes.push(ct);
-  if(!selConn) selConn=ct.id;
-  closeConnPanel();
-  renderSidebar();
-  renderEdges();
-  saveLocal();
-  postSheet({action:'saveConnTypes', connTypes});
 }
 
-function deleteConnType() {
-  if(connTypes.length<=1){alert('Mantenha ao menos um tipo.');return;}
-  if(!confirm('Excluir este tipo? Conexões com ele serão removidas.'))return;
-  connTypes=connTypes.filter(c=>c.id!==editingConnId);
-  canvas.edges=canvas.edges.filter(e=>e.cid!==editingConnId);
-  if(selConn===editingConnId) selConn=connTypes[0]?.id;
-  closeConnPanel();
-  renderSidebar(); renderEdges(); updateChips(); saveLocal();
-  postSheet({action:'saveConnTypes', connTypes});
+// ─── Open workflow ─────────────────────────────────────────────────────────────
+function openWorkflow(wf) {
+  // Update URL hash
+  location.hash = wf.id;
+  // Store active workflow
+  localStorage.setItem('aw_active_wf', JSON.stringify(wf));
+  // Redirect to workflow editor
+  location.href = 'editor.html#' + wf.id;
 }
 
-// ── Edge menu ─────────────────────────────────────────────────────────────────
-function edgeMenuAction(action) {
-  const menu = document.getElementById('edge-menu');
-  const eid = menu.dataset.eid;
-  menu.classList.remove('open');
-  if (action==='disconnect') removeEdge(eid);
-}
-
-
-
-// Show edge delete buttons on proximity
-document.getElementById('cw').addEventListener('mousemove', function(e) {
-  const rect = this.getBoundingClientRect();
-  // Convert mouse to canvas space
-  const mx = (e.clientX - rect.left - vp.x) / vp.scale;
-  const my = (e.clientY - rect.top  - vp.y) / vp.scale;
-  document.querySelectorAll('.edge-del').forEach(btn => {
-    const bx = parseFloat(btn.dataset.mx);
-    const by = parseFloat(btn.dataset.my);
-    const dist = Math.sqrt((mx-bx)**2 + (my-by)**2);
-    btn.classList.toggle('visible', dist < 40);
-  });
-});
-document.getElementById('cw').addEventListener('mouseleave', function() {
-  document.querySelectorAll('.edge-del').forEach(btn => btn.classList.remove('visible'));
+// Close dialogs on overlay click
+document.querySelectorAll('.dlg-overlay').forEach(dlg => {
+  dlg.addEventListener('click', e => { if(e.target===dlg) dlg.classList.remove('open'); });
 });
 
-
+// Keyboard: ESC closes dialogs
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') document.querySelectorAll('.dlg-overlay.open').forEach(d=>d.classList.remove('open'));
+  if (e.key==='Enter' && document.getElementById('dlg-wf').classList.contains('open')) saveWF();
+});
 
 init();
 </script>
-<iframe name="_aw_sync_frame" style="display:none" aria-hidden="true"></iframe>
 </body>
 </html>
