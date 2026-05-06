@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.56</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.57</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -307,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.56</div>
+      <div id="logo-ver">v1.57</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -765,7 +765,8 @@ select.tfi { cursor:pointer; }
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const SHEET_ID   = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4mvK7fnaKnAGEeE96XxBnBcP_MywkIYTCq4yawxhXNy1CXGPoOpCqPXec6zV8xB_Q/exec';
-const MODS_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
+const MODS_CSV      = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
+const MODS_JSON_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=ModulosJSON`;
 const CONN_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es`;
 const CANVAS_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Canvas`;
 const TIPOS_CSV       = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tipos`;
@@ -914,9 +915,11 @@ async function init() {
 
   try {
     // Load modules and conn types from Sheets
-    [modules, connTypes] = await Promise.all([loadModules(), loadConnTypes()]);
-    // Merge default conn fields if missing
-    connTypes = connTypes.map(ct=>({width:2,arrow:'end',...ct}));
+    // Try JSON blob first (most reliable), fall back to CSV
+    const [csvMods, csvConns] = await Promise.all([loadModules(), loadConnTypes()]);
+    const jsonMods = await loadModulesFromJSON();
+    modules = jsonMods || csvMods;
+    connTypes = csvConns.map(ct=>({width:2,arrow:'end',...ct}));
 
     // Load connTypes JSON from Sheets (overrides CSV if available)
     try { await loadConnTypesFromSheets(); } catch(e) {}
@@ -1374,7 +1377,9 @@ async function saveMod(){
   window.dirty=false; closeEP(true);
   renderSidebar(); renderCanvas();
   setStatus('loading','Salvando...');
+  // Save individual module AND full modules JSON for reliable sync
   await postSheet({action:'saveModule',...mod});
+  await postSheet({action:'saveModules', modules});
   setStatus('ok', modules.length+' módulos · salvo ✓');
   setTimeout(()=>setStatus('ok', modules.length+' módulos · conectado'), 3000);
 }
@@ -1422,6 +1427,7 @@ async function dlgDel(yes){
   closeEP(true); saveLocal(); schedSave();
   renderSidebar(); renderCanvas(); updateChips();
   await postSheet({action:'deleteModule',id});
+  await postSheet({action:'saveModules', modules});
 }
 
 // ─── New module ───────────────────────────────────────────────────────────────
@@ -1508,6 +1514,27 @@ async function loadConnTypesFromSheets() {
     connTypes = parsed.map(ct=>({width:2,arrow:'end',...ct}));
     return true;
   } catch(e) { return false; }
+}
+
+
+async function loadModulesFromJSON() {
+  try {
+    const r = await fetch(MODS_JSON_CSV + '&t=' + Date.now());
+    if (!r.ok) return null;
+    const txt = await r.text();
+    if (!txt || txt.includes('<!DOCTYPE')) return null;
+    const lines = txt.trim().split('\n');
+    if (lines.length < 2) return null;
+    const raw = lines[1].replace(/^"|"$/g,'').replace(/""/g,'"').trim();
+    if (!raw || !raw.startsWith('[')) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || !parsed.length) return null;
+    return parsed;
+  } catch(e) { return null; }
+}
+
+async function saveModulesToSheets() {
+  await postSheet({action:'saveModules', modules});
 }
 
 async function loadTiposFromSheets() {
