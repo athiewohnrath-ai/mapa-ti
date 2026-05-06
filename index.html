@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.57</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.58</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -292,6 +292,58 @@ select.tfi { cursor:pointer; }
   pointer-events:auto;
 }
 .edge-del:hover { transform:translate(-50%,-50%) scale(1.2); }
+
+/* ── Viewport / Canvas infinito ── */
+#cv-wrap {
+  position:absolute; inset:0;
+  overflow:hidden;
+  cursor:default;
+}
+#cv-transform {
+  position:absolute;
+  top:0; left:0;
+  transform-origin:0 0;
+  will-change:transform;
+}
+#esvg {
+  position:absolute;
+  top:0; left:0;
+  width:100000px; height:100000px;
+  pointer-events:none;
+  overflow:visible;
+}
+#cv {
+  position:absolute;
+  top:0; left:0;
+  width:100000px; height:100000px;
+}
+#cw { overflow:hidden; }
+
+/* Zoom controls */
+#zoom-ctrl {
+  position:absolute;
+  bottom:60px; right:14px;
+  display:flex; flex-direction:column; gap:4px;
+  z-index:50;
+}
+.zoom-btn {
+  width:32px; height:32px;
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:8px; cursor:pointer;
+  font-size:14px; font-weight:600;
+  color:var(--text2); display:flex;
+  align-items:center; justify-content:center;
+  box-shadow:var(--shadow);
+  transition:all .15s;
+}
+.zoom-btn:hover { background:var(--bg3); color:var(--text); }
+#zoom-level {
+  font-size:9px; text-align:center;
+  color:var(--text3); font-family:'DM Mono',monospace;
+  padding:2px 0;
+}
+.tool-pan #cv-wrap { cursor:grab; }
+.tool-pan.panning #cv-wrap { cursor:grabbing; }
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
@@ -307,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.57</div>
+      <div id="logo-ver">v1.58</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -389,8 +441,21 @@ select.tfi { cursor:pointer; }
 
 <!-- Canvas -->
 <div id="cw">
-  <svg id="esvg"></svg>
-  <div id="cv"></div>
+  <div id="cv-wrap">
+    <div id="cv-transform">
+      <svg id="esvg"></svg>
+      <div id="cv"></div>
+    </div>
+  </div>
+  
+<div id="zoom-ctrl">
+  <button class="zoom-btn" onclick="zoomIn()" title="Zoom in">+</button>
+  <div id="zoom-level">100%</div>
+  <button class="zoom-btn" onclick="zoomOut()" title="Zoom out">−</button>
+  <button class="zoom-btn" onclick="zoomFit()" title="Ajustar tudo" style="font-size:11px">⊡</button>
+  <button class="zoom-btn" id="pan-btn" onclick="togglePan()" title="Mão / Mover" style="font-size:14px">✋</button>
+</div>
+
   <div id="cbanner">Clique em outro módulo para conectar — ESC para cancelar</div>
   <div id="chips">
     <div class="chip" id="chip-mods">—</div>
@@ -777,13 +842,15 @@ let modules = [], connTypes = [], canvas = {nodes:[], edges:[]};
 let settings = {dark:false, nw:180, snap:false, gridSize:26};
 let cfg = {devs:['Totvs','Salesforce','Microsoft','AW Interno','Externo'], ambs:['Local','Nuvem','Servidor AW','Híbrido','SaaS'], sts:['Ativo','Em implantação','Protótipo','Legado','Descontinuado','Planejado']};
 let tool='sel', connFrom=null, selConn=null;
+let vp = {x:0, y:0, scale:1}; // viewport: pan + zoom
+let isPanning=false, panStart={x:0,y:0}, panOrigin={x:0,y:0};
 let drag=null, dragOff={x:0,y:0};
 let editId=null; window.dirty=false;
 let _saveTimer=null;
 
 // ─── Persist local ────────────────────────────────────────────────────────────
 function saveLocal() {
-  try { localStorage.setItem('aw_v22', JSON.stringify({canvas, settings, cfg})); } catch(e){}
+  try { localStorage.setItem('aw_v22', JSON.stringify({canvas, settings, cfg, vp})); } catch(e){}
 }
 function loadLocal() {
   try {
@@ -793,7 +860,7 @@ function loadLocal() {
       const c = p.canvas||{nodes:[],edges:[]};
       // Migrate old moduleId -> mid
       if(c.nodes) c.nodes = c.nodes.map(n=>({...n, mid: n.mid||n.moduleId}));
-      canvas=c; settings={...settings,...(p.settings||{})}; cfg={...cfg,...(p.cfg||{})};
+      canvas=c; settings={...settings,...(p.settings||{})}; cfg={...cfg,...(p.cfg||{})}; if(p.vp) vp={...vp,...p.vp};
     }
   } catch(e){}
 }
@@ -949,7 +1016,7 @@ async function init() {
     if (!canvas.nodes.length) seedCanvas();
   }
 
-  renderSidebar(); renderCanvas(); updateChips();
+  renderSidebar(); renderCanvas(); updateChips(); applyVP();
 }
 
 function defaultConns() {
@@ -1058,7 +1125,9 @@ document.getElementById('cw').addEventListener('drop',e=>{
   e.preventDefault();
   const mid=e.dataTransfer.getData('mid'); if(!mid) return;
   const r=document.getElementById('cw').getBoundingClientRect();
-  canvas.nodes.push({id:'n'+Date.now(),mid,x:e.clientX-r.left-90,y:e.clientY-r.top-35});
+  const dropX = (e.clientX-r.left - vp.x) / vp.scale - 90;
+  const dropY = (e.clientY-r.top  - vp.y) / vp.scale - 35;
+  canvas.nodes.push({id:'n'+Date.now(),mid,x:dropX,y:dropY});
   saveLocal(); schedSave(); renderCanvas(); renderSidebar(); updateChips();
 });
 
@@ -1106,7 +1175,7 @@ function renderCanvas() {
       if(tool==='con'){startConn(node.id);return;}
       drag=node.id;
       const r=el.getBoundingClientRect();
-      dragOff={x:ev.clientX-r.left,y:ev.clientY-r.top};
+      dragOff={x:(ev.clientX-r.left)/vp.scale,y:(ev.clientY-r.top)/vp.scale};
       ev.preventDefault();
     });
     cv.appendChild(el);
@@ -1118,8 +1187,8 @@ document.addEventListener('mousemove',e=>{
   if(!drag) return;
   const w=document.getElementById('cw').getBoundingClientRect();
   const n=canvas.nodes.find(x=>x.id===drag); if(!n) return;
-  n.x=Math.max(0,e.clientX-w.left-dragOff.x);
-  n.y=Math.max(0,e.clientY-w.top-dragOff.y);
+  n.x=Math.max(0,(e.clientX-w.left-dragOff.x*vp.scale - vp.x)/vp.scale);
+  n.y=Math.max(0,(e.clientY-w.top -dragOff.y*vp.scale - vp.y)/vp.scale);
   const el=document.getElementById('node-'+drag);
   if(el){el.style.left=n.x+'px';el.style.top=n.y+'px';}
   renderEdges();
@@ -1140,7 +1209,8 @@ document.addEventListener('mouseup', e=>{
   drag=null;
   // Handle connection click
   if(!connFrom) return;
-  const target = e.target.closest('.node');
+  const target = e.target.closest('.node') || e.target.closest('.node-actions')?.closest('.node');
+  if (!target) { const t2 = e.target; }
   if(!target) return;
   const tid = target.id.replace('node-','');
   if(tid===connFrom) return;
@@ -1182,7 +1252,7 @@ function nEdge(id, tx, ty) {
 function renderEdges() {
   const svg=document.getElementById('esvg');
   const w=document.getElementById('cw');
-  svg.setAttribute('width',w.offsetWidth); svg.setAttribute('height',w.offsetHeight);
+  // SVG covers infinite canvas, no need to resize
   const sid=s=>(s||'').replace(/[^a-z0-9]/gi,'');
   const sid2=s=>(s||'').replace(/[^a-z0-9]/gi,'');
   const defs = connTypes.map(ct => {
@@ -1425,7 +1495,7 @@ async function dlgDel(yes){
     return f&&t;
   });
   closeEP(true); saveLocal(); schedSave();
-  renderSidebar(); renderCanvas(); updateChips();
+  renderSidebar(); renderCanvas(); updateChips(); applyVP();
   await postSheet({action:'deleteModule',id});
   await postSheet({action:'saveModules', modules});
 }
@@ -1456,7 +1526,7 @@ async function doRefresh(){
     if(!connTypes.length) connTypes=defaultConns();
     selConn=connTypes[0]?.id;
     setStatus('ok',modules.length+' módulos');
-    renderSidebar(); renderCanvas(); updateChips();
+    renderSidebar(); renderCanvas(); updateChips(); applyVP();
   }catch(e){setStatus('err','Erro ao atualizar');}
 }
 
@@ -1780,6 +1850,124 @@ function fillTipoSelect() {
 }
 
 
+
+// ── Viewport: Pan & Zoom ──────────────────────────────────────────────────────
+function applyVP() {
+  const t = document.getElementById('cv-transform');
+  if (t) t.style.transform = `translate(${vp.x}px,${vp.y}px) scale(${vp.scale})`;
+  const zl = document.getElementById('zoom-level');
+  if (zl) zl.textContent = Math.round(vp.scale*100)+'%';
+  // Update svg size and position
+  renderEdges();
+}
+
+function zoomAt(cx, cy, factor) {
+  const newScale = Math.min(3, Math.max(0.1, vp.scale * factor));
+  const sf = newScale / vp.scale;
+  vp.x = cx - sf*(cx - vp.x);
+  vp.y = cy - sf*(cy - vp.y);
+  vp.scale = newScale;
+  applyVP();
+  saveLocal();
+}
+
+function zoomIn()  { const c=cwCenter(); zoomAt(c.x,c.y,1.25); }
+function zoomOut() { const c=cwCenter(); zoomAt(c.x,c.y,0.8); }
+
+function cwCenter() {
+  const cw = document.getElementById('cw').getBoundingClientRect();
+  return {x: cw.width/2, y: cw.height/2};
+}
+
+function zoomFit() {
+  if (!canvas.nodes.length) { vp={x:0,y:0,scale:1}; applyVP(); return; }
+  const cw = document.getElementById('cw');
+  const W = cw.offsetWidth - 80, H = cw.offsetHeight - 80;
+  const nw = settings.nw||180, nh = 80;
+  let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+  canvas.nodes.forEach(n => {
+    minX=Math.min(minX,n.x); minY=Math.min(minY,n.y);
+    maxX=Math.max(maxX,n.x+nw); maxY=Math.max(maxY,n.y+nh);
+  });
+  const rangeX=maxX-minX, rangeY=maxY-minY;
+  const scaleX=W/(rangeX||1), scaleY=H/(rangeY||1);
+  vp.scale = Math.min(scaleX, scaleY, 1.5);
+  vp.x = (W - rangeX*vp.scale)/2 + 40 - minX*vp.scale;
+  vp.y = (H - rangeY*vp.scale)/2 + 40 - minY*vp.scale;
+  applyVP();
+  saveLocal();
+}
+
+function togglePan() {
+  tool = tool==='pan' ? 'sel' : 'pan';
+  document.body.classList.toggle('tool-pan', tool==='pan');
+  const btn = document.getElementById('pan-btn');
+  if (btn) btn.style.background = tool==='pan' ? 'var(--accent-dim)' : '';
+  document.getElementById('tbtn-sel').classList.toggle('on', tool==='sel');
+  document.getElementById('tbtn-con').classList.toggle('on', false);
+}
+
+// Mouse wheel zoom
+document.getElementById('cw').addEventListener('wheel', e=>{
+  e.preventDefault();
+  const rect = document.getElementById('cw').getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  zoomAt(cx, cy, e.deltaY < 0 ? 1.1 : 0.9);
+}, {passive:false});
+
+// Pan with mouse drag on canvas background
+const cvWrap = document.getElementById('cv-wrap');
+cvWrap.addEventListener('mousedown', e=>{
+  if (tool!=='pan') return;
+  if (e.target.closest('.node,.ntb-btn,.edge-del,.node-actions')) return;
+  isPanning=true;
+  panStart={x:e.clientX, y:e.clientY};
+  panOrigin={x:vp.x, y:vp.y};
+  document.body.classList.add('panning');
+  e.preventDefault();
+});
+document.addEventListener('mousemove', e=>{
+  if (!isPanning) return;
+  vp.x = panOrigin.x + (e.clientX-panStart.x);
+  vp.y = panOrigin.y + (e.clientY-panStart.y);
+  applyVP();
+});
+document.addEventListener('mouseup', e=>{
+  if (isPanning) { isPanning=false; document.body.classList.remove('panning'); saveLocal(); }
+});
+
+// Also pan with middle mouse button (regardless of tool)
+document.getElementById('cw').addEventListener('mousedown', e=>{
+  if (e.button!==1) return;
+  isPanning=true;
+  panStart={x:e.clientX, y:e.clientY};
+  panOrigin={x:vp.x, y:vp.y};
+  e.preventDefault();
+});
+
+// Touch: pinch-to-zoom + pan
+let touches={}, lastPinchDist=0;
+cvWrap.addEventListener('touchstart', e=>{
+  Array.from(e.touches).forEach(t=>touches[t.identifier]={x:t.clientX,y:t.clientY});
+  if(e.touches.length===2){
+    const t0=e.touches[0],t1=e.touches[1];
+    lastPinchDist=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY);
+  }
+},{passive:true});
+cvWrap.addEventListener('touchmove', e=>{
+  if(e.touches.length===2){
+    const t0=e.touches[0],t1=e.touches[1];
+    const dist=Math.hypot(t1.clientX-t0.clientX,t1.clientY-t0.clientY);
+    const factor=dist/lastPinchDist;
+    lastPinchDist=dist;
+    const cx=(t0.clientX+t1.clientX)/2, cy=(t0.clientY+t1.clientY)/2;
+    const rect=document.getElementById('cw').getBoundingClientRect();
+    zoomAt(cx-rect.left,cy-rect.top,factor);
+  }
+},{passive:true});
+
+
 // ── Grid snap ──────────────────────────────────────────────────────────────
 function toggleSnap() {
   settings.snap = !settings.snap;
@@ -1995,8 +2183,9 @@ function edgeMenuAction(action) {
 // Show edge delete buttons on proximity
 document.getElementById('cw').addEventListener('mousemove', function(e) {
   const rect = this.getBoundingClientRect();
-  const mx = e.clientX - rect.left;
-  const my = e.clientY - rect.top;
+  // Convert mouse to canvas space
+  const mx = (e.clientX - rect.left - vp.x) / vp.scale;
+  const my = (e.clientY - rect.top  - vp.y) / vp.scale;
   document.querySelectorAll('.edge-del').forEach(btn => {
     const bx = parseFloat(btn.dataset.mx);
     const by = parseFloat(btn.dataset.my);
