@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.45</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.46</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -266,6 +266,25 @@ select.tfi { cursor:pointer; }
 .node.shape-parallelogram { clip-path:polygon(10% 0%,100% 0%,90% 100%,0% 100%); border-radius:0; }
 .node.shape-cloud { border-radius:50% 50% 50% 50%/40% 40% 60% 60%; }
 
+
+/* ── Edge delete buttons ── */
+.edge-del {
+  position:absolute;
+  width:18px; height:18px;
+  background:var(--red);
+  color:#fff;
+  border:none; border-radius:50%;
+  font-size:11px; font-weight:700;
+  cursor:pointer;
+  display:none;
+  align-items:center; justify-content:center;
+  z-index:20;
+  line-height:1;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
+  transform:translate(-50%,-50%);
+}
+#cv:hover .edge-del { display:flex; }
+.edge-del:hover { transform:translate(-50%,-50%) scale(1.2); }
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 </style>
@@ -281,7 +300,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.45</div>
+      <div id="logo-ver">v1.46</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1128,6 +1147,28 @@ function renderEdges() {
     <text x="${(f.x+t.x)/2}" y="${(f.y+t.y)/2-35}" text-anchor="middle" font-size="10" fill="${ct.color}" opacity=".65" font-family="DM Mono,monospace">${esc(ct.name)}</text>`;
   }).join('');
   svg.innerHTML=`<defs>${defs}</defs>${paths}`;
+
+  // Add HTML delete buttons for each edge (reliable click targets)
+  document.querySelectorAll('.edge-del').forEach(e=>e.remove());
+  const cw = document.getElementById('cw');
+  canvas.edges.forEach(edge => {
+    const f=nCenter(edge.from), t=nCenter(edge.to);
+    if(!f.x && !f.y) return;
+    const mx = (f.x+t.x)/2;
+    const my = (f.y+t.y)/2 - 14;
+    const btn = document.createElement('button');
+    btn.className = 'edge-del';
+    btn.title = 'Remover conexão';
+    btn.textContent = '×';
+    btn.style.left = mx+'px';
+    btn.style.top  = my+'px';
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      canvas.edges = canvas.edges.filter(x=>x.id!==edge.id);
+      saveLocal(); schedSave(); renderEdges(); updateChips();
+    };
+    cw.appendChild(btn);
+  });
 }
 
 function connMenu(id, e) {
@@ -1847,14 +1888,6 @@ function edgeMenuAction(action) {
   if (action==='disconnect') removeEdge(eid);
 }
 
-
-// SVG edge click handler
-document.getElementById('esvg').addEventListener('click', function(e) {
-  const path = e.target.closest('.edge-path');
-  if (!path) return;
-  const eid = path.dataset.eid;
-  if (eid) connMenu(eid, e);
-});
 
 init();
 </script>
