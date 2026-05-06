@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workflow · Athié Wohnrath v1.62</title>
+<title>Workflow · Athié Wohnrath v1.63</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Workflow</div>
         <div id="logo-sub" id="wf-subtitle">—</div>
       </div>
-      <div id="logo-ver">v1.62</div>
+      <div id="logo-ver">v1.63</div>
       <button onclick="goHome()" style="background:none;border:1px solid var(--border2);border-radius:7px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;margin-left:6px">← Workflows</button>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
@@ -993,6 +993,7 @@ function showChip(txt, persist) {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
+  loadActiveWorkflow(); // Must be first — sets activeWorkflow and canvas
   loadLocal();
   loadTipos();
   applySett();
@@ -1000,11 +1001,17 @@ async function init() {
 
   try {
     // Load modules and conn types from Sheets
-    // Try JSON blob first (most reliable), fall back to CSV
-    const [csvMods, csvConns] = await Promise.all([loadModules(), loadConnTypes()]);
+    // Load workflow-specific data only — no global fallback
     const jsonMods = await loadModulesFromJSON();
-    modules = jsonMods || csvMods;
-    connTypes = csvConns.map(ct=>({width:2,arrow:'end',...ct}));
+    if (jsonMods !== null) {
+      modules = jsonMods; // Has data in wf-specific sheet
+    } else {
+      modules = []; // New workflow — start empty
+    }
+    // Load conn types (wf-specific, fallback to empty)
+    let csvConns = [];
+    try { csvConns = await loadConnTypes(); } catch(e){}
+    connTypes = csvConns.length ? csvConns.map(ct=>({width:2,arrow:'end',...ct})) : defaultConns();
 
     // Load connTypes JSON from Sheets (overrides CSV if available)
     try { await loadConnTypesFromSheets(); } catch(e) {}
