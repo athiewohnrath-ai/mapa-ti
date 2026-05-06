@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.50</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.51</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -307,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.50</div>
+      <div id="logo-ver">v1.51</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1141,11 +1141,20 @@ function nCenter(id) {
   const w = el ? el.offsetWidth  : (settings.nw||180);
   const h = el ? el.offsetHeight : 60;
   return {x: node.x + w/2, y: node.y + h/2, w, h};
-};
-  const r=el.getBoundingClientRect();
-  return {x:r.left-w.left+r.width/2,y:r.top-w.top+r.height/2,w:r.width,h:r.height};
 }
 
+function nEdge(id, tx, ty) {
+  const c=nCenter(id);
+  if(!c || (!c.x && !c.y)) return {x:0,y:0};
+  const w2 = (c.w||settings.nw||180)/2 + 4;
+  const h2 = (c.h||60)/2 + 4;
+  const dx=tx-c.x, dy=ty-c.y;
+  const len=Math.sqrt(dx*dx+dy*dy);
+  if(len<1) return c;
+  const ux=dx/len, uy=dy/len;
+  const t=Math.min(w2/Math.max(Math.abs(ux),0.001), h2/Math.max(Math.abs(uy),0.001));
+  return {x:c.x+ux*t, y:c.y+uy*t};
+}
 function renderEdges() {
   const svg=document.getElementById('esvg');
   const w=document.getElementById('cw');
@@ -1700,7 +1709,7 @@ async function saveTipo() {
   setTimeout(()=>setStatus('ok', modules.length+' módulos'), 2000);
 }
 
-async function deleteTipo() {
+async async function deleteTipo() {
   if (editingTipoId==='default') return;
   if (!confirm('Excluir este tipo? Os módulos que o usam voltarão ao padrão.')) return;
   tipos = tipos.filter(t=>t.id!==editingTipoId);
@@ -1951,18 +1960,6 @@ document.getElementById('cw').addEventListener('mouseleave', function() {
 });
 
 
-function nEdge(id, tx, ty) {
-  const c=nCenter(id);
-  if(!c || (!c.x && !c.y)) return {x:0,y:0};
-  const w2 = (c.w||settings.nw||180)/2 + 4;
-  const h2 = (c.h||60)/2 + 4;
-  const dx=tx-c.x, dy=ty-c.y;
-  const len=Math.sqrt(dx*dx+dy*dy);
-  if(len<1) return c;
-  const ux=dx/len, uy=dy/len;
-  const t=Math.min(w2/Math.max(Math.abs(ux),0.001), h2/Math.max(Math.abs(uy),0.001));
-  return {x:c.x+ux*t, y:c.y+uy*t};
-}
 
 init();
 </script>
