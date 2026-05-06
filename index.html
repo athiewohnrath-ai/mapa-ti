@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.48</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.49</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -307,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.48</div>
+      <div id="logo-ver">v1.49</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -1138,7 +1138,7 @@ function nCenter(id) {
   const w=document.getElementById('cw').getBoundingClientRect();
   if(!el) return {x:0,y:0};
   const r=el.getBoundingClientRect();
-  return {x:r.left-w.left+r.width/2,y:r.top-w.top+r.height/2};
+  return {x:r.left-w.left+r.width/2,y:r.top-w.top+r.height/2,w:r.width,h:r.height};
 }
 
 function renderEdges() {
@@ -1155,7 +1155,9 @@ function renderEdges() {
   const lw=1.8;
   const paths=canvas.edges.map(edge=>{
     const ct=connTypes.find(c=>c.id===edge.cid)||connTypes[0]; if(!ct) return '';
-    const f=nCenter(edge.from),t=nCenter(edge.to);
+    const cf2=nCenter(edge.from), ct2=nCenter(edge.to);
+    const f=nEdge(edge.from, ct2.x, ct2.y);
+    const t=nEdge(edge.to, cf2.x, cf2.y);
     const mx=(f.x+t.x)/2,my=(f.y+t.y)/2-28;
     const dash=ct.style==='Tracejada'?`stroke-dasharray="${lw*4} ${lw*3}"`:ct.style==='Pontilhada'?`stroke-dasharray="${lw} ${lw*4}"`:'';
     return `<path d="M${f.x},${f.y} Q${mx},${my} ${t.x},${t.y}" fill="none" stroke="${ct.color}" stroke-width="${ct.width||lw}" opacity=".85" ${dash} marker-end="url(#ae${sid(ct.id)})" marker-start="${(ct.arrow||'end')==='both'?'url(#as'+sid(ct.id)+')':''}" style="pointer-events:stroke;cursor:pointer" data-eid="${edge.id}" class="edge-path"/>
@@ -1942,6 +1944,20 @@ document.getElementById('cw').addEventListener('mousemove', function(e) {
 document.getElementById('cw').addEventListener('mouseleave', function() {
   document.querySelectorAll('.edge-del').forEach(btn => btn.classList.remove('visible'));
 });
+
+
+function nEdge(id, tx, ty) {
+  const c=nCenter(id);
+  if(!c || (!c.x && !c.y)) return {x:0,y:0};
+  const w2 = (c.w||settings.nw||180)/2 + 4;
+  const h2 = (c.h||60)/2 + 4;
+  const dx=tx-c.x, dy=ty-c.y;
+  const len=Math.sqrt(dx*dx+dy*dy);
+  if(len<1) return c;
+  const ux=dx/len, uy=dy/len;
+  const t=Math.min(w2/Math.max(Math.abs(ux),0.001), h2/Math.max(Math.abs(uy),0.001));
+  return {x:c.x+ux*t, y:c.y+uy*t};
+}
 
 init();
 </script>
