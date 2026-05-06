@@ -270,20 +270,24 @@ select.tfi { cursor:pointer; }
 /* ── Edge delete buttons ── */
 .edge-del {
   position:absolute;
-  width:18px; height:18px;
+  width:20px; height:20px;
   background:var(--red);
   color:#fff;
   border:none; border-radius:50%;
-  font-size:11px; font-weight:700;
+  font-size:13px; font-weight:700;
   cursor:pointer;
-  display:none;
+  display:flex;
   align-items:center; justify-content:center;
-  z-index:20;
+  z-index:25;
   line-height:1;
-  box-shadow:0 1px 4px rgba(0,0,0,.3);
+  box-shadow:0 2px 6px rgba(0,0,0,.3);
   transform:translate(-50%,-50%);
+  opacity:0;
+  transition:opacity .2s, transform .15s;
+  pointer-events:auto;
 }
-#cv:hover .edge-del { display:flex; }
+.edge-del { display:flex; opacity:0; transition:opacity .2s; }
+#cv:hover .edge-del { opacity:1; }
 .edge-del:hover { transform:translate(-50%,-50%) scale(1.2); }
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
@@ -1148,26 +1152,28 @@ function renderEdges() {
   }).join('');
   svg.innerHTML=`<defs>${defs}</defs>${paths}`;
 
-  // Add HTML delete buttons for each edge (reliable click targets)
+  // Add delete buttons using node positions from data (not DOM)
   document.querySelectorAll('.edge-del').forEach(e=>e.remove());
-  const cw = document.getElementById('cw');
   canvas.edges.forEach(edge => {
-    const f=nCenter(edge.from), t=nCenter(edge.to);
-    if(!f.x && !f.y) return;
-    const mx = (f.x+t.x)/2;
-    const my = (f.y+t.y)/2 - 14;
+    const nFrom = canvas.nodes.find(n=>n.id===edge.from);
+    const nTo   = canvas.nodes.find(n=>n.id===edge.to);
+    if(!nFrom||!nTo) return;
+    const nw = settings.nw||180;
+    // Estimate node center from stored x,y + half width/height
+    const fx = nFrom.x + nw/2, fy = nFrom.y + 40;
+    const tx = nTo.x   + nw/2, ty = nTo.y   + 40;
+    const mx = (fx+tx)/2, my = (fy+ty)/2 - 14;
     const btn = document.createElement('button');
     btn.className = 'edge-del';
-    btn.title = 'Remover conexão';
-    btn.textContent = '×';
+    btn.innerHTML = '×';
     btn.style.left = mx+'px';
     btn.style.top  = my+'px';
-    btn.onclick = (e) => {
-      e.stopPropagation();
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
       canvas.edges = canvas.edges.filter(x=>x.id!==edge.id);
       saveLocal(); schedSave(); renderEdges(); updateChips();
-    };
-    cw.appendChild(btn);
+    });
+    document.getElementById('cv').appendChild(btn);
   });
 }
 
