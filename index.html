@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mapa de Sistemas de TI — Athié Wohnrath v1.55</title>
+<title>Mapa de Sistemas de TI — Athié Wohnrath v1.56</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -307,7 +307,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Athié Wohnrath</div>
         <div id="logo-sub">Mapa de Sistemas de TI</div>
       </div>
-      <div id="logo-ver">v1.55</div>
+      <div id="logo-ver">v1.56</div>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
   </div>
@@ -879,10 +879,13 @@ async function testSync() {
 
 async function postSheet(payload) {
   const url = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
+  console.log('[SYNC] Sending:', payload.action, payload.id||'', payload.name||'');
   try {
     await fetch(url, {mode:'no-cors'});
+    console.log('[SYNC] Request sent (no-cors, cannot confirm arrival)');
   } catch(e) {
-    console.warn('postSheet failed:', e);
+    console.error('[SYNC] Failed:', e);
+    setStatus('err', 'Erro ao sincronizar: ' + e.message);
   }
 }
 
@@ -1372,7 +1375,8 @@ async function saveMod(){
   renderSidebar(); renderCanvas();
   setStatus('loading','Salvando...');
   await postSheet({action:'saveModule',...mod});
-  setStatus('ok',modules.length+' módulos');
+  setStatus('ok', modules.length+' módulos · salvo ✓');
+  setTimeout(()=>setStatus('ok', modules.length+' módulos · conectado'), 3000);
 }
 
 function hideModule(){
