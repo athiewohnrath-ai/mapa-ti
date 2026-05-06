@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workflow · Athié Wohnrath v1.61</title>
+<title>Workflow · Athié Wohnrath v1.62</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Workflow</div>
         <div id="logo-sub" id="wf-subtitle">—</div>
       </div>
-      <div id="logo-ver">v1.61</div>
+      <div id="logo-ver">v1.62</div>
       <button onclick="goHome()" style="background:none;border:1px solid var(--border2);border-radius:7px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;margin-left:6px">← Workflows</button>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
@@ -831,8 +831,13 @@ select.tfi { cursor:pointer; }
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 const SHEET_ID   = '1kWu9OjSFVvU92YTojbxf_MBC41Sz8QACUAwzoB_pSAA';
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby4mvK7fnaKnAGEeE96XxBnBcP_MywkIYTCq4yawxhXNy1CXGPoOpCqPXec6zV8xB_Q/exec';
-const MODS_CSV      = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=M%C3%B3dulos`;
-const MODS_JSON_CSV = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=ModulosJSON`;
+// Per-workflow sheet URLs — all data scoped to active workflow
+function wfSheet(name) {
+  const wfId = activeWorkflow?.id;
+  const prefix = wfId ? 'WF_'+wfId.replace(/[^a-z0-9]/gi,'_')+'_' : '';
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(prefix+name)}`;
+}
+// Legacy fallbacks (used if workflow-specific sheet doesn't exist yet)
 const CONN_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Conex%C3%B5es`;
 function getCanvasCSV(wfId) {
   const sheet = wfId && wfId!=='default' ? 'Canvas_'+wfId.replace(/[^a-z0-9]/gi,'_') : 'Canvas';
@@ -856,8 +861,12 @@ let _saveTimer=null;
 // ─── Persist local ────────────────────────────────────────────────────────────
 function saveLocal() {
   try {
-    const key = activeWorkflow ? 'aw_wf_' + activeWorkflow.id : 'aw_v22';
-    localStorage.setItem(key, JSON.stringify({canvas, settings, cfg, vp}));
+    // Save canvas+vp per workflow, settings+cfg globally
+    if (activeWorkflow) {
+      const wfKey = 'aw_wf_' + activeWorkflow.id;
+      localStorage.setItem(wfKey, JSON.stringify({canvas, vp}));
+    }
+    localStorage.setItem('aw_v22', JSON.stringify({settings, cfg}));
   } catch(e){}
 }
 function loadLocal() {
@@ -892,7 +901,7 @@ function parseCSV(txt) {
 }
 
 async function loadModules() {
-  const r = await fetch(MODS_CSV);
+  const r = await fetch(wfSheet('Modulos')+'&t='+Date.now());
   const rows = parseCSV(await r.text());
   return rows.map((row,i)=>({
     id:   row['ID']||row['id']||'m'+i,
@@ -909,7 +918,8 @@ async function loadModules() {
 }
 
 async function loadConnTypes() {
-  const r = await fetch(CONN_CSV);
+  const connUrl = wfSheet('Conexoes');
+  const r = await fetch(connUrl+'&t='+Date.now());
   const rows = parseCSV(await r.text());
   return rows.map((row,i)=>({
     id:   row['ID']||row['id']||'ct'+i,
@@ -924,7 +934,7 @@ async function loadConnTypes() {
 
 async function loadCanvasFromSheets() {
   try {
-    const r = await fetch(CANVAS_CSV+'&t='+Date.now());
+    const r = await fetch(wfSheet('Canvas')+'&t='+Date.now());
     const txt = await r.text();
     const lines = txt.trim().split('\n');
     if (lines.length >= 2) {
@@ -1456,8 +1466,8 @@ async function saveMod(){
   renderSidebar(); renderCanvas();
   setStatus('loading','Salvando...');
   // Save individual module AND full modules JSON for reliable sync
-  await postSheet({action:'saveModule',...mod});
-  await postSheet({action:'saveModules', modules});
+  await postSheet({action:'saveModule', ...mod, wfId: activeWorkflow?.id});
+  await postSheet({action:'saveModules', modules, wfId: activeWorkflow?.id});
   setStatus('ok', modules.length+' módulos · salvo ✓');
   setTimeout(()=>setStatus('ok', modules.length+' módulos · conectado'), 3000);
 }
@@ -1505,7 +1515,7 @@ async function dlgDel(yes){
   closeEP(true); saveLocal(); schedSave();
   renderSidebar(); renderCanvas(); updateChips(); applyVP();
   await postSheet({action:'deleteModule',id});
-  await postSheet({action:'saveModules', modules});
+  await postSheet({action:'saveModules', modules, wfId: activeWorkflow?.id});
 }
 
 // ─── New module ───────────────────────────────────────────────────────────────
@@ -1579,7 +1589,7 @@ function loadTipos() {
 
 async function loadConnTypesFromSheets() {
   try {
-    const r = await fetch(CONNTYPES_JSON_CSV + '&t=' + Date.now());
+    const r = await fetch(wfSheet('ConnTypes')+'&t='+Date.now());
     if (!r.ok) return false;
     const txt = await r.text();
     if (!txt || txt.includes('<!DOCTYPE')) return false;
@@ -1597,7 +1607,7 @@ async function loadConnTypesFromSheets() {
 
 async function loadModulesFromJSON() {
   try {
-    const r = await fetch(MODS_JSON_CSV + '&t=' + Date.now());
+    const r = await fetch(wfSheet('ModulosJSON')+'&t='+Date.now());
     if (!r.ok) return null;
     const txt = await r.text();
     if (!txt || txt.includes('<!DOCTYPE')) return null;
@@ -1612,12 +1622,12 @@ async function loadModulesFromJSON() {
 }
 
 async function saveModulesToSheets() {
-  await postSheet({action:'saveModules', modules});
+  await postSheet({action:'saveModules', modules, wfId: activeWorkflow?.id});
 }
 
 async function loadTiposFromSheets() {
   try {
-    const r = await fetch(TIPOS_CSV + '&t=' + Date.now());
+    const r = await fetch(wfSheet('Tipos')+'&t='+Date.now());
     if (!r.ok) return false;
     const txt = await r.text();
     if (!txt || txt.includes('<!DOCTYPE')) return false; // not a CSV
@@ -1998,7 +2008,10 @@ function loadActiveWorkflow() {
     }
     if (activeWorkflow) {
       const sub = document.getElementById('wf-subtitle');
-      if (sub) sub.textContent = activeWorkflow.name;
+      if (sub) {
+        const statusEmoji = {dev:'🟡', val:'🟢', sup:'⚫'}[activeWorkflow.status||'dev'] || '🟡';
+        sub.textContent = statusEmoji + ' ' + activeWorkflow.name;
+      }
       // Load workflow-specific canvas (NEVER fall back to global canvas)
       const lsKey = 'aw_wf_' + activeWorkflow.id;
       const stored2 = localStorage.getItem(lsKey);
@@ -2204,7 +2217,7 @@ function saveConnType() {
   renderSidebar();
   renderEdges();
   saveLocal();
-  postSheet({action:'saveConnTypes', connTypes});
+  postSheet({action:'saveConnTypes', connTypes, wfId: activeWorkflow?.id});
 }
 
 function deleteConnType() {
@@ -2215,7 +2228,7 @@ function deleteConnType() {
   if(selConn===editingConnId) selConn=connTypes[0]?.id;
   closeConnPanel();
   renderSidebar(); renderEdges(); updateChips(); saveLocal();
-  postSheet({action:'saveConnTypes', connTypes});
+  postSheet({action:'saveConnTypes', connTypes, wfId: activeWorkflow?.id});
 }
 
 // ── Edge menu ─────────────────────────────────────────────────────────────────
