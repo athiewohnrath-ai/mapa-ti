@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workflow · Athié Wohnrath v1.66</title>
+<title>Workflow · Athié Wohnrath v1.67</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Workflow</div>
         <div id="logo-sub" id="wf-subtitle">—</div>
       </div>
-      <div id="logo-ver">v1.66</div>
+      <div id="logo-ver">v1.67</div>
       <button onclick="goHome()" style="background:none;border:1px solid var(--border2);border-radius:7px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;margin-left:6px">← Workflows</button>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
@@ -1196,8 +1196,7 @@ function renderCanvas() {
     el.style.cssText = `left:${node.x}px;top:${node.y}px;position:absolute;width:${t.w||180}px;background:${bg};border:${t.borderW||1.5}px solid ${border};padding:11px 13px;`;
     if(t.h) el.style.minHeight = t.h+'px';
 
-        // Auto-center title if no tags visible
-    const hasFields = [t.showAmb&&m.amb, t.showSta&&m.sta, t.showDev&&m.dev, t.showArea&&m.area, t.showDesc&&m.desc].some(Boolean);
+    // Auto-center title if no fields visible
     const align = t.titleAlign==='auto' ? (hasFields ? 'left' : 'center') : (t.titleAlign||'left');
     el.innerHTML=`<div class="ntop" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'};padding-bottom:${hasFields?'9px':'0'};border-bottom:${hasFields?'0.5px solid rgba(0,0,0,0.08)':'none'};margin-bottom:${hasFields?'8px':'0'}"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC};text-align:${align}">${esc(m.name)}</div></div>
       ${hasFields ? `<div style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC};line-height:1.7;text-align:${align}">${fieldRows.join('<br>')}</div>` : ''}
