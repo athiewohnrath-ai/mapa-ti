@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workflow · Athié Wohnrath v1.64</title>
+<title>Workflow · Athié Wohnrath v1.65</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Workflow</div>
         <div id="logo-sub" id="wf-subtitle">—</div>
       </div>
-      <div id="logo-ver">v1.64</div>
+      <div id="logo-ver">v1.65</div>
       <button onclick="goHome()" style="background:none;border:1px solid var(--border2);border-radius:7px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;margin-left:6px">← Workflows</button>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
@@ -964,14 +964,19 @@ async function testSync() {
 }
 
 async function postSheet(payload) {
+  if (!activeWorkflow) {
+    console.error('[SYNC] No active workflow! Cannot save.');
+    setStatus('err', 'Erro: nenhum workflow ativo');
+    return;
+  }
   const url = SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
-  console.log('[SYNC] Sending:', payload.action, payload.id||'', payload.name||'');
+  console.log('[SYNC]', payload.action, '| wfId:', payload.wfId||'none', '| name:', payload.name||payload.modules?.length||'');
   try {
     await fetch(url, {mode:'no-cors'});
-    console.log('[SYNC] Request sent (no-cors, cannot confirm arrival)');
+    console.log('[SYNC] ✓ sent');
   } catch(e) {
-    console.error('[SYNC] Failed:', e);
-    setStatus('err', 'Erro ao sincronizar: ' + e.message);
+    console.error('[SYNC] ✗ failed:', e);
+    setStatus('err', 'Erro ao sincronizar');
   }
 }
 
