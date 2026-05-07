@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workflow · Athié Wohnrath v1.63</title>
+<title>Workflow · Athié Wohnrath v1.64</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Workflow</div>
         <div id="logo-sub" id="wf-subtitle">—</div>
       </div>
-      <div id="logo-ver">v1.63</div>
+      <div id="logo-ver">v1.64</div>
       <button onclick="goHome()" style="background:none;border:1px solid var(--border2);border-radius:7px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;margin-left:6px">← Workflows</button>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
@@ -2015,10 +2015,10 @@ function loadActiveWorkflow() {
     }
     if (activeWorkflow) {
       const sub = document.getElementById('wf-subtitle');
-      if (sub) {
-        const statusEmoji = {dev:'🟡', val:'🟢', sup:'⚫'}[activeWorkflow.status||'dev'] || '🟡';
-        sub.textContent = statusEmoji + ' ' + activeWorkflow.name;
-      }
+      const logoText = document.getElementById('logo-text');
+      if (logoText) logoText.textContent = activeWorkflow.name;
+      const statusEmoji = {dev:'🟡', val:'🟢', sup:'⚫'}[activeWorkflow.status||'dev'] || '🟡';
+      if (sub) sub.textContent = statusEmoji + ' ' + ({dev:'Em desenvolvimento', val:'Validado', sup:'Superado'}[activeWorkflow.status||'dev']||'');
       // Load workflow-specific canvas (NEVER fall back to global canvas)
       const lsKey = 'aw_wf_' + activeWorkflow.id;
       const stored2 = localStorage.getItem(lsKey);
