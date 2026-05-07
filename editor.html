@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workflow · Athié Wohnrath v1.65</title>
+<title>Workflow · Athié Wohnrath v1.66</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
 
@@ -359,7 +359,7 @@ select.tfi { cursor:pointer; }
         <div id="logo-text">Workflow</div>
         <div id="logo-sub" id="wf-subtitle">—</div>
       </div>
-      <div id="logo-ver">v1.65</div>
+      <div id="logo-ver">v1.66</div>
       <button onclick="goHome()" style="background:none;border:1px solid var(--border2);border-radius:7px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;font-family:inherit;margin-left:6px">← Workflows</button>
     </div>
     <div id="status-bar"><div class="sdot loading" id="sdot"></div><span id="slabel">Carregando...</span></div>
@@ -1175,13 +1175,20 @@ function renderCanvas() {
     const titleC = isDark ? t.titleDark : t.titleLight;
     const fieldC = isDark ? t.fieldDark : t.fieldLight;
 
-    const tags = [
-      t.showAmb && m.amb  ? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.amb)}</span>` : '',
-      t.showSta && m.sta  ? `<span class="ntag ${sc}" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px">${esc(m.sta)}</span>` : '',
-      t.showDev && m.dev  ? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.dev)}</span>` : '',
-      t.showArea && m.area? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC}">${esc(m.area.split(',')[0].trim())}</span>` : '',
-      t.showDesc && m.desc? `<span class="ntag" style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC};max-width:100%;overflow:hidden;text-overflow:ellipsis">${esc(m.desc.substring(0,40))}</span>` : '',
-    ].join('');
+    // Build field lines for option-3 style (plain text, separator + compact)
+    const fieldParts = [
+      t.showArea && m.area ? esc(m.area.split(',')[0].trim()) : '',
+      t.showAmb  && m.amb  ? esc(m.amb)  : '',
+      t.showSta  && m.sta  ? esc(m.sta)  : '',
+      t.showDev  && m.dev  ? esc(m.dev)  : '',
+      t.showDesc && m.desc ? esc(m.desc.substring(0,36)) : '',
+    ].filter(Boolean);
+    // Split into rows of 2
+    const fieldRows = [];
+    for (let i=0;i<fieldParts.length;i+=2) {
+      fieldRows.push(fieldParts.slice(i,i+2).join(' · '));
+    }
+    const hasFields = fieldRows.length > 0;
 
     const el=document.createElement('div');
     const shapeClass = t.shape && t.shape!=='rect' ? 'node shape-'+t.shape : 'node';
@@ -1192,8 +1199,8 @@ function renderCanvas() {
         // Auto-center title if no tags visible
     const hasFields = [t.showAmb&&m.amb, t.showSta&&m.sta, t.showDev&&m.dev, t.showArea&&m.area, t.showDesc&&m.desc].some(Boolean);
     const align = t.titleAlign==='auto' ? (hasFields ? 'left' : 'center') : (t.titleAlign||'left');
-    el.innerHTML=`<div class="ntop" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'}"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC};text-align:${align}">${esc(m.name)}</div></div>
-      <div class="ntags" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'}">${tags}</div>
+    el.innerHTML=`<div class="ntop" style="justify-content:${align==='center'?'center':align==='right'?'flex-end':'flex-start'};padding-bottom:${hasFields?'9px':'0'};border-bottom:${hasFields?'0.5px solid rgba(0,0,0,0.08)':'none'};margin-bottom:${hasFields?'8px':'0'}"><div class="ntitle" style="font-family:${t.titleFont};font-size:${t.titleSize}px;font-weight:${t.titleWeight};color:${titleC};text-align:${align}">${esc(m.name)}</div></div>
+      ${hasFields ? `<div style="font-family:${t.fieldFont};font-size:${t.fieldSize}px;color:${fieldC};line-height:1.7;text-align:${align}">${fieldRows.join('<br>')}</div>` : ''}
 `+`<div class="node-actions">
       <button class="ntb-btn p" onclick="startConn('${node.id}')">⟶ Conectar</button>
       <button class="ntb-btn" onclick="openEP('${m.id}','${node.id}')">✎ Editar</button>
